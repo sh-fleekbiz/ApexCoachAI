@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext.js';
 import Settings from '../settings/Settings.tsx';
+import { OnboardingTour } from '../../components/Onboarding/OnboardingTour.tsx';
 
 import styles from './Layout.module.css';
 
@@ -18,6 +19,18 @@ const Layout = () => {
   const [chats, setChats] = useState<Chat[]>([]);
   const [isLoadingChats, setIsLoadingChats] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Check if user has completed onboarding
+  useEffect(() => {
+    const hasCompletedOnboarding = localStorage.getItem('onboarding_completed');
+    if (!hasCompletedOnboarding) {
+      // Show onboarding after a short delay to allow page to load
+      setTimeout(() => {
+        setShowOnboarding(true);
+      }, 500);
+    }
+  }, []);
 
   // Fetch chats on mount
   useEffect(() => {
@@ -72,6 +85,16 @@ const Layout = () => {
     navigate('/login');
   };
 
+  const handleOnboardingComplete = () => {
+    localStorage.setItem('onboarding_completed', 'true');
+    setShowOnboarding(false);
+  };
+
+  const handleOnboardingSkip = () => {
+    localStorage.setItem('onboarding_completed', 'true');
+    setShowOnboarding(false);
+  };
+
   return (
     <div className={styles.appShell}>
       <aside className={styles.sidebar}>
@@ -123,6 +146,9 @@ const Layout = () => {
             <button className={styles.navSectionButton} onClick={() => setIsSettingsOpen(true)} type="button">
               Data & Privacy
             </button>
+            <button className={styles.navSectionButton} onClick={() => setShowOnboarding(true)} type="button">
+              Replay Tour
+            </button>
           </div>
         </nav>
         <div className={styles.sidebarFooter}>
@@ -143,6 +169,7 @@ const Layout = () => {
         <Outlet />
       </main>
       {isSettingsOpen && <Settings onClose={() => setIsSettingsOpen(false)} />}
+      {showOnboarding && <OnboardingTour onComplete={handleOnboardingComplete} onSkip={handleOnboardingSkip} />}
     </div>
   );
 };
