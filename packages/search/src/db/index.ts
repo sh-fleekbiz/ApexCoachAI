@@ -5,3 +5,5 @@ export * from './chat-repository.js';
 export * from './message-repository.js';
 export * from './meta-prompt-repository.js';
 export * from './user-settings-repository.js';
+export * from './admin-action-log-repository.js';
+export * from './white-label-settings-repository.js';
