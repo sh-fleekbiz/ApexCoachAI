@@ -179,15 +179,20 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       });
     }
 
-    const program = programRepository.getProgramById(programId);
-    if (!program) {
-      return reply.code(404).send({
-        error: 'Program not found',
-        error_message: `Program with ID ${programId} does not exist`,
-      });
-    }
+    try {
+      const program = programRepository.getProgramById(programId);
+      if (!program) {
+        return reply.code(404).send({
+          error: 'Program not found',
+          error_message: `Program with ID ${programId} does not exist`,
+        });
+      }
 
-    return program;
+      return program;
+    } catch (error) {
+      fastify.log.error(error);
+      return reply.code(500).send({ error: 'Failed to fetch program' });
+    }
   });
 
   // Create program
