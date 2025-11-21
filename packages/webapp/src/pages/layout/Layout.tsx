@@ -21,14 +21,28 @@ const Layout = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
 
+  // Helper to detect mobile devices
+  function isMobileDevice() {
+    return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|Windows Phone/i.test(navigator.userAgent);
+  }
+
   // Check if user has completed onboarding
   useEffect(() => {
     const hasCompletedOnboarding = localStorage.getItem('onboarding_completed');
     if (!hasCompletedOnboarding) {
-      // Show onboarding after a short delay to allow page to load
-      setTimeout(() => {
-        setShowOnboarding(true);
-      }, 500);
+      // Wait for page to be fully loaded and stable
+      function showTourWhenReady() {
+        // Use longer delay on mobile devices
+        const delay = isMobileDevice() ? 1200 : 500;
+        setTimeout(() => {
+          setShowOnboarding(true);
+        }, delay);
+      }
+      if (document.readyState === 'complete') {
+        showTourWhenReady();
+      } else {
+        window.addEventListener('load', showTourWhenReady, { once: true });
+      }
     }
   }, []);
 
