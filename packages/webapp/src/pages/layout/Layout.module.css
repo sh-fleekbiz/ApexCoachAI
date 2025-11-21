@@ -1,0 +1,179 @@
+.appShell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 280px;
+  background-color: #ffffff;
+  border-right: 1px solid #e5e5e5;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.sidebarHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  background-color: #000000;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  margin-right: 12px;
+}
+
+.brandName {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0;
+}
+
+.newChatButton {
+  width: 100%;
+  padding: 12px 16px;
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-bottom: 24px;
+  transition: background-color 0.2s;
+}
+
+.newChatButton:hover {
+  background-color: #333333;
+}
+
+.sidebarNav {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.navSection {
+  margin-bottom: 32px;
+}
+
+.navSectionTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 12px 0;
+}
+
+.mainContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #f5f5f4;
+  overflow: hidden;
+}
+
+.sidebarFooter {
+  margin-top: auto;
+  padding: 16px 0 0;
+  border-top: 1px solid #e0e0e0;
+}
+
+.userInfo {
+  margin-bottom: 12px;
+}
+
+.userName {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+.adminLink {
+  font-size: 12px;
+  color: #0078d4;
+  text-decoration: none;
+  margin-left: 8px;
+}
+
+.adminLink:hover {
+  text-decoration: underline;
+}
+
+.logoutButton {
+  width: 100%;
+  padding: 10px;
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.logoutButton:hover {
+  background: #d32f2f;
+}
+
+.chatsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chatItem {
+  padding: 12px;
+  background: #f5f5f5;
+  border: none;
+  border-radius: 8px;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  transition: background 0.2s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chatItem:hover {
+  background: #e0e0e0;
+}
+
+.loadingChats,
+.noChats {
+  padding: 12px;
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+}
+
+.navSectionButton {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  color: #666;
+}
+
+.navSectionButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

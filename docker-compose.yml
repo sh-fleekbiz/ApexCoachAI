@@ -1,0 +1,76 @@
+version: "3.9"
+
+services:
+  search:
+    build:
+      context: .
+      dockerfile: packages/search/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+    volumes:
+      - .:/workspace:rw
+    working_dir: /workspace
+    command: [ "npm", "run", "dev", "--workspace=search" ]
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/health" ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  indexer:
+    build:
+      context: .
+      dockerfile: packages/indexer/Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: development
+    volumes:
+      - .:/workspace:rw
+    working_dir: /workspace
+    command: [ "npm", "run", "dev", "--workspace=indexer" ]
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3001/health" ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    depends_on:
+      - search
+
+  webapp:
+    build:
+      context: .
+      dockerfile: packages/webapp/Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      NODE_ENV: development
+    volumes:
+      - .:/workspace:rw
+    working_dir: /workspace
+    command: [ "npm", "run", "dev", "--workspace=webapp", "--", "--host" ]
+    depends_on:
+      - search
+
+  chat-component:
+    build:
+      context: .
+      dockerfile: packages/chat-component/Dockerfile
+    ports:
+      - "5174:5173"
+    environment:
+      NODE_ENV: development
+    volumes:
+      - .:/workspace:rw
+    working_dir: /workspace
+    command: [ "npm", "run", "dev", "--workspace=chat-component", "--", "--host" ]
+    depends_on:
+      - search
+
+networks:
+  default:
+    name: apexcoach-ai-dev

@@ -1,0 +1,30 @@
+# Azure az webapp deployment details
+.azure
+*_env
+
+# Unit test / coverage reports
+.tap/
+packages/*/test-dist/
+
+# Environments
+.env
+.env.local
+*.env.local
+
+# NPM
+npm-debug.log*
+node_modules
+static/
+dist/
+
+# macOS
+*.DS_Store*
+
+# misc
+TODO
+/test-results/
+/playwright-report/
+/playwright/.cache/
+coverage/
+
+.github/instructions

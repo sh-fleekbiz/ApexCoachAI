@@ -1,0 +1,11 @@
+{
+  "name": "shared",
+  "version": "1.0.0",
+  "description": "Shared types for Apex Coach AI",
+  "type": "module",
+  "main": "./chat-types.js",
+  "types": "./chat-types.d.ts",
+  "exports": {
+    "./chat-types": "./chat-types.js"
+  }
+}

@@ -1,0 +1,185 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  name         String?
+  role         Role     @default(USER)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  chats              Chat[]
+  invitations        Invitation[] @relation("InvitedByUser")
+  programAssignments ProgramAssignment[]
+  usageEvents        UsageEvent[]
+  userSettings       UserSettings?
+  createdPrograms    Program[]     @relation("CreatedByUser")
+
+  @@map("users")
+}
+
+model Chat {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  title     String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages ChatMessage[]
+
+  @@index([userId])
+  @@index([updatedAt(sort: Desc)])
+  @@map("chats")
+}
+
+model ChatMessage {
+  id           Int      @id @default(autoincrement())
+  chatId       Int      @map("chat_id")
+  role         MessageRole
+  content      String
+  citationsJson String? @map("citations_json")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  @@index([chatId])
+  @@map("chat_messages")
+}
+
+model MetaPrompt {
+  id         Int      @id @default(autoincrement())
+  name       String
+  promptText String   @map("prompt_text")
+  isDefault  Boolean  @default(false) @map("is_default")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  // Relations
+  userSettings UserSettings[]
+
+  @@map("meta_prompts")
+}
+
+model Invitation {
+  id             Int           @id @default(autoincrement())
+  email          String        @unique
+  role           Role          @default(USER)
+  status         InvitationStatus @default(PENDING)
+  invitedByUserId Int          @map("invited_by_user_id")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  acceptedAt     DateTime?     @map("accepted_at")
+
+  // Relations
+  invitedByUser User @relation("InvitedByUser", fields: [invitedByUserId], references: [id], onDelete: Cascade)
+
+  @@map("invitations")
+}
+
+model Program {
+  id                Int      @id @default(autoincrement())
+  name              String
+  description       String?
+  createdAt         DateTime @default(now()) @map("created_at")
+  createdByUserId   Int      @map("created_by_user_id")
+
+  // Relations
+  createdByUser  User               @relation("CreatedByUser", fields: [createdByUserId], references: [id], onDelete: Cascade)
+  assignments     ProgramAssignment[]
+  libraryResources LibraryResource[]
+
+  @@map("programs")
+}
+
+model ProgramAssignment {
+  id        Int      @id @default(autoincrement())
+  programId Int      @map("program_id")
+  userId    Int      @map("user_id")
+  role      AssignmentRole
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([programId, userId])
+  @@map("program_assignments")
+}
+
+model UsageEvent {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  type      String
+  metaJson  String?  @map("meta_json")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("usage_events")
+}
+
+model LibraryResource {
+  id        Int      @id @default(autoincrement())
+  programId Int?     @map("program_id")
+  title     String
+  type      String
+  source    String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  program Program? @relation(fields: [programId], references: [id], onDelete: SetNull)
+
+  @@map("library_resources")
+}
+
+model UserSettings {
+  userId               Int         @id @map("user_id")
+  defaultPersonalityId Int?        @map("default_personality_id")
+  nickname             String?
+  occupation           String?
+
+  // Relations
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  defaultPersonality MetaPrompt? @relation(fields: [defaultPersonalityId], references: [id], onDelete: SetNull)
+
+  @@map("user_settings")
+}
+
+// Enums
+enum Role {
+  ADMIN
+  COACH
+  USER
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  CANCELLED
+}
+
+enum AssignmentRole {
+  COACH
+  PARTICIPANT
+}

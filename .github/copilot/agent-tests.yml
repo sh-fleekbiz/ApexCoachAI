@@ -1,0 +1,37 @@
+# GitHub Copilot Coding Agent Tests Configuration for Lawli
+tests:
+  suite: lawli-agent-tests
+  
+  legal_ai_agent_tests:
+    - name: test_eviction_agent_implementation
+      description: "Verify agent can implement eviction notice generation"
+      steps:
+        - Create eviction agent
+        - Use gpt-5.1-mini for generation
+        - Verify Texas Property Code compliance
+      expected_behavior:
+        - Uses AZURE_OPENAI_ENDPOINT from env
+        - Returns structured eviction notice
+        - Follows Texas Property Code templates
+  
+  frontend_agent_tests:
+    - name: test_react_component_creation
+      description: "Verify agent creates React components"
+      steps:
+        - Create new React component
+        - Use TypeScript strict mode
+      expected_behavior:
+        - Exports named function
+        - Uses TypeScript with no 'any' types
+
+execution:
+  auto_run: true
+  on_agent_creation: true
+  on_agent_update: true
+  schedule: "0 0 * * *"
+  
+  reporting:
+    format: junit
+    output: .github/copilot/test-results/
+    publish: true
+
