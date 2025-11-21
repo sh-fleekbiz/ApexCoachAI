@@ -175,7 +175,7 @@ const WhiteLabel: React.FC = () => {
               type="color"
               value={brandColor || '#0078D4'}
               onChange={(e) => setBrandColor(e.target.value)}
-              className="h-10 w-20 border border-gray-300 rounded cursor-pointer"
+              className="h-11 w-20 border border-gray-300 rounded cursor-pointer"
             />
             <TextField
               value={brandColor}
