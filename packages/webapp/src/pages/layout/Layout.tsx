@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext.js';
 import Settings from '../settings/Settings.tsx';
+import { OnboardingTour } from '../../components/Onboarding/OnboardingTour.tsx';
 
 import styles from './Layout.module.css';
 
@@ -18,6 +19,32 @@ const Layout = () => {
   const [chats, setChats] = useState<Chat[]>([]);
   const [isLoadingChats, setIsLoadingChats] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Helper to detect mobile devices
+  function isMobileDevice() {
+    return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|Windows Phone/i.test(navigator.userAgent);
+  }
+
+  // Check if user has completed onboarding
+  useEffect(() => {
+    const hasCompletedOnboarding = localStorage.getItem('onboarding_completed');
+    if (!hasCompletedOnboarding) {
+      // Wait for page to be fully loaded and stable
+      function showTourWhenReady() {
+        // Use longer delay on mobile devices
+        const delay = isMobileDevice() ? 1200 : 500;
+        setTimeout(() => {
+          setShowOnboarding(true);
+        }, delay);
+      }
+      if (document.readyState === 'complete') {
+        showTourWhenReady();
+      } else {
+        window.addEventListener('load', showTourWhenReady, { once: true });
+      }
+    }
+  }, []);
 
   // Fetch chats on mount
   useEffect(() => {
@@ -72,6 +99,16 @@ const Layout = () => {
     navigate('/login');
   };
 
+  const handleOnboardingComplete = () => {
+    localStorage.setItem('onboarding_completed', 'true');
+    setShowOnboarding(false);
+  };
+
+  const handleOnboardingSkip = () => {
+    localStorage.setItem('onboarding_completed', 'true');
+    setShowOnboarding(false);
+  };
+
   return (
     <div className={styles.appShell}>
       <aside className={styles.sidebar}>
@@ -123,6 +160,9 @@ const Layout = () => {
             <button className={styles.navSectionButton} onClick={() => setIsSettingsOpen(true)} type="button">
               Data & Privacy
             </button>
+            <button className={styles.navSectionButton} onClick={() => setShowOnboarding(true)} type="button">
+              Replay Tour
+            </button>
           </div>
         </nav>
         <div className={styles.sidebarFooter}>
@@ -143,6 +183,7 @@ const Layout = () => {
         <Outlet />
       </main>
       {isSettingsOpen && <Settings onClose={() => setIsSettingsOpen(false)} />}
+      {showOnboarding && <OnboardingTour onComplete={handleOnboardingComplete} onSkip={handleOnboardingSkip} />}
     </div>
   );
 };
