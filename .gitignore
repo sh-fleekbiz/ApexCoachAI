@@ -27,4 +27,4 @@ TODO
 /playwright/.cache/
 coverage/
 
-.github/instructions
+!.github/instructions/
