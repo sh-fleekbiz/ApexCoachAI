@@ -34,7 +34,10 @@ ApexCoachAI/
 - **Monorepo**: pnpm workspaces with separate webapp + search packages
 - **Frontend**: React + TypeScript (packages/webapp)
 - **Backend**: Node.js + Fastify (packages/search/src/app.ts)
-- **RAG**: Azure OpenAI (default gpt-4o-mini; target gpt-5.1-mini) + Azure AI Search
+- **RAG**: Azure OpenAI exclusively
+  - Chat: `gpt-5.1-mini`
+  - Embeddings: `text-embedding-3-small`
+  - Azure AI Search for vector search
 - **Optional Storage**: Supabase client/repositories for users, chats, messages, prompts (packages/search/src/supabase-\*.ts)
 
 ## Build & Test Commands
