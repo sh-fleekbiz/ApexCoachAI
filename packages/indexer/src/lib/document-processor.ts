@@ -13,13 +13,7 @@ export class DocumentProcessor {
 
   constructor(private logger: BaseLogger) {}
 
-  async createDocumentFromFile(
-    filename: string,
-    data: Buffer,
-    type: string,
-    category: string,
-    programId?: number,
-  ) {
+  async createDocumentFromFile(filename: string, data: Buffer, type: string, category: string, programId?: number) {
     const pages = await this.extractText(data, type);
     const contentSections = this.splitPages(filename, pages);
     const sections = await this.createSections(filename, contentSections, category, programId);

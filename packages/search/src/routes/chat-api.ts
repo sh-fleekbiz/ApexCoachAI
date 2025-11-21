@@ -53,6 +53,7 @@ const chatApi: FastifyPluginAsync = async (_fastify, _options): Promise<void> =>
       response: {
         400: { $ref: 'httpError' },
         401: { $ref: 'httpError' },
+        403: { $ref: 'httpError' },
         500: { $ref: 'httpError' },
       },
     } as const,
@@ -71,6 +72,7 @@ const chatApi: FastifyPluginAsync = async (_fastify, _options): Promise<void> =>
         if (chatId) {
           chat = chatRepository.getChatById(chatId);
           if (!chat || chat.user_id !== request.user!.id) {
+            // @ts-expect-error: 403 status code not in schema but needed for RBAC
             return reply.code(403).send({ error: 'Forbidden' });
           }
         } else {
@@ -258,6 +260,7 @@ const chatApi: FastifyPluginAsync = async (_fastify, _options): Promise<void> =>
         const error = _error as Error & { error?: any; status?: number };
         fastify.log.error(error);
         if (error.error) {
+          // @ts-expect-error: Dynamic status code handling
           return reply.code(error.status ?? 500).send(error);
         }
 

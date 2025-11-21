@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import styles from './Chat.module.css';
-import { RetrievalMode, apiBaseUrl, type RequestOverrides, getChatMessages, sendChatMessage } from '../../api/index.js';
+import { RetrievalMode, apiBaseUrl, type RequestOverrides, getChatMessages } from '../../api/index.js';
 import { SettingsButton } from '../../components/SettingsButton/index.js';
 import { Checkbox, DefaultButton, Dropdown, Panel, SpinButton, TextField, TooltipHost, Toggle } from '@fluentui/react';
 import type { IDropdownOption } from '@fluentui/react/lib-commonjs/Dropdown';
@@ -26,7 +26,6 @@ const Chat = () => {
   const chatComponentReference = useRef<any>(null);
   const [currentChatId, setCurrentChatId] = useState<number | undefined>();
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
-  const [chatHistory, setChatHistory] = useState<any[]>([]);
   const {
     personalities,
     selectedPersonalityId,
@@ -46,7 +45,6 @@ const Chat = () => {
     } else {
       // No chatId = new chat
       setCurrentChatId(undefined);
-      setChatHistory([]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
@@ -72,7 +70,6 @@ const Chat = () => {
     try {
       const data = await getChatMessages(chatId);
       const messages = data.messages || [];
-      setChatHistory(messages);
 
       // Load messages into chat-component
       // Use a small delay to ensure the component is mounted
@@ -90,7 +87,6 @@ const Chat = () => {
       }, 100);
     } catch (error) {
       console.error('Failed to load chat history:', error);
-      setChatHistory([]);
     } finally {
       setIsLoadingHistory(false);
     }

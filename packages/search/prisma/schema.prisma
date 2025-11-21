@@ -26,6 +26,7 @@ model User {
   usageEvents        UsageEvent[]
   userSettings       UserSettings?
   createdPrograms    Program[]     @relation("CreatedByUser")
+  adminActionLogs    AdminActionLog[]
 
   @@map("users")
 }
@@ -133,16 +134,24 @@ model UsageEvent {
 }
 
 model LibraryResource {
-  id        Int      @id @default(autoincrement())
-  programId Int?     @map("program_id")
-  title     String
-  type      String
-  source    String
-  createdAt DateTime @default(now()) @map("created_at")
+  id               Int      @id @default(autoincrement())
+  programId        Int?     @map("program_id")
+  title            String
+  type             String
+  source           String
+  status           String   @default("pending") // pending, processing, indexed, failed
+  durationSeconds  Int?     @map("duration_seconds")
+  transcriptJson   String?  @map("transcript_json")
+  speakerMetaJson  String?  @map("speaker_meta_json")
+  thumbnailUrl     String?  @map("thumbnail_url")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
 
   // Relations
   program Program? @relation(fields: [programId], references: [id], onDelete: SetNull)
 
+  @@index([programId])
+  @@index([status])
   @@map("library_resources")
 }
 
@@ -159,8 +168,39 @@ model UserSettings {
   @@map("user_settings")
 }
 
+model AdminActionLog {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  action      String
+  entityType  String?  @map("entity_type")
+  entityId    Int?     @map("entity_id")
+  description String?
+  metaJson    String?  @map("meta_json")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt(sort: Desc)])
+  @@map("admin_action_logs")
+}
+
+model WhiteLabelSettings {
+  id             Int      @id @default(autoincrement())
+  logoUrl        String?  @map("logo_url")
+  brandColor     String?  @map("brand_color")
+  appName        String?  @map("app_name")
+  customCss      String?  @map("custom_css")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("white_label_settings")
+}
+
 // Enums
 enum Role {
+  OWNER
   ADMIN
   COACH
   USER

@@ -12,9 +12,7 @@ export interface Invitation {
 
 export const invitationRepository = {
   createInvitation(invitation: Omit<Invitation, 'id' | 'status' | 'created_at' | 'accepted_at'>): Invitation {
-    const stmt = database.prepare(
-      'INSERT INTO invitations (email, role, invited_by_user_id) VALUES (?, ?, ?)',
-    );
+    const stmt = database.prepare('INSERT INTO invitations (email, role, invited_by_user_id) VALUES (?, ?, ?)');
     const result = stmt.run(invitation.email, invitation.role, invitation.invited_by_user_id);
     return this.getInvitationById(result.lastInsertRowid as number)!;
   },
