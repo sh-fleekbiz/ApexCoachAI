@@ -12,6 +12,7 @@ AI coding agent guide for Apex Coach AI, an AI-powered coaching and development 
 ## Business Context
 
 Apex Coach AI is a consumer-to-business (C2B) solution that enables:
+
 - **Coaches & Consultants**: Scale 1-on-1 coaching without sacrificing personalization
 - **Training Companies**: Turn course libraries into interactive learning assistants
 - **Startup Founders**: Provide consistent onboarding for growing teams

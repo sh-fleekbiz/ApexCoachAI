@@ -22,7 +22,7 @@ export function initializeDatabase() {
       email TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
       name TEXT,
-      role TEXT NOT NULL DEFAULT 'user' CHECK(role IN ('admin', 'coach', 'user')),
+      role TEXT NOT NULL DEFAULT 'user' CHECK(role IN ('owner', 'admin', 'coach', 'user')),
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `);
@@ -68,7 +68,7 @@ export function initializeDatabase() {
     CREATE TABLE IF NOT EXISTS invitations (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       email TEXT UNIQUE NOT NULL,
-      role TEXT NOT NULL DEFAULT 'user' CHECK(role IN ('admin', 'coach', 'user')),
+      role TEXT NOT NULL DEFAULT 'user' CHECK(role IN ('owner', 'admin', 'coach', 'user')),
       status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'accepted', 'expired', 'cancelled')),
       invited_by_user_id INTEGER NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -122,7 +122,13 @@ export function initializeDatabase() {
       title TEXT NOT NULL,
       type TEXT NOT NULL,
       source TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'processing', 'indexed', 'failed')),
+      duration_seconds INTEGER,
+      transcript_json TEXT,
+      speaker_meta_json TEXT,
+      thumbnail_url TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (program_id) REFERENCES programs(id) ON DELETE SET NULL
     );
   `);
@@ -139,6 +145,33 @@ export function initializeDatabase() {
     );
   `);
 
+  // Admin action logs table
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS admin_action_logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      action TEXT NOT NULL,
+      entity_type TEXT,
+      entity_id INTEGER,
+      description TEXT,
+      meta_json TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+  `);
+
+  // White label settings table
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS white_label_settings (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      logo_url TEXT,
+      brand_color TEXT,
+      app_name TEXT,
+      custom_css TEXT,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
   // Create indexes for better performance
   database.exec(`
     CREATE INDEX IF NOT EXISTS idx_chats_user_id ON chats(user_id);
@@ -146,6 +179,11 @@ export function initializeDatabase() {
     CREATE INDEX IF NOT EXISTS idx_chat_messages_chat_id ON chat_messages(chat_id);
     CREATE INDEX IF NOT EXISTS idx_chat_messages_created_at ON chat_messages(created_at);
     CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+    CREATE INDEX IF NOT EXISTS idx_library_resources_program_id ON library_resources(program_id);
+    CREATE INDEX IF NOT EXISTS idx_library_resources_status ON library_resources(status);
+    CREATE INDEX IF NOT EXISTS idx_admin_action_logs_user_id ON admin_action_logs(user_id);
+    CREATE INDEX IF NOT EXISTS idx_admin_action_logs_action ON admin_action_logs(action);
+    CREATE INDEX IF NOT EXISTS idx_admin_action_logs_created_at ON admin_action_logs(created_at DESC);
   `);
 
   console.log('Database initialized successfully');

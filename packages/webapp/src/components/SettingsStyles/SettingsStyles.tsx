@@ -54,7 +54,6 @@ export const SettingsStyles = ({ onChange }: Props) => {
           AccentDark: styleDefaults.AccentDark,
           TextColor: styleDefaults.TextColor,
           BackgroundColor: styleDefaults.BackgroundColor,
-          ForegroundColor: styleDefaults.ForegroundColor,
           FormBackgroundColor: styleDefaults.FormBackgroundColor,
           BorderRadius: '10px',
           BorderWidth: '3px',

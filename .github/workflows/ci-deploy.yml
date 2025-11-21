@@ -2,7 +2,7 @@ name: Apex Coach AI CI & Azure Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch: {}
 
 # Unified workflow combining infrastructure provisioning (azd) and static web app deployment.
@@ -13,12 +13,12 @@ on:
 #  - Optional verification step performs a lightweight availability check.
 
 permissions:
-  id-token: write   # Required for federated Azure auth when using OIDC
+  id-token: write # Required for federated Azure auth when using OIDC
   contents: read
 
 concurrency:
   group: apexcoach-ai-ci-deploy
-  cancel-in-progress: false  # Allow overlapping manual infra runs; keep it relaxed.
+  cancel-in-progress: false # Allow overlapping manual infra runs; keep it relaxed.
 
 env:
   NODE_VERSION: '22.x'

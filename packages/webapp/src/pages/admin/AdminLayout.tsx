@@ -10,11 +10,31 @@ const AdminLayout: React.FC = () => {
         </div>
         <nav>
           <ul>
-            <li><NavLink to="/admin/people" className="block p-4 hover:bg-gray-200">People</NavLink></li>
-            <li><NavLink to="/admin/programs" className="block p-4 hover:bg-gray-200">Programs</NavLink></li>
-            <li><NavLink to="/admin/knowledge-base" className="block p-4 hover:bg-gray-200">Knowledge Base</NavLink></li>
-            <li><NavLink to="/admin/meta-prompts" className="block p-4 hover:bg-gray-200">Meta Prompts</NavLink></li>
-            <li><NavLink to="/admin/analytics" className="block p-4 hover:bg-gray-200">Analytics</NavLink></li>
+            <li>
+              <NavLink to="/admin/people" className="block p-4 hover:bg-gray-200">
+                People
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/admin/programs" className="block p-4 hover:bg-gray-200">
+                Programs
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/admin/knowledge-base" className="block p-4 hover:bg-gray-200">
+                Knowledge Base
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/admin/meta-prompts" className="block p-4 hover:bg-gray-200">
+                Meta Prompts
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/admin/analytics" className="block p-4 hover:bg-gray-200">
+                Analytics
+              </NavLink>
+            </li>
           </ul>
         </nav>
       </div>

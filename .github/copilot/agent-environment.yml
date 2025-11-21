@@ -79,9 +79,9 @@ focus_directories:
   - packages/chat-component/src
 
 ignore_patterns:
-  - "**/node_modules/**"
-  - "**/dist/**"
-  - "**/*.log"
-  - "**/.env.local"
-  - "**/.env"
-  - "**/coverage/**"
+  - '**/node_modules/**'
+  - '**/dist/**'
+  - '**/*.log'
+  - '**/.env.local'
+  - '**/.env'
+  - '**/coverage/**'
