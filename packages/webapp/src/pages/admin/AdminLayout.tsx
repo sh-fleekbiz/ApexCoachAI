@@ -35,6 +35,16 @@ const AdminLayout: React.FC = () => {
                 Analytics
               </NavLink>
             </li>
+            <li>
+              <NavLink to="/admin/white-label" className="block p-4 hover:bg-gray-200">
+                White Label
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/admin/action-logs" className="block p-4 hover:bg-gray-200">
+                Action Logs
+              </NavLink>
+            </li>
           </ul>
         </nav>
       </div>
