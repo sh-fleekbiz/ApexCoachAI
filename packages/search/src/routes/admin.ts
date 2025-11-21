@@ -61,14 +61,19 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       userRepository.updateUserRole(userId, role);
 
       // Log admin action
-      adminActionLogRepository.createLog({
-        user_id: (request as unknown as AuthenticatedRequest).user.id,
-        action: 'update_user_role',
-        entity_type: 'user',
-        entity_id: userId,
-        description: `Changed user role from ${oldRole} to ${role}`,
-        meta_json: { userId, oldRole, newRole: role, userEmail: user.email },
-      });
+      try {
+        adminActionLogRepository.createLog({
+          user_id: (request as unknown as AuthenticatedRequest).user.id,
+          action: 'update_user_role',
+          entity_type: 'user',
+          entity_id: userId,
+          description: `Changed user role from ${oldRole} to ${role}`,
+          meta_json: { userId, oldRole, newRole: role, userEmail: user.email },
+        });
+      } catch (logError) {
+        fastify.log.error({ err: logError }, 'Failed to log admin action for update_user_role');
+        throw logError;
+      }
 
       return { success: true };
     } catch (error) {
