@@ -5,7 +5,7 @@ export interface User {
   email: string;
   password_hash: string;
   name: string | null;
-  role: 'admin' | 'coach' | 'user';
+  role: 'owner' | 'admin' | 'coach' | 'user';
   created_at: string;
 }
 
