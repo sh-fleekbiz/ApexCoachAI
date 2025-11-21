@@ -46,4 +46,13 @@ export const programRepository = {
       .prepare('SELECT * FROM program_assignments WHERE program_id = ?')
       .all(programId) as ProgramAssignment[];
   },
+
+  getUserProgramAssignments(userId: number): ProgramAssignment[] {
+    return database.prepare('SELECT * FROM program_assignments WHERE user_id = ?').all(userId) as ProgramAssignment[];
+  },
+
+  getUserProgramIds(userId: number): number[] {
+    const assignments = this.getUserProgramAssignments(userId);
+    return assignments.map((a) => a.program_id);
+  },
 };
