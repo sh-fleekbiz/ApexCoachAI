@@ -7,7 +7,10 @@
     "sourceMap": true,
     "esModuleInterop": true,
     "noStrictGenericChecks": false,
-    "lib": ["esnext"]
+    "lib": ["esnext"],
+    "paths": {
+      "shared/*": ["../shared/*"]
+    }
   },
   "include": ["src/**/*.ts"]
 }

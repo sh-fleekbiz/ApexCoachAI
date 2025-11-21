@@ -92,7 +92,7 @@ const Layout = () => {
             <h3 className={styles.navSectionTitle}>Chats</h3>
             {isLoadingChats ? (
               <div className={styles.loadingChats}>Loading...</div>
-            ) : (chats.length > 0 ? (
+            ) : chats.length > 0 ? (
               <div className={styles.chatsList}>
                 {chats.map((chat) => (
                   <button
@@ -107,7 +107,7 @@ const Layout = () => {
               </div>
             ) : (
               <div className={styles.noChats}>No chats yet</div>
-            ))}
+            )}
           </div>
           <div className={styles.navSection}>
             <h3 className={styles.navSectionTitle}>Library</h3>

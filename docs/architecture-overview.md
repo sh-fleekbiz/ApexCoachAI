@@ -307,20 +307,17 @@ The database schema is automatically initialized on application startup via the 
 **Auth Routes**: `packages/search/src/routes/auth.ts`
 
 - `POST /auth/signup`: Create new user account
-
   - Validates email uniqueness
   - Hashes password with bcrypt
   - Returns JWT token in HTTP-only cookie
   - Returns user data (id, email, name)
 
 - `POST /auth/login`: Authenticate existing user
-
   - Verifies email and password
   - Returns JWT token in HTTP-only cookie
   - Returns user data
 
 - `POST /auth/logout`: End user session
-
   - Clears authentication cookie
 
 - `GET /auth/me`: Get current authenticated user

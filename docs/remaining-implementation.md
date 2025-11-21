@@ -61,7 +61,6 @@ This document outlines the remaining tasks to complete the full multi-chat and p
    ```
 
 2. **Update Chat Component** (`packages/webapp/src/pages/chat/Chat.tsx`):
-
    - Add state for `currentChatId`
    - Check URL params for `chatId` on mount
    - If `chatId` exists, load messages from `/chats/:id/messages`
@@ -111,7 +110,6 @@ This document outlines the remaining tasks to complete the full multi-chat and p
    ```
 
 2. **Add Personality Dropdown to Chat Header**:
-
    - Update `Chat.tsx` to include personality selector
    - Use Fluent UI `Dropdown` component
    - Display current personality name
@@ -199,7 +197,6 @@ const { personalities, selectedPersonalityId, setSelectedPersonalityId } = usePe
    ```
 
 2. **Add Settings Route**:
-
    - Update router in `index.tsx`
    - Add `/settings` route
    - Add link in Layout sidebar
@@ -223,7 +220,6 @@ const { personalities, selectedPersonalityId, setSelectedPersonalityId } = usePe
 ### Testing Checklist
 
 1. **Authentication Flow**:
-
    - [ ] User can sign up with email/password
    - [ ] User can log in
    - [ ] Unauthenticated users redirected to login
@@ -231,7 +227,6 @@ const { personalities, selectedPersonalityId, setSelectedPersonalityId } = usePe
    - [ ] Protected routes work correctly
 
 2. **Multi-Chat Flow**:
-
    - [ ] User can start a new chat
    - [ ] Messages persist to database
    - [ ] Chat appears in sidebar list
@@ -240,7 +235,6 @@ const { personalities, selectedPersonalityId, setSelectedPersonalityId } = usePe
    - [ ] Can delete a chat
 
 3. **Personality System**:
-
    - [ ] Default personality loads correctly
    - [ ] Can select different personality in chat
    - [ ] AI response reflects selected personality
@@ -277,7 +271,6 @@ const { personalities, selectedPersonalityId, setSelectedPersonalityId } = usePe
    ```
 
 2. **Database will auto-initialize** on first run:
-
    - Tables created automatically
    - Default personality seeded
    - No manual migration needed

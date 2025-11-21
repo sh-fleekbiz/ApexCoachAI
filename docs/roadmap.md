@@ -119,21 +119,18 @@ This document outlines the planned features and enhancements for Apex Coach AI.
 ## Next Steps (Immediate)
 
 1. **Connect Chat UI to Backend**:
-
    - Modify chat component to use `/api/chat` endpoint
    - Add chatId state management
    - Load chat history when selecting from sidebar
    - Persist new messages to database
 
 2. **Personality Selector UI**:
-
    - Add dropdown in chat header for personality selection
    - Fetch personalities from `/meta-prompts`
    - Send personalityId with chat requests
    - Show current personality in UI
 
 3. **Settings Page**:
-
    - Create dedicated settings page
    - Allow users to set default personality
    - Display user profile information
