@@ -298,21 +298,25 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       const assignment = programRepository.createProgramAssignment({ program_id: programId, user_id, role });
 
       // Log admin action
-      adminActionLogRepository.createLog({
-        user_id: (request as unknown as AuthenticatedRequest).user.id,
-        action: 'create_program_assignment',
-        entity_type: 'program_assignment',
-        entity_id: assignment.id,
-        description: `Assigned user ${user.email} to program ${program.name} as ${role}`,
-        meta_json: {
-          assignmentId: assignment.id,
-          programId,
-          userId: user_id,
-          role,
-          programName: program.name,
-          userEmail: user.email,
-        },
-      });
+      try {
+        adminActionLogRepository.createLog({
+          user_id: (request as unknown as AuthenticatedRequest).user.id,
+          action: 'create_program_assignment',
+          entity_type: 'program_assignment',
+          entity_id: assignment.id,
+          description: `Assigned user ${user.email} to program ${program.name} as ${role}`,
+          meta_json: {
+            assignmentId: assignment.id,
+            programId,
+            userId: user_id,
+            role,
+            programName: program.name,
+            userEmail: user.email,
+          },
+        });
+      } catch (logError) {
+        fastify.log.error({ err: logError }, 'Failed to log admin action for program assignment');
+      }
 
       return assignment;
     } catch (error) {
