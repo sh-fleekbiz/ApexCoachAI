@@ -29,15 +29,19 @@ Apex Coach AI enables coaches, consultants, and training companies to turn their
 ## 👥 Who is Apex Coach AI For?
 
 ### Business Coaches & Consultants
+
 Scale your 1-on-1 coaching without sacrificing personalization. Your AI assistant handles routine questions while you focus on high-value interactions.
 
 ### Training Companies
+
 Turn your course library into an interactive learning assistant. Students get instant answers backed by your actual training content.
 
 ### Startup Founders
+
 Provide consistent onboarding and development for growing teams. New hires learn from your accumulated knowledge base.
 
 ### Professional Services
+
 Deliver client support backed by your proprietary methodologies. Maintain quality at scale.
 
 ---
@@ -133,12 +137,14 @@ A similar option to Codespaces is VS Code Remote Containers, that will open the 
 ### Deploy to Azure
 
 1. **Clone the repository:**
+
    ```bash
    git clone https://github.com/sh-fleekbiz/ApexCoachAI
    cd ApexCoachAI
    ```
 
 2. **Authenticate and deploy:**
+
    ```bash
    azd auth login
    azd up
@@ -147,6 +153,7 @@ A similar option to Codespaces is VS Code Remote Containers, that will open the 
    Select your Azure region when prompted. Deployment takes approximately 15 minutes.
 
 3. **Upload your content:**
+
    ```bash
    # Add your documents to the data/ folder
    ./scripts/index-data.sh  # or index-data.ps1 on Windows
@@ -196,14 +203,14 @@ Apex Coach AI is built on a modern, scalable architecture:
 
 Typical monthly costs for a small business (10-50 active users):
 
-| Service | Cost Range | Details |
-|---------|------------|---------|
-| Azure OpenAI | $50-200 | Based on chat volume |
-| Azure AI Search | $250 | Standard tier |
-| Container Apps | $30-100 | Based on traffic |
-| Static Web Apps | Free | Free tier |
-| Storage | $5-20 | Blob + data storage |
-| **Total** | **$335-570/month** | |
+| Service         | Cost Range         | Details              |
+| --------------- | ------------------ | -------------------- |
+| Azure OpenAI    | $50-200            | Based on chat volume |
+| Azure AI Search | $250               | Standard tier        |
+| Container Apps  | $30-100            | Based on traffic     |
+| Static Web Apps | Free               | Free tier            |
+| Storage         | $5-20              | Blob + data storage  |
+| **Total**       | **$335-570/month** |                      |
 
 [Azure Pricing Calculator](https://azure.com/e/8468fee268374b6fbd32db323deec786)
 
@@ -280,16 +287,19 @@ ApexCoachAI/
 ### Deployment Options
 
 **Option 1: Full Deployment**
+
 ```bash
 azd up
 ```
 
 **Option 2: Code-Only Deployment**
+
 ```bash
 azd deploy
 ```
 
 **Option 3: With Existing Resources**
+
 ```bash
 azd env set AZURE_OPENAI_SERVICE <your-service>
 azd env set AZURE_SEARCH_SERVICE <your-service>
@@ -311,18 +321,21 @@ azd up
 ## 🗺️ Roadmap
 
 ### Phase 1: Core Application Loop (Q1 2025)
+
 - ✅ Authentication and session persistence
 - ✅ Personality selector UI
 - ⏳ Guided onboarding flow
 - ⏳ Chat history management
 
 ### Phase 2: Multimedia Coaching Vault (Q2 2025)
+
 - ⏳ Video transcription pipeline
 - ⏳ Speaker-aware RAG with authority levels
 - ⏳ Citation-linked library UI with timestamps
 - ⏳ Enhanced source verification
 
 ### Phase 3: Program Management (Q3 2025)
+
 - ⏳ Admin UI for program creation
 - ⏳ Role-based content filtering
 - ⏳ Client assignment workflows

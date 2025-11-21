@@ -45,7 +45,7 @@ const Analytics: React.FC = () => {
       </div>
       {loading ? (
         <p>Loading...</p>
-      ) : (snapshot ? (
+      ) : snapshot ? (
         <div className="grid grid-cols-5 gap-4">
           <div className="bg-white p-4 shadow">
             <h2 className="text-lg font-bold">Total Users</h2>
@@ -70,7 +70,7 @@ const Analytics: React.FC = () => {
         </div>
       ) : (
         <p>Failed to load analytics snapshot.</p>
-      ))}
+      )}
     </div>
   );
 };

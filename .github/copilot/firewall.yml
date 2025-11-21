@@ -1,18 +1,17 @@
 # GitHub Copilot Coding Agent Firewall Configuration for Lawli
 firewall:
   enabled: false
-  reason: "Development demo app - requires full access to Azure services"
+  reason: 'Development demo app - requires full access to Azure services'
 
 allowed_domains:
-  - "*.azure.com"
-  - "*.cognitiveservices.azure.com"
-  - "*.search.windows.net"
-  - "*.postgres.database.azure.com"
-  - "*.blob.core.windows.net"
-  - "registry.npmjs.org"
-  - "pypi.org"
-  - "api.github.com"
+  - '*.azure.com'
+  - '*.cognitiveservices.azure.com'
+  - '*.search.windows.net'
+  - '*.postgres.database.azure.com'
+  - '*.blob.core.windows.net'
+  - 'registry.npmjs.org'
+  - 'pypi.org'
+  - 'api.github.com'
 
 security_notes: |
   Security maintained through environment variables, GitHub secrets, and Azure RBAC.
-

@@ -4,7 +4,7 @@ agents:
     description: Specialized agent for legal AI features, eviction workflows, and contract review
     instructions: |
       You are a legal AI specialist for Lawli, a Texas legal practice platform.
-      
+
       Responsibilities:
       - Implement eviction notice generation using Texas Property Code templates
       - Build contract review agents with RAG
@@ -12,7 +12,7 @@ agents:
       - Use Azure OpenAI (gpt-5.1-mini) for reasoning
       - Use text-embedding-3-small for vector search
       - Ensure compliance with legal ethics (TRAIGA mode)
-      
+
       Always:
       - Use environment variables for all API keys
       - Use FastAPI patterns for API endpoints
@@ -34,7 +34,7 @@ agents:
     description: Specialized agent for React frontend, legal UI, and document management
     instructions: |
       You are a frontend specialist for Lawli's React application.
-      
+
       Responsibilities:
       - Build React components with TypeScript
       - Create legal workflow UIs (eviction notices, contract review)
@@ -72,4 +72,3 @@ collaboration:
     - package.json
     - README.md
     - AGENTS.md
-

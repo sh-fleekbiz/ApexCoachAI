@@ -36,7 +36,7 @@ const KnowledgeBase: React.FC = () => {
       <h1 className="text-2xl font-bold mb-4">Knowledge Base Overview</h1>
       {loading ? (
         <p>Loading...</p>
-      ) : (overview ? (
+      ) : overview ? (
         <div>
           <div className="grid grid-cols-4 gap-4 mb-4">
             <div className="bg-white p-4 shadow">
@@ -83,7 +83,7 @@ const KnowledgeBase: React.FC = () => {
         </div>
       ) : (
         <p>Failed to load overview.</p>
-      ))}
+      )}
     </div>
   );
 };

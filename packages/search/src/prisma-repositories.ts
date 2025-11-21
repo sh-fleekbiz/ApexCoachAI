@@ -1,4 +1,16 @@
-import { PrismaClient, type User, type Chat, type ChatMessage, type MetaPrompt, type Invitation, type Program, type UserSettings, type Role, type MessageRole, type InvitationStatus } from '@prisma/client';
+import {
+  PrismaClient,
+  type User,
+  type Chat,
+  type ChatMessage,
+  type MetaPrompt,
+  type Invitation,
+  type Program,
+  type UserSettings,
+  type Role,
+  type MessageRole,
+  type InvitationStatus,
+} from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -12,13 +24,13 @@ export interface CreateUserParameters {
 export const prismaUserRepository = {
   async getUserByEmail(email: string): Promise<User | null> {
     return await prisma.user.findUnique({
-      where: { email }
+      where: { email },
     });
   },
 
   async getUserById(id: number): Promise<User | null> {
     return await prisma.user.findUnique({
-      where: { id }
+      where: { id },
     });
   },
 
@@ -28,27 +40,27 @@ export const prismaUserRepository = {
       data: {
         email,
         passwordHash: password_hash,
-        name: name || undefined
-      }
+        name: name || undefined,
+      },
     });
   },
 
   async getAllUsers(): Promise<User[]> {
     return await prisma.user.findMany({
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
   },
 
   async updateUserRole(id: number, role: Role): Promise<void> {
     await prisma.user.update({
       where: { id },
-      data: { role }
+      data: { role },
     });
   },
 
   async deleteUser(id: number): Promise<void> {
     await prisma.user.delete({
-      where: { id }
+      where: { id },
     });
   },
 };
@@ -57,7 +69,7 @@ export const prismaChatRepository = {
   async getChatsByUserId(userId: number) {
     return await prisma.chat.findMany({
       where: { userId },
-      orderBy: { updatedAt: 'desc' }
+      orderBy: { updatedAt: 'desc' },
     });
   },
 
@@ -66,9 +78,9 @@ export const prismaChatRepository = {
       where: { id },
       include: {
         messages: {
-          orderBy: { createdAt: 'asc' }
-        }
-      }
+          orderBy: { createdAt: 'asc' },
+        },
+      },
     });
   },
 
@@ -76,28 +88,28 @@ export const prismaChatRepository = {
     return await prisma.chat.create({
       data: {
         userId,
-        title
-      }
+        title,
+      },
     });
   },
 
   async updateChatTitle(id: number, title: string): Promise<void> {
     await prisma.chat.update({
       where: { id },
-      data: { title }
+      data: { title },
     });
   },
 
   async deleteChat(id: number): Promise<void> {
     await prisma.chat.delete({
-      where: { id }
+      where: { id },
     });
   },
 
   async updateChatTimestamp(id: number): Promise<void> {
     await prisma.chat.update({
       where: { id },
-      data: { updatedAt: new Date() }
+      data: { updatedAt: new Date() },
     });
   },
 };
@@ -106,24 +118,29 @@ export const prismaMessageRepository = {
   async getMessagesByChatId(chatId: number) {
     return await prisma.chatMessage.findMany({
       where: { chatId },
-      orderBy: { createdAt: 'asc' }
+      orderBy: { createdAt: 'asc' },
     });
   },
 
-  async createMessage(chatId: number, role: MessageRole, content: string, citationsJson?: string): Promise<ChatMessage> {
+  async createMessage(
+    chatId: number,
+    role: MessageRole,
+    content: string,
+    citationsJson?: string,
+  ): Promise<ChatMessage> {
     return await prisma.chatMessage.create({
       data: {
         chatId,
         role,
         content,
-        citationsJson: citationsJson || undefined
-      }
+        citationsJson: citationsJson || undefined,
+      },
     });
   },
 
   async deleteMessagesByChatId(chatId: number): Promise<void> {
     await prisma.chatMessage.deleteMany({
-      where: { chatId }
+      where: { chatId },
     });
   },
 };
@@ -131,13 +148,13 @@ export const prismaMessageRepository = {
 export const prismaMetaPromptRepository = {
   async getAllPrompts() {
     return await prisma.metaPrompt.findMany({
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
   },
 
   async getDefaultPrompt(): Promise<MetaPrompt | null> {
     return await prisma.metaPrompt.findFirst({
-      where: { isDefault: true }
+      where: { isDefault: true },
     });
   },
 
@@ -146,21 +163,21 @@ export const prismaMetaPromptRepository = {
       data: {
         name,
         promptText,
-        isDefault
-      }
+        isDefault,
+      },
     });
   },
 
   async updatePrompt(id: number, name: string, promptText: string, isDefault: boolean): Promise<void> {
     await prisma.metaPrompt.update({
       where: { id },
-      data: { name, promptText, isDefault }
+      data: { name, promptText, isDefault },
     });
   },
 
   async deletePrompt(id: number): Promise<void> {
     await prisma.metaPrompt.delete({
-      where: { id }
+      where: { id },
     });
   },
 };
@@ -170,10 +187,10 @@ export const prismaInvitationRepository = {
     return await prisma.invitation.findMany({
       include: {
         invitedByUser: {
-          select: { id: true, email: true, name: true }
-        }
+          select: { id: true, email: true, name: true },
+        },
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
   },
 
@@ -182,8 +199,8 @@ export const prismaInvitationRepository = {
       data: {
         email: data.email,
         role: data.role,
-        invitedByUserId: data.invited_by_user_id
-      }
+        invitedByUserId: data.invited_by_user_id,
+      },
     });
   },
 
@@ -192,25 +209,25 @@ export const prismaInvitationRepository = {
       where: { id },
       include: {
         invitedByUser: {
-          select: { id: true, email: true, name: true }
-        }
-      }
+          select: { id: true, email: true, name: true },
+        },
+      },
     });
   },
 
   async updateInvitationStatus(id: number, status: InvitationStatus): Promise<void> {
     await prisma.invitation.update({
       where: { id },
-      data: { 
+      data: {
         status,
-        acceptedAt: status === 'ACCEPTED' ? new Date() : undefined
-      }
+        acceptedAt: status === 'ACCEPTED' ? new Date() : undefined,
+      },
     });
   },
 
   async deleteInvitation(id: number): Promise<void> {
     await prisma.invitation.delete({
-      where: { id }
+      where: { id },
     });
   },
 };
@@ -220,17 +237,17 @@ export const prismaProgramRepository = {
     return await prisma.program.findMany({
       include: {
         createdByUser: {
-          select: { id: true, email: true, name: true }
+          select: { id: true, email: true, name: true },
         },
         assignments: {
           include: {
             user: {
-              select: { id: true, email: true, name: true }
-            }
-          }
-        }
+              select: { id: true, email: true, name: true },
+            },
+          },
+        },
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
   },
 
@@ -239,16 +256,16 @@ export const prismaProgramRepository = {
       where: { id },
       include: {
         createdByUser: {
-          select: { id: true, email: true, name: true }
+          select: { id: true, email: true, name: true },
         },
         assignments: {
           include: {
             user: {
-              select: { id: true, email: true, name: true }
-            }
-          }
-        }
-      }
+              select: { id: true, email: true, name: true },
+            },
+          },
+        },
+      },
     });
   },
 
@@ -257,8 +274,8 @@ export const prismaProgramRepository = {
       data: {
         name: data.name,
         description: data.description || undefined,
-        createdByUserId: data.created_by_user_id
-      }
+        createdByUserId: data.created_by_user_id,
+      },
     });
   },
 
@@ -267,14 +284,14 @@ export const prismaProgramRepository = {
       where: { id },
       data: {
         name,
-        description: description || undefined
-      }
+        description: description || undefined,
+      },
     });
   },
 
   async deleteProgram(id: number): Promise<void> {
     await prisma.program.delete({
-      where: { id }
+      where: { id },
     });
   },
 };
@@ -285,8 +302,8 @@ export const prismaUsageEventRepository = {
       data: {
         userId: data.user_id,
         type: data.type,
-        metaJson: data.meta_json ? JSON.stringify(data.meta_json) : undefined
-      }
+        metaJson: data.meta_json ? JSON.stringify(data.meta_json) : undefined,
+      },
     });
   },
 
@@ -294,7 +311,7 @@ export const prismaUsageEventRepository = {
     return await prisma.usageEvent.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
-      take: limit
+      take: limit,
     });
   },
 
@@ -311,20 +328,20 @@ export const prismaUsageEventRepository = {
           chats: {
             some: {
               updatedAt: {
-                gte: startDate
-              }
-            }
-          }
-        }
+                gte: startDate,
+              },
+            },
+          },
+        },
       }),
       prisma.chat.count(),
       prisma.chatMessage.count({
         where: {
           createdAt: {
-            gte: startDate
-          }
-        }
-      })
+            gte: startDate,
+          },
+        },
+      }),
     ]);
 
     return {
@@ -332,7 +349,7 @@ export const prismaUsageEventRepository = {
       activeUsers,
       totalChats,
       messagesInPeriod,
-      resourcesIngestedInPeriod: 0 // Placeholder for future implementation
+      resourcesIngestedInPeriod: 0, // Placeholder for future implementation
     };
   },
 };
@@ -342,36 +359,42 @@ export const prismaUserSettingsRepository = {
     return await prisma.userSettings.findUnique({
       where: { userId },
       include: {
-        defaultPersonality: true
-      }
+        defaultPersonality: true,
+      },
     });
   },
 
-  async createUserSettings(userId: number, data: { default_personality_id?: number; nickname?: string; occupation?: string }): Promise<UserSettings> {
+  async createUserSettings(
+    userId: number,
+    data: { default_personality_id?: number; nickname?: string; occupation?: string },
+  ): Promise<UserSettings> {
     return await prisma.userSettings.create({
       data: {
         userId,
         defaultPersonalityId: data.default_personality_id || undefined,
         nickname: data.nickname || undefined,
-        occupation: data.occupation || undefined
-      }
+        occupation: data.occupation || undefined,
+      },
     });
   },
 
-  async updateUserSettings(userId: number, data: { default_personality_id?: number; nickname?: string; occupation?: string }): Promise<void> {
+  async updateUserSettings(
+    userId: number,
+    data: { default_personality_id?: number; nickname?: string; occupation?: string },
+  ): Promise<void> {
     await prisma.userSettings.upsert({
       where: { userId },
       update: {
         defaultPersonalityId: data.default_personality_id || undefined,
         nickname: data.nickname || undefined,
-        occupation: data.occupation || undefined
+        occupation: data.occupation || undefined,
       },
       create: {
         userId,
         defaultPersonalityId: data.default_personality_id || undefined,
         nickname: data.nickname || undefined,
-        occupation: data.occupation || undefined
-      }
+        occupation: data.occupation || undefined,
+      },
     });
   },
 };
