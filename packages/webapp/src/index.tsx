@@ -20,6 +20,8 @@ import ProgramDetails from './pages/admin/programs/ProgramDetails.tsx';
 import KnowledgeBase from './pages/admin/knowledge-base/KnowledgeBase.tsx';
 import MetaPrompts from './pages/admin/meta-prompts/MetaPrompts.tsx';
 import Analytics from './pages/admin/analytics/Analytics.tsx';
+import WhiteLabel from './pages/admin/white-label/WhiteLabel.tsx';
+import ActionLogs from './pages/admin/action-logs/ActionLogs.tsx';
 import { AdminRoute } from './components/AdminRoute.tsx';
 
 initializeIcons();
@@ -94,6 +96,14 @@ const router = createHashRouter([
       {
         path: 'analytics',
         element: <Analytics />,
+      },
+      {
+        path: 'white-label',
+        element: <WhiteLabel />,
+      },
+      {
+        path: 'action-logs',
+        element: <ActionLogs />,
       },
     ],
   },
