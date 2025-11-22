@@ -14,16 +14,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-          
+
       - name: Log in to ACR
         run: |
           az acr login --name shacrapps
-          
+
       - name: Build and Push webapp
         uses: docker/build-push-action@v4
         with:
@@ -33,20 +33,27 @@ jobs:
           tags: |
             shacrapps.azurecr.io/apexcoachai-webapp:${{ github.sha }}
             shacrapps.azurecr.io/apexcoachai-webapp:latest
+
+      - name: Deploy to Container App
+        run: |
+          az containerapp update \
+            --name apexcoachai-web \
+            --resource-group rg-shared-app \
+            --image shacrapps.azurecr.io/apexcoachai-webapp:latest
   build-and-push-indexer:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-          
+
       - name: Log in to ACR
         run: |
           az acr login --name shacrapps
-          
+
       - name: Build and Push indexer
         uses: docker/build-push-action@v4
         with:
@@ -60,16 +67,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-          
+
       - name: Log in to ACR
         run: |
           az acr login --name shacrapps
-          
+
       - name: Build and Push search
         uses: docker/build-push-action@v4
         with:
