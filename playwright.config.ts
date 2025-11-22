@@ -38,35 +38,47 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
 
-  /* Configure projects for major browsers */
+  /* Configure projects for major browsers - MOBILE FIRST (390x844px) */
   projects: [
+    /* Primary: Mobile viewports (390x844px - iPhone 12 standard) */
     {
-      name: 'chromium',
+      name: 'mobile-chrome',
+      use: { 
+        ...devices['iPhone 12'], // 390x844px - Standard mobile viewport
+        hasTouch: true,
+        isMobile: true,
+      },
+    },
+    {
+      name: 'mobile-safari',
+      use: { 
+        ...devices['iPhone 12'], // 390x844px
+        hasTouch: true,
+        isMobile: true,
+      },
+    },
+
+    /* Secondary: Desktop browsers */
+    {
+      name: 'chromium-desktop',
       use: { ...devices['Desktop Chrome'] },
     },
-
     {
-      name: 'firefox',
+      name: 'firefox-desktop',
       use: { ...devices['Desktop Firefox'] },
     },
-
     {
-      name: 'webkit',
+      name: 'webkit-desktop',
       use: { ...devices['Desktop Safari'] },
     },
 
-    /* Test against mobile viewports. */
+    /* Optional: Tablet viewports */
     {
-      name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'] },
-    },
-    {
-      name: 'Mobile Safari',
-      use: { ...devices['iPhone 12'] },
-    },
-    {
-      name: 'Tablet Chrome',
-      use: { ...devices['iPad Air'] },
+      name: 'tablet-chrome',
+      use: { 
+        ...devices['iPad Pro'],
+        hasTouch: true,
+      },
     },
 
     /* Test against branded browsers. */
