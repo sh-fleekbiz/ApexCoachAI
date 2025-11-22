@@ -17,41 +17,61 @@ Apex Coach AI transforms proprietary coaching content (videos, documents, traini
 
 ## Tech Stack
 
-- **Frontend**: React, TypeScript, TailwindCSS
+- **Frontend**: React, TypeScript, TailwindCSS, Vite
 - **Backend**: Fastify (Node.js, TypeScript)
-- **Database**: Azure PostgreSQL (`pg-shared-apps-eastus2`) with pgvector
-- **AI**: Azure OpenAI exclusively
-  - Chat: `gpt-5.1-mini`
+- **Database**: Azure PostgreSQL (`pg-shared-apps-eastus2`, database: `apexcoachai_db`) with pgvector
+- **AI**: Azure OpenAI exclusively (via `@shared/ai` package)
+  - Chat: `gpt-4o` (default), `gpt-5.1` (heavy tasks)
   - Embeddings: `text-embedding-3-small`
-- **Search**: Azure AI Search (`shared-search-standard-eastus2`)
-- **Storage**: Azure Blob Storage (`stmahumsharedapps`, container: `apexcoachai-content`)
+  - Image: `gpt-image-1-mini`
+- **Search**: Azure AI Search (`shared-search-standard-eastus2`, index prefix: `apexcoachai`)
+- **Storage**: Azure Blob Storage (`stmahumsharedapps`, prefix: `apexcoachai/`)
 - **Deployment**: 
-  - Frontend: Azure Static Web App (`rg-shared-web`)
-  - Backend: Azure Container App (`rg-shared-apps`)
+  - Frontend: Azure Static Web App `apexcoachai` in `rg-shared-web` (Free SKU)
+  - Backend: Azure Container Apps `apexcoachai-api` and `apexcoachai-indexer` in `rg-shared-apps` (Consumption plan)
+- **Custom Domain**: `apexcoachai.shtrial.com`
 
 ## Architecture
 
-- **Monorepo**: pnpm workspaces
+- **Monorepo**: pnpm workspaces with Turborepo
+- **Apps**:
+  - `apps/frontend`: React frontend
+  - `apps/backend/search`: Fastify RAG backend
+  - `apps/backend/indexer`: Content indexing service
 - **Packages**:
-  - `packages/webapp`: React frontend
-  - `packages/search`: Fastify RAG backend
-  - `packages/indexer`: Content indexing service
+  - `packages/shared-ai`: Shared Azure OpenAI client (`@shared/ai`)
+  - `packages/shared-data`: Shared Postgres, Search, Storage clients (`@shared/data`)
+  - `packages/shared`: Shared types and utilities
+  - `packages/ui`: Shared UI components
 
 ## Environment Variables
 
-See `packages/search/.env.example` for the complete schema. Key variables:
+**No Key Vault**: All secrets/config via App Settings and environment variables.
+
+**No OpenAI.com**: Only Azure OpenAI endpoint (`shared-openai-eastus2`).
+
+See `docs/CONFIG.md` and `.env.example` for the complete schema. Key variables:
 
 ```env
-# Azure OpenAI (Standardized - shared across all portfolio apps)
-AZURE_OPENAI_ENDPOINT=https://shared-openai-eastus2.openai.azure.com/
-AZURE_OPENAI_API_KEY=<your_key>
-AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-5.1-mini
-AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small
+# Azure OpenAI (Shared - via @shared/ai package)
+AZURE_OPENAI_ENDPOINT=https://shared-openai-eastus2.openai.azure.com/openai/v1/
+AZURE_OPENAI_API_KEY=<your-key>
+AZURE_OPENAI_DEFAULT_CHAT_MODEL=gpt-4o
+AZURE_OPENAI_MODEL_HEAVY=gpt-5.1
+AZURE_OPENAI_MODEL_EMBED=text-embedding-3-small
+AZURE_OPENAI_MODEL_IMAGE=gpt-image-1-mini
 
-# Azure AI Search
+# PostgreSQL (Shared - via @shared/data package)
+SHARED_PG_CONNECTION_STRING=postgresql://<user>:<pass>@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apexcoachai_db?sslmode=require
+
+# Azure AI Search (Shared - via @shared/data package)
 AZURE_SEARCH_ENDPOINT=https://shared-search-standard-eastus2.search.windows.net
-AZURE_SEARCH_API_KEY=<your_key>
-AZURE_SEARCH_INDEX=<index_name>
+AZURE_SEARCH_API_KEY=<your-key>
+AZURE_SEARCH_INDEX_PREFIX=apexcoachai
+
+# Azure Storage (Shared - via @shared/data package)
+AZURE_STORAGE_CONNECTION_STRING=<connection-string>
+APP_STORAGE_PREFIX=apexcoachai
 ```
 
 ## Setup

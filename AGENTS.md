@@ -5,9 +5,10 @@ AI coding agent guide for Apex Coach AI, an AI-powered coaching and development 
 ## Project Overview
 
 **Application**: AI-Powered Coaching & Development Platform
-**URL**: https://apexcoach.shtrial.com
-**Stack**: Monorepo with React webapp + Fastify search backend + Azure OpenAI/Azure AI Search
+**URL**: https://apexcoachai.shtrial.com
+**Stack**: Monorepo with React frontend + Fastify search/indexer backends + Azure OpenAI/Azure AI Search
 **Target Market**: Content-focused SMBs, coaches, consultants, and training companies
+**Monorepo**: Yes (apps/frontend, apps/backend/search, apps/backend/indexer, packages/*)
 
 ## Business Context
 
@@ -24,21 +25,34 @@ Apex Coach AI is a consumer-to-business (C2B) solution that enables:
 
 ```
 ApexCoachAI/
-└── packages/
-    ├── webapp/       # React coaching UI (talks to search API via VITE_SEARCH_API_URI)
-    └── search/       # Fastify RAG backend (Azure OpenAI + Azure AI Search, optional Supabase repos)
+├── apps/
+│   ├── frontend/          # React coaching UI
+│   └── backend/
+│       ├── search/        # Fastify RAG backend
+│       └── indexer/       # Content indexing service
+├── packages/
+│   ├── shared-ai/         # Shared Azure OpenAI client (@shared/ai)
+│   ├── shared-data/       # Shared Postgres, Search, Storage clients (@shared/data)
+│   ├── shared/            # Shared types and utilities
+│   └── ui/                # Shared UI components
 ```
 
 ## Tech Stack
 
-- **Monorepo**: pnpm workspaces with separate webapp + search packages
-- **Frontend**: React + TypeScript (packages/webapp)
-- **Backend**: Node.js + Fastify (packages/search/src/app.ts)
-- **RAG**: Azure OpenAI exclusively
-  - Chat: `gpt-5.1-mini`
+- **Monorepo**: pnpm workspaces with Turborepo
+- **Frontend**: React + TypeScript (apps/frontend)
+- **Backend**: Node.js + Fastify (apps/backend/search, apps/backend/indexer)
+- **Database**: Azure PostgreSQL (`pg-shared-apps-eastus2`, database: `apexcoachai_db`) with pgvector
+- **RAG**: Azure OpenAI exclusively (via `@shared/ai` package)
+  - Chat: `gpt-4o` (default), `gpt-5.1` (heavy tasks)
   - Embeddings: `text-embedding-3-small`
-  - Azure AI Search for vector search
-- **Optional Storage**: Supabase client/repositories for users, chats, messages, prompts (packages/search/src/supabase-\*.ts)
+  - Image: `gpt-image-1-mini`
+- **Search**: Azure AI Search (`shared-search-standard-eastus2`, index prefix: `apexcoachai`)
+- **Storage**: Azure Blob Storage (`stmahumsharedapps`, prefix: `apexcoachai/`)
+- **Deployment**: 
+  - Frontend: Azure Static Web App `apexcoachai` in `rg-shared-web` (Free SKU)
+  - Backend: Azure Container Apps `apexcoachai-api` and `apexcoachai-indexer` in `rg-shared-apps` (Consumption plan)
+- **Custom Domain**: `apexcoachai.shtrial.com`
 
 ## Build & Test Commands
 

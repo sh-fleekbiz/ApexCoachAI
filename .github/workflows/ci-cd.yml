@@ -59,25 +59,29 @@ jobs:
       - name: Deploy frontend to Azure Static Web App
         uses: Azure/static-web-apps-deploy@v1
         with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_SWA_TOKEN }}
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_APEXCOACHAI }}
           app_location: "apps/frontend"
           output_location: "apps/frontend/dist"
           resource_group_name: "rg-shared-web"
+          app_name: "apexcoachai"
 
-      - name: Deploy backend to Azure Container App
+      - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
       
+      - name: Log in to Azure Container Registry
+        run: az acr login --name shacrapps
+      
       - name: Build and push Docker images
         run: |
-          docker build -t acr-mahum-shared.azurecr.io/apexcoach-search:${{ github.sha }} -f apps/backend/search/Dockerfile .
-          docker build -t acr-mahum-shared.azurecr.io/apexcoach-indexer:${{ github.sha }} -f apps/backend/indexer/Dockerfile .
-          docker push acr-mahum-shared.azurecr.io/apexcoach-search:${{ github.sha }}
-          docker push acr-mahum-shared.azurecr.io/apexcoach-indexer:${{ github.sha }}
+          docker build -t shacrapps.azurecr.io/apexcoachai-api:${{ github.sha }} -f apps/backend/search/Dockerfile .
+          docker build -t shacrapps.azurecr.io/apexcoachai-indexer:${{ github.sha }} -f apps/backend/indexer/Dockerfile .
+          docker push shacrapps.azurecr.io/apexcoachai-api:${{ github.sha }}
+          docker push shacrapps.azurecr.io/apexcoachai-indexer:${{ github.sha }}
       
       - name: Update Container Apps
         run: |
-          az containerapp update --name apexcoach-search --resource-group rg-shared-apps --image acr-mahum-shared.azurecr.io/apexcoach-search:${{ github.sha }}
-          az containerapp update --name apexcoach-indexer --resource-group rg-shared-apps --image acr-mahum-shared.azurecr.io/apexcoach-indexer:${{ github.sha }}
+          az containerapp update --name apexcoachai-api --resource-group rg-shared-apps --image shacrapps.azurecr.io/apexcoachai-api:${{ github.sha }}
+          az containerapp update --name apexcoachai-indexer --resource-group rg-shared-apps --image shacrapps.azurecr.io/apexcoachai-indexer:${{ github.sha }}
 
