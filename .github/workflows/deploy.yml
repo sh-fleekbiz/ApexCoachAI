@@ -1,0 +1,82 @@
+name: Build and Push
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-push-webapp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          
+      - name: Log in to ACR
+        run: |
+          az acr login --name shacrapps
+          
+      - name: Build and Push webapp
+        uses: docker/build-push-action@v4
+        with:
+          context: packages/webapp
+          file: packages/webapp/Dockerfile
+          push: true
+          tags: |
+            shacrapps.azurecr.io/apexcoachai-webapp:${{ github.sha }}
+            shacrapps.azurecr.io/apexcoachai-webapp:latest
+  build-and-push-indexer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          
+      - name: Log in to ACR
+        run: |
+          az acr login --name shacrapps
+          
+      - name: Build and Push indexer
+        uses: docker/build-push-action@v4
+        with:
+          context: packages/indexer
+          file: packages/indexer/Dockerfile
+          push: true
+          tags: |
+            shacrapps.azurecr.io/apexcoachai-indexer:${{ github.sha }}
+            shacrapps.azurecr.io/apexcoachai-indexer:latest
+  build-and-push-search:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          
+      - name: Log in to ACR
+        run: |
+          az acr login --name shacrapps
+          
+      - name: Build and Push search
+        uses: docker/build-push-action@v4
+        with:
+          context: packages/search
+          file: packages/search/Dockerfile
+          push: true
+          tags: |
+            shacrapps.azurecr.io/apexcoachai-search:${{ github.sha }}
+            shacrapps.azurecr.io/apexcoachai-search:latest
+
