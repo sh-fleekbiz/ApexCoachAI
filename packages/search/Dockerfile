@@ -6,7 +6,7 @@ FROM node:22-alpine as build
 WORKDIR /app
 COPY ./package*.json ./
 COPY ./packages/search ./packages/search
-RUN npm ci --cache /tmp/empty-cache
+RUN npm install
 RUN npm run build --workspace=search
 
 # Run Node.js app
@@ -17,8 +17,7 @@ ENV NODE_ENV=production
 WORKDIR /app
 COPY ./package*.json ./
 COPY ./packages/search/package.json ./packages/search/
-COPY ./packages/search/data/employee-info.csv ./packages/search/data/employee-info.csv
-RUN npm ci --omit=dev --workspace=search --cache /tmp/empty-cache
+RUN npm install --omit=dev --workspace=search
 COPY --from=build app/packages/search/dist packages/search/dist
 EXPOSE 3000
 CMD [ "npm", "start", "--workspace=search" ]
