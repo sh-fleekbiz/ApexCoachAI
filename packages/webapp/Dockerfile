@@ -10,6 +10,7 @@ RUN npm install -g pnpm@10.0.0 && pnpm install --frozen-lockfile --filter webapp
 FROM node:22-alpine AS build
 WORKDIR /workspace
 COPY . .
+COPY --from=deps /workspace/node_modules ./node_modules
 RUN npm install -g pnpm@10.0.0 && pnpm run build --workspace=webapp
 
 FROM node:22-alpine AS runtime
