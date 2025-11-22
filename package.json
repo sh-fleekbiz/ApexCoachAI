@@ -3,62 +3,14 @@
   "version": "1.0.0",
   "description": "Apex Coach AI - The Unified AI Platform for Structured, Multimedia Coaching Programs",
   "private": true,
-  "directories": {
-    "doc": "docs"
-  },
+  "packageManager": "pnpm@9.0.0",
   "scripts": {
-    "start": "concurrently \"npm:start:*\" --kill-others",
-    "start:webapp": "npm run dev --workspace=webapp",
-    "start:search": "npm run dev --workspace=search",
-    "start:indexer": "npm run dev --workspace=indexer",
-    "test": "npm run test -ws --if-present",
-    "test:playwright": "npx playwright test",
-    "test:load": "k6 run tests/load/index.js",
-    "build": "npm run build -ws --if-present",
-    "clean": "npm run clean -ws --if-present",
-    "docker:build": "npm run docker:build -ws --if-present",
-    "format": "prettier --list-different --write .",
-    "format:check": "prettier --check .",
-    "lint": "eslint .",
-    "lint:fix": "eslint --fix .",
-    "prepare": "simple-git-hooks || echo 'simple-git-hooks install skipped'",
-    "install:playwright": "npx playwright install --with-deps"
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "test": "turbo test",
+    "lint": "turbo lint"
   },
-  "keywords": [],
-  "author": "sh-fleekbiz",
-  "license": "MIT",
-  "workspaces": [
-    "packages/*"
-  ],
   "devDependencies": {
-    "@playwright/test": "^1.56.1",
-    "@types/k6": "^1.4.0",
-    "@types/node": "^24.10.1",
-    "c8": "^10.1.3",
-    "concurrently": "^9.2.1",
-    "eslint": "^9.39.1",
-    "eslint-config-shared": "^1.0.0",
-    "lint-staged": "^16.2.6",
-    "prettier": "^3.6.2",
-    "simple-git-hooks": "^2.13.1",
-    "tsx": "^4.20.6"
-  },
-  "engines": {
-    "node": ">=22",
-    "npm": ">=10"
-  },
-  "simple-git-hooks": {
-    "pre-commit": "npx lint-staged"
-  },
-  "prettier": {
-    "tabWidth": 2,
-    "semi": true,
-    "singleQuote": true,
-    "printWidth": 120,
-    "bracketSpacing": true
-  },
-  "eslintConfig": {
-    "extends": "eslint-config-shared"
-  },
-  "packageManager": "pnpm@10.0.0"
+    "turbo": "^2.0.0"
+  }
 }
