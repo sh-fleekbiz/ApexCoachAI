@@ -27,7 +27,7 @@ jobs:
       - name: Build and Push webapp
         uses: docker/build-push-action@v4
         with:
-          context: packages/webapp
+          context: .
           file: packages/webapp/Dockerfile
           push: true
           tags: |
@@ -50,7 +50,7 @@ jobs:
       - name: Build and Push indexer
         uses: docker/build-push-action@v4
         with:
-          context: packages/indexer
+          context: .
           file: packages/indexer/Dockerfile
           push: true
           tags: |
@@ -73,10 +73,11 @@ jobs:
       - name: Build and Push search
         uses: docker/build-push-action@v4
         with:
-          context: packages/search
+          context: .
           file: packages/search/Dockerfile
           push: true
           tags: |
             shacrapps.azurecr.io/apexcoachai-search:${{ github.sha }}
             shacrapps.azurecr.io/apexcoachai-search:latest
+
 
