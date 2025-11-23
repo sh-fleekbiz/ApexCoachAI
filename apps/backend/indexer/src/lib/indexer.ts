@@ -1,14 +1,14 @@
-import { type BaseLogger } from 'pino';
 import { type SearchIndex } from '@azure/search-documents';
 import { encoding_for_model, type TiktokenModel } from '@dqbd/tiktoken';
+import { type BaseLogger } from 'pino';
 import { type AzureClients } from '../plugins/azure.js';
 import { type OpenAiService } from '../plugins/openai.js';
-import { wait } from './util/index.js';
+import { BlobStorage } from './blob-storage.js';
 import { DocumentProcessor } from './document-processor.js';
+import { type Section } from './document.js';
 import { extractText, extractTextFromPdf } from './formats/index.js';
 import { MODELS_SUPPORTED_BATCH_SIZE } from './model-limits.js';
-import { BlobStorage } from './blob-storage.js';
-import { type Section } from './document.js';
+import { wait } from './util/index.js';
 
 export interface IndexFileOptions {
   useVectors?: boolean;
@@ -33,7 +33,7 @@ export class Indexer {
     private logger: BaseLogger,
     private azure: AzureClients,
     private openai: OpenAiService,
-    private embeddingModelName: string = 'text-embedding-ada-002',
+    private embeddingModelName: string = 'text-embedding-3-small'
   ) {
     this.blobStorage = new BlobStorage(logger, azure);
   }
@@ -152,9 +152,15 @@ export class Indexer {
     await searchIndexClient.deleteIndex(indexName);
   }
 
-  async indexFile(indexName: string, fileInfos: FileInfos, options: IndexFileOptions = {}) {
+  async indexFile(
+    indexName: string,
+    fileInfos: FileInfos,
+    options: IndexFileOptions = {}
+  ) {
     const { filename, data, type, category, programId } = fileInfos;
-    this.logger.debug(`Indexing file "${filename}" into search index "${indexName}..."`);
+    this.logger.debug(
+      `Indexing file "${filename}" into search index "${indexName}..."`
+    );
 
     try {
       if (options.uploadToStorage) {
@@ -165,8 +171,17 @@ export class Indexer {
       const documentProcessor = new DocumentProcessor(this.logger);
       documentProcessor.registerFormatHandler('text/plain', extractText);
       documentProcessor.registerFormatHandler('text/markdown', extractText);
-      documentProcessor.registerFormatHandler('application/pdf', extractTextFromPdf);
-      const document = await documentProcessor.createDocumentFromFile(filename, data, type, category, programId);
+      documentProcessor.registerFormatHandler(
+        'application/pdf',
+        extractTextFromPdf
+      );
+      const document = await documentProcessor.createDocumentFromFile(
+        filename,
+        data,
+        type,
+        category,
+        programId
+      );
       const sections = document.sections;
       if (options.useVectors) {
         await this.updateEmbeddingsInBatch(sections);
@@ -184,7 +199,9 @@ export class Indexer {
           const { results } = await searchClient.uploadDocuments(batch);
           const succeeded = results.filter((r) => r.succeeded).length;
           const indexed = batch.length;
-          this.logger.debug(`Indexed ${indexed} sections, ${succeeded} succeeded`);
+          this.logger.debug(
+            `Indexed ${indexed} sections, ${succeeded} succeeded`
+          );
           batch = [];
         }
       }
@@ -193,19 +210,27 @@ export class Indexer {
       if (options.throwErrors) {
         throw error;
       } else {
-        this.logger.error(`Error indexing file "${filename}": ${error.message}`);
+        this.logger.error(
+          `Error indexing file "${filename}": ${error.message}`
+        );
       }
     }
   }
 
   async deleteFromIndex(indexName: string, filename?: string) {
-    this.logger.debug(`Removing sections from "${filename ?? '<all>'}" from search index "${indexName}"`);
+    this.logger.debug(
+      `Removing sections from "${filename ?? '<all>'}" from search index "${indexName}"`
+    );
     const searchClient = this.azure.searchIndex.getSearchClient(indexName);
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
       const filter = filename ? `sourcefile eq '${filename}'` : undefined;
-      const r = await searchClient.search('', { filter: filter, top: 1000, includeTotalCount: true });
+      const r = await searchClient.search('', {
+        filter: filter,
+        top: 1000,
+        includeTotalCount: true,
+      });
       if (r.count === 0) {
         break;
       }
@@ -217,7 +242,9 @@ export class Indexer {
       const { results } = await searchClient.deleteDocuments(documents);
       this.logger.debug(`Removed ${results.length} sections from index`);
 
-      await (filename ? this.blobStorage.delete(filename) : this.blobStorage.deleteAll());
+      await (filename
+        ? this.blobStorage.delete(filename)
+        : this.blobStorage.deleteAll());
 
       // It can take a few seconds for search results to reflect changes, so wait a bit
       await wait(2000);
@@ -227,14 +254,20 @@ export class Indexer {
   async createEmbedding(text: string): Promise<number[]> {
     // TODO: add retry
     const embeddingsClient = await this.openai.getEmbeddings();
-    const result = await embeddingsClient.create({ input: text, model: this.embeddingModelName });
+    const result = await embeddingsClient.create({
+      input: text,
+      model: this.embeddingModelName,
+    });
     return result.data[0].embedding;
   }
 
   async createEmbeddingsInBatch(texts: string[]): Promise<Array<number[]>> {
     // TODO: add retry
     const embeddingsClient = await this.openai.getEmbeddings();
-    const result = await embeddingsClient.create({ input: texts, model: this.embeddingModelName });
+    const result = await embeddingsClient.create({
+      input: texts,
+      model: this.embeddingModelName,
+    });
     return result.data.map((d) => d.embedding);
   }
 
@@ -252,9 +285,14 @@ export class Indexer {
         batchQueue.length >= batchSize.maxBatchSize ||
         index === sections.length - 1
       ) {
-        const embeddings = await this.createEmbeddingsInBatch(batchQueue.map((section) => section.content));
-        for (const [index_, section] of batchQueue.entries()) section.embedding = embeddings[index_];
-        this.logger.debug(`Batch Completed. Batch size ${batchQueue.length} Token count ${tokenCount}`);
+        const embeddings = await this.createEmbeddingsInBatch(
+          batchQueue.map((section) => section.content)
+        );
+        for (const [index_, section] of batchQueue.entries())
+          section.embedding = embeddings[index_];
+        this.logger.debug(
+          `Batch Completed. Batch size ${batchQueue.length} Token count ${tokenCount}`
+        );
 
         batchQueue.length = 0;
         tokenCount = 0;

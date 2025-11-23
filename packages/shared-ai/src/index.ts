@@ -1,22 +1,22 @@
-import OpenAI from "openai";
+import OpenAI from 'openai';
 
-export type ChatModel = "gpt-4o" | "gpt-5.1";
-export type EmbeddingModel = "text-embedding-3-small";
-export type ImageModel = "gpt-image-1-mini";
+export type ChatModel = 'gpt-4o' | 'gpt-5.1';
+export type EmbeddingModel = 'text-embedding-3-small';
+export type ImageModel = 'gpt-image-1-mini';
 
 const endpoint =
   process.env.AZURE_OPENAI_ENDPOINT ??
-  "https://shared-openai-eastus2.openai.azure.com/openai/v1/";
+  'https://shared-openai-eastus2.openai.azure.com/openai/v1/';
 
 const apiKey = process.env.AZURE_OPENAI_API_KEY;
 
 if (!apiKey) {
-  throw new Error("AZURE_OPENAI_API_KEY is not set");
+  throw new Error('AZURE_OPENAI_API_KEY is not set');
 }
 
 export const openai = new OpenAI({
   baseURL: endpoint,
-  apiKey
+  apiKey,
 });
 
 /**
@@ -31,13 +31,13 @@ export async function chatComplete(opts: {
   const model: ChatModel =
     opts.model ||
     (process.env.AZURE_OPENAI_DEFAULT_CHAT_MODEL as ChatModel) ||
-    "gpt-4o";
+    'gpt-5.1';
 
   const completion = await openai.chat.completions.create({
     model,
     messages: opts.messages,
     temperature: opts.temperature ?? 0.4,
-    max_completion_tokens: opts.maxTokens
+    max_completion_tokens: opts.maxTokens,
   });
 
   return completion;
@@ -55,13 +55,13 @@ export async function chatStream(opts: {
   const model: ChatModel =
     opts.model ||
     (process.env.AZURE_OPENAI_DEFAULT_CHAT_MODEL as ChatModel) ||
-    "gpt-4o";
+    'gpt-5.1';
 
   const stream = await openai.chat.completions.create({
     model,
     messages: opts.messages,
     temperature: opts.temperature ?? 0.4,
-    stream: true
+    stream: true,
   });
 
   return stream;
@@ -77,11 +77,11 @@ export async function embedText(
   const model: EmbeddingModel =
     modelOverride ||
     (process.env.AZURE_OPENAI_EMBEDDING_MODEL as EmbeddingModel) ||
-    "text-embedding-3-small";
+    'text-embedding-3-small';
 
   const res = await openai.embeddings.create({
     model,
-    input
+    input,
   });
 
   return res.data.map((item) => item.embedding);
@@ -92,21 +92,20 @@ export async function embedText(
  */
 export async function generateImage(opts: {
   prompt: string;
-  size?: "512x512" | "1024x1024";
+  size?: '512x512' | '1024x1024';
   model?: ImageModel;
 }) {
   const model: ImageModel =
     opts.model ||
     (process.env.AZURE_OPENAI_IMAGE_MODEL as ImageModel) ||
-    "gpt-image-1-mini";
+    'gpt-image-1-mini';
 
   const result = await openai.images.generate({
     model,
     prompt: opts.prompt,
     n: 1,
-    size: opts.size ?? "1024x1024"
+    size: opts.size ?? '1024x1024',
   });
 
   return result.data[0]; // contains b64_json or URL depending on config
 }
-
