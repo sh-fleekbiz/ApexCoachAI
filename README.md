@@ -1,7 +1,7 @@
 # Apex Coach AI - AI-Powered Coaching Platform
 
-**Industry**: Education/Coaching  
-**Domain**: https://apexcoachai.shtrial.com  
+**Industry**: Education/Coaching
+**Domain**: https://apexcoachai.shtrial.com
 **Type**: Full-stack AI Application
 
 ## Overview
@@ -21,12 +21,12 @@ Apex Coach AI transforms proprietary coaching content (videos, documents, traini
 - **Backend**: Fastify (Node.js, TypeScript)
 - **Database**: Azure PostgreSQL (`pg-shared-apps-eastus2`, database: `apexcoachai_db`) with pgvector
 - **AI**: Azure OpenAI exclusively (via `@shared/ai` package)
-  - Chat: `gpt-4o` (default), `gpt-5.1` (heavy tasks)
+  - Chat: `gpt-5.1`
   - Embeddings: `text-embedding-3-small`
   - Image: `gpt-image-1-mini`
 - **Search**: Azure AI Search (`shared-search-standard-eastus2`, index prefix: `apexcoachai`)
 - **Storage**: Azure Blob Storage (`stmahumsharedapps`, prefix: `apexcoachai/`)
-- **Deployment**: 
+- **Deployment**:
   - Frontend: Azure Static Web App `apexcoachai` in `rg-shared-web` (Free SKU)
   - Backend: Azure Container Apps `apexcoachai-api` and `apexcoachai-indexer` in `rg-shared-apps` (Consumption plan)
 - **Custom Domain**: `apexcoachai.shtrial.com`
@@ -56,8 +56,7 @@ See `docs/CONFIG.md` and `.env.example` for the complete schema. Key variables:
 # Azure OpenAI (Shared - via @shared/ai package)
 AZURE_OPENAI_ENDPOINT=https://shared-openai-eastus2.openai.azure.com/openai/v1/
 AZURE_OPENAI_API_KEY=<your-key>
-AZURE_OPENAI_DEFAULT_CHAT_MODEL=gpt-4o
-AZURE_OPENAI_MODEL_HEAVY=gpt-5.1
+AZURE_OPENAI_DEFAULT_CHAT_MODEL=gpt-5.1
 AZURE_OPENAI_MODEL_EMBED=text-embedding-3-small
 AZURE_OPENAI_MODEL_IMAGE=gpt-image-1-mini
 
@@ -99,7 +98,6 @@ pnpm test             # Run tests
 ## Deployment
 
 Deployed via GitHub Actions workflow (`.github/workflows/deploy.yml`):
+
 - Frontend → Azure Static Web App
 - Backend → Azure Container App
-
-
