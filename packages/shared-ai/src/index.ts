@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 
-export type ChatModel = 'gpt-4o' | 'gpt-5.1';
+// Exclusive chat model usage (gpt-5.1).
+export type ChatModel = 'gpt-5.1';
 export type EmbeddingModel = 'text-embedding-3-small';
 export type ImageModel = 'gpt-image-1-mini';
 
@@ -28,10 +29,7 @@ export async function chatComplete(opts: {
   temperature?: number;
   maxTokens?: number;
 }) {
-  const model: ChatModel =
-    opts.model ||
-    (process.env.AZURE_OPENAI_DEFAULT_CHAT_MODEL as ChatModel) ||
-    'gpt-5.1';
+  const model: ChatModel = 'gpt-5.1';
 
   const completion = await openai.chat.completions.create({
     model,
@@ -52,10 +50,7 @@ export async function chatStream(opts: {
   model?: ChatModel;
   temperature?: number;
 }) {
-  const model: ChatModel =
-    opts.model ||
-    (process.env.AZURE_OPENAI_DEFAULT_CHAT_MODEL as ChatModel) ||
-    'gpt-5.1';
+  const model: ChatModel = 'gpt-5.1';
 
   const stream = await openai.chat.completions.create({
     model,
