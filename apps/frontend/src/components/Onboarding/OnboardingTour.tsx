@@ -126,12 +126,11 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ onComplete, onSk
       <div
         className="fixed z-50 bg-white rounded-lg shadow-2xl max-w-md w-full"
         style={{
-          // Use dynamic viewport height if supported, fallback to 20vh
           top: '20vh',
           left: '50%',
           transform: 'translateX(-50%)',
         }}
-        // Use a custom class for dvh support if desired, or keep inline style for simplicity
+      >
         {/* Close button */}
         <div className="absolute top-4 right-4">
           <IconButton iconProps={{ iconName: 'Cancel' }} onClick={onSkip} title="Close tour" />

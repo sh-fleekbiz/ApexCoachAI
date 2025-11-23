@@ -3,7 +3,9 @@
   "include": ["src"],
   "compilerOptions": {
     "outDir": "dist",
-    "declaration": true
+    "declaration": true,
+    "lib": ["ES2020", "DOM"],
+    "types": ["node"]
   }
 }
 
