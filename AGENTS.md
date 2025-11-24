@@ -1,3 +1,14 @@
+# ApexCoachAI Agents
+
+## Data Storage Naming
+
+Canonical identifiers:
+
+- PostgreSQL database: `apexcoachai_db` (server `pg-shared-apps-eastus2`)
+- Blob container: `apexcoachai` (storage account `stmahumsharedapps`)
+
+Use these in secrets, IaC modules, and documentation.
+
 # AGENTS.md - Apex Coach AI
 
 AI coding agent guide for Apex Coach AI, an AI-powered coaching and development platform that transforms proprietary content into interactive AI coaching experts.
@@ -53,6 +64,14 @@ ApexCoachAI/
   - Image: `shacrapps.azurecr.io/apexcoachai-indexer:latest`
   - Compute: Consumption plan (scales to zero)
 - **Custom Domain**: `apexcoachai.shtrial.com`
+
+## Custom Domains
+
+- Frontend: `https://apexcoachai.shtrial.com`
+- Backend API: `https://api.apexcoachai.shtrial.com`
+- Swagger: `https://api.apexcoachai.shtrial.com/swagger`
+
+DNS Notes: Ensure `api.apexcoachai.shtrial.com` is a CNAME to the Container App FQDN and bind TLS in the Azure portal.
 
 **Shared Resources** (all in shared resource groups):
 
