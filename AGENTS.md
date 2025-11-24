@@ -8,7 +8,7 @@ AI coding agent guide for Apex Coach AI, an AI-powered coaching and development 
 **URL**: https://apexcoachai.shtrial.com
 **Stack**: Monorepo with React frontend + Fastify search/indexer backends + Azure OpenAI/Azure AI Search
 **Target Market**: Content-focused SMBs, coaches, consultants, and training companies
-**Monorepo**: Yes (apps/frontend, apps/backend/search, apps/backend/indexer, packages/*)
+**Monorepo**: Yes (apps/frontend, apps/backend/search, apps/backend/indexer, packages/\*)
 
 ## Business Context
 
@@ -37,6 +37,32 @@ ApexCoachAI/
 │   └── ui/                # Shared UI components
 ```
 
+## Deployment Architecture
+
+**Current Deployment**: ✅ **Container Apps (Shared Environment)**
+
+- **Frontend**: Azure Static Web App `apexcoachai` in `rg-shared-web` (Free SKU)
+- **Backend API**: Azure Container App `apexcoachai-api` in shared environment:
+  - Environment: `cae-shared-apps` (in `rg-shared-apps`)
+  - Registry: `shacrapps.azurecr.io`
+  - Image: `shacrapps.azurecr.io/apexcoachai-search:latest`
+  - Compute: Consumption plan (scales to zero)
+- **Indexer**: Azure Container App `apexcoachai-indexer` in shared environment:
+  - Environment: `cae-shared-apps` (in `rg-shared-apps`)
+  - Registry: `shacrapps.azurecr.io`
+  - Image: `shacrapps.azurecr.io/apexcoachai-indexer:latest`
+  - Compute: Consumption plan (scales to zero)
+- **Custom Domain**: `apexcoachai.shtrial.com`
+
+**Shared Resources** (all in shared resource groups):
+
+- Database: `pg-shared-apps-eastus2` (database: `apexcoachai_db`)
+- Azure OpenAI: `shared-openai-eastus2` (in `rg-shared-ai`)
+- Azure AI Search: `shared-search-standard-eastus2` (in `rg-shared-ai`)
+- Storage: `stmahumsharedapps` (in `rg-shared-data`)
+
+**Cost**: ~$5-10/month (frontend + Container Apps on consumption plan)
+
 ## Tech Stack
 
 - **Monorepo**: pnpm workspaces with Turborepo
@@ -49,7 +75,7 @@ ApexCoachAI/
   - Image: `gpt-image-1-mini`
 - **Search**: Azure AI Search (`shared-search-standard-eastus2`, index prefix: `apexcoachai`)
 - **Storage**: Azure Blob Storage (`stmahumsharedapps`, prefix: `apexcoachai/`)
-- **Deployment**: 
+- **Deployment**:
   - Frontend: Azure Static Web App `apexcoachai` in `rg-shared-web` (Free SKU)
   - Backend: Azure Container Apps `apexcoachai-api` and `apexcoachai-indexer` in `rg-shared-apps` (Consumption plan)
 - **Custom Domain**: `apexcoachai.shtrial.com`
