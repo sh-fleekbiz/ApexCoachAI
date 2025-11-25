@@ -1,4 +1,34 @@
 {
+  "routes": [
+    {
+      "route": "/api/*",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/auth/*",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/chats/*",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/me/*",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/meta-prompts/*",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/settings/*",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/admin/*",
+      "allowedRoles": ["anonymous"]
+    }
+  ],
   "navigationFallback": {
     "rewrite": "/index.html",
     "exclude": [

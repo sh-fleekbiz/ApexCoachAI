@@ -5,6 +5,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import { apiBaseUrl } from '../api/index.js';
 
 export interface User {
   id: number;
@@ -36,7 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     async function checkAuth() {
       try {
-        const response = await fetch('/auth/me', {
+        const response = await fetch(`${apiBaseUrl}/auth/me`, {
           credentials: 'include',
         });
 
@@ -55,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
-    const response = await fetch('/auth/login', {
+    const response = await fetch(`${apiBaseUrl}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -72,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const demoLogin = async () => {
-    const response = await fetch('/auth/demo-login', {
+    const response = await fetch(`${apiBaseUrl}/auth/demo-login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -88,7 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const demoLoginWithRole = async (role: string) => {
-    const response = await fetch('/auth/demo-login', {
+    const response = await fetch(`${apiBaseUrl}/auth/demo-login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -105,7 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signup = async (email: string, password: string, name?: string) => {
-    const response = await fetch('/auth/signup', {
+    const response = await fetch(`${apiBaseUrl}/auth/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -122,7 +123,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
-    await fetch('/auth/logout', {
+    await fetch(`${apiBaseUrl}/auth/logout`, {
       method: 'POST',
       credentials: 'include',
     });

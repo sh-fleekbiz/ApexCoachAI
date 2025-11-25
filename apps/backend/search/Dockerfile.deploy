@@ -11,21 +11,24 @@ RUN corepack enable && \
   rm -rf /var/lib/apt/lists/*
 
 FROM base AS build
-ARG DATABASE_URL="postgresql://localhost:5432/placeholder"
-ENV DATABASE_URL=$DATABASE_URL
+# Placeholder DATABASE_URL for Prisma generate (actual URL set at runtime)
+ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder?sslmode=disable"
 COPY . /usr/src/app
 WORKDIR /usr/src/app
 # Install all dependencies with BuildKit cache
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
-# Generate Prisma client
+# Generate Prisma client with linux binaries
 RUN cd apps/backend/search && npx prisma generate
 # Build all packages
 RUN pnpm run build
 # Deploy only the search backend with its dependencies to /prod/search
 RUN pnpm deploy --filter=search --prod /prod/search
+# Copy prisma schema to deployed location (needed for runtime generation)
+RUN cp -r apps/backend/search/prisma /prod/search/prisma
 
 FROM base AS runtime
 COPY --from=build /prod/search /prod/search
 WORKDIR /prod/search
 EXPOSE 3000
-CMD [ "node", "dist/app.js" ]
+# Generate Prisma client at runtime (with actual DATABASE_URL) then start server
+CMD ["sh", "-c", "npx prisma generate --schema=./prisma/schema.prisma && npx fastify start -l info dist/app.js"]

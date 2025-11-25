@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { apiBaseUrl } from '../../api/index.js';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface DemoRole {
@@ -9,6 +11,7 @@ interface DemoRole {
 
 const DemoLoginButtons: React.FC = () => {
   const { demoLoginWithRole } = useAuth();
+  const navigate = useNavigate();
   const [demoRoles, setDemoRoles] = useState<DemoRole[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -17,7 +20,7 @@ const DemoLoginButtons: React.FC = () => {
   useEffect(() => {
     const fetchDemoRoles = async () => {
       try {
-        const response = await fetch('/auth/demo-users', {
+        const response = await fetch(`${apiBaseUrl}/auth/demo-users`, {
           credentials: 'include',
         });
 
@@ -44,6 +47,7 @@ const DemoLoginButtons: React.FC = () => {
     setError(null);
     try {
       await demoLoginWithRole(role);
+      navigate('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Demo login failed');
       setLoggingIn(null);
