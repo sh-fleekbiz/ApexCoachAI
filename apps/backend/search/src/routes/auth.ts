@@ -160,11 +160,11 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
           role: user.role,
         });
 
-        // Set cookie
+        // Set cookie - sameSite: 'none' required for cross-origin requests
         reply.setCookie('token', token, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'lax',
+          secure: true, // Required for sameSite: 'none'
+          sameSite: 'none',
           path: '/',
           maxAge: 7 * 24 * 60 * 60, // 7 days
         });
