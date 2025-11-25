@@ -8,8 +8,8 @@ const me: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
   // Export user data
   fastify.post('/me/export-data', async (request, reply) => {
-    const user = await userRepository.getUserById(request.user.id);
-    const chats = await chatRepository.getChatsForUser(request.user.id);
+    const user = await await userRepository.getUserById(request.user.id);
+    const chats = await await chatRepository.getChatsForUser(request.user.id);
     const data = {
       user,
       chats,
@@ -21,7 +21,7 @@ const me: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
   // Delete all chats
   fastify.post('/me/delete-all-chats', async (request, reply) => {
     try {
-      await chatRepository.deleteAllChatsForUser(request.user.id);
+      await await chatRepository.deleteAllChatsForUser(request.user.id);
       return { success: true };
     } catch (error) {
       fastify.log.error(error);
@@ -32,7 +32,7 @@ const me: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
   // Delete account
   fastify.post('/me/delete-account', async (request, reply) => {
     try {
-      await userRepository.deleteUser(request.user.id);
+      await await userRepository.deleteUser(request.user.id);
       reply.clearCookie('token', { path: '/' });
       return { success: true };
     } catch (error) {

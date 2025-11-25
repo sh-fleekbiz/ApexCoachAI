@@ -1,0 +1,23 @@
+# Dockerfile using pnpm deploy for proper workspace dependency resolution
+# Based on official pnpm Docker documentation
+
+FROM node:22-slim AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+FROM base AS build
+COPY . /usr/src/app
+WORKDIR /usr/src/app
+# Install all dependencies with BuildKit cache
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+# Build all packages
+RUN pnpm run build
+# Deploy only the search backend with its dependencies to /prod/search
+RUN pnpm deploy --filter=search --prod /prod/search
+
+FROM base AS runtime
+COPY --from=build /prod/search /prod/search
+WORKDIR /prod/search
+EXPOSE 3000
+CMD [ "node", "dist/app.js" ]

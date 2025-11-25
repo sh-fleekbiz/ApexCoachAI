@@ -32,7 +32,7 @@ const settings: FastifyPluginAsync = async (fastify, _options): Promise<void> =>
       },
     },
     handler: async function (_request, _reply) {
-      const metaPrompts = metaPromptRepository.getAllMetaPrompts();
+      const metaPrompts = await await metaPromptRepository.getAllMetaPrompts();
 
       return {
         metaPrompts: metaPrompts.map((mp) => ({
@@ -71,11 +71,11 @@ const settings: FastifyPluginAsync = async (fastify, _options): Promise<void> =>
       },
     },
     handler: async function (request, _reply) {
-      let settings = userSettingsRepository.getUserSettings(request.user!.id);
+      let settings = await userSettingsRepository.getUserSettings(request.user!.id);
 
       // If no settings exist, create default ones
       if (!settings) {
-        settings = userSettingsRepository.upsertUserSettings({ user_id: request.user!.id });
+        settings = await userSettingsRepository.upsertUserSettings({ user_id: request.user!.id });
       }
 
       return {
@@ -128,7 +128,7 @@ const settings: FastifyPluginAsync = async (fastify, _options): Promise<void> =>
         occupation?: string | null;
       };
 
-      const settings = userSettingsRepository.upsertUserSettings({
+      const settings = await await userSettingsRepository.upsertUserSettings({
         user_id: request.user!.id,
         default_personality_id: body.defaultPersonalityId,
         nickname: body.nickname,

@@ -1,5 +1,5 @@
-import { database } from './database.js';
-import type { Role, Citation } from 'shared/chat-types.js';
+import { withClient } from '@shared/data';
+import type { Citation, Role } from 'shared/chat-types.js';
 
 export interface ChatMessage {
   id: number;
@@ -18,38 +18,60 @@ export interface CreateMessageParameters {
 }
 
 export const messageRepository = {
-  getMessagesByChatId(chatId: number, limit?: number): ChatMessage[] {
-    if (limit) {
-      return database
-        .prepare('SELECT * FROM chat_messages WHERE chat_id = ? ORDER BY created_at DESC LIMIT ?')
-        .all(chatId, limit) as ChatMessage[];
-    }
-    return database
-      .prepare('SELECT * FROM chat_messages WHERE chat_id = ? ORDER BY created_at ASC')
-      .all(chatId) as ChatMessage[];
+  async getMessagesByChatId(
+    chatId: number,
+    limit?: number
+  ): Promise<ChatMessage[]> {
+    return withClient(async (client) => {
+      if (limit) {
+        const result = await client.query(
+          'SELECT * FROM chat_messages WHERE chat_id = $1 ORDER BY created_at DESC LIMIT $2',
+          [chatId, limit]
+        );
+        return result.rows as ChatMessage[];
+      }
+      const result = await client.query(
+        'SELECT * FROM chat_messages WHERE chat_id = $1 ORDER BY created_at ASC',
+        [chatId]
+      );
+      return result.rows as ChatMessage[];
+    });
   },
 
-  getRecentMessages(chatId: number, limit: number): ChatMessage[] {
-    const messages = database
-      .prepare('SELECT * FROM chat_messages WHERE chat_id = ? ORDER BY created_at DESC LIMIT ?')
-      .all(chatId, limit) as ChatMessage[];
-
-    // Return in chronological order (oldest first)
-    return messages.reverse();
+  async getRecentMessages(
+    chatId: number,
+    limit: number
+  ): Promise<ChatMessage[]> {
+    return withClient(async (client) => {
+      const result = await client.query(
+        'SELECT * FROM chat_messages WHERE chat_id = $1 ORDER BY created_at DESC LIMIT $2',
+        [chatId, limit]
+      );
+      // Return in chronological order (oldest first)
+      return (result.rows as ChatMessage[]).reverse();
+    });
   },
 
-  createMessage(parameters: CreateMessageParameters): ChatMessage {
+  async createMessage(
+    parameters: CreateMessageParameters
+  ): Promise<ChatMessage> {
     const { chat_id, role, content, citations } = parameters;
-    const citations_json = citations ? JSON.stringify(citations) : undefined;
+    const citations_json = citations ? JSON.stringify(citations) : null;
 
-    const result = database
-      .prepare('INSERT INTO chat_messages (chat_id, role, content, citations_json) VALUES (?, ?, ?, ?)')
-      .run(chat_id, role, content, citations_json);
-
-    return database.prepare('SELECT * FROM chat_messages WHERE id = ?').get(result.lastInsertRowid) as ChatMessage;
+    return withClient(async (client) => {
+      const result = await client.query(
+        'INSERT INTO chat_messages (chat_id, role, content, citations_json) VALUES ($1, $2, $3, $4) RETURNING *',
+        [chat_id, role, content, citations_json]
+      );
+      return result.rows[0] as ChatMessage;
+    });
   },
 
-  deleteMessagesByChatId(chatId: number): void {
-    database.prepare('DELETE FROM chat_messages WHERE chat_id = ?').run(chatId);
+  async deleteMessagesByChatId(chatId: number): Promise<void> {
+    return withClient(async (client) => {
+      await client.query('DELETE FROM chat_messages WHERE chat_id = $1', [
+        chatId,
+      ]);
+    });
   },
 };

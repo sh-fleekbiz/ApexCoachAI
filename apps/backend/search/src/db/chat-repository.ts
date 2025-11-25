@@ -1,4 +1,4 @@
-import { database } from './database.js';
+import { withClient } from '@shared/data';
 
 export interface Chat {
   id: number;
@@ -14,38 +14,73 @@ export interface CreateChatParameters {
 }
 
 export const chatRepository = {
-  getChatsByUserId(userId: number): Chat[] {
-    return database.prepare('SELECT * FROM chats WHERE user_id = ? ORDER BY updated_at DESC').all(userId) as Chat[];
+  async getChatsByUserId(userId: number): Promise<Chat[]> {
+    return withClient(async (client) => {
+      const result = await client.query(
+        'SELECT * FROM chats WHERE user_id = $1 ORDER BY updated_at DESC',
+        [userId]
+      );
+      return result.rows as Chat[];
+    });
   },
 
-  getChatById(chatId: number): Chat | undefined {
-    return database.prepare('SELECT * FROM chats WHERE id = ?').get(chatId) as Chat | undefined;
+  async getChatById(chatId: number): Promise<Chat | undefined> {
+    return withClient(async (client) => {
+      const result = await client.query('SELECT * FROM chats WHERE id = $1', [
+        chatId,
+      ]);
+      return result.rows.length > 0 ? (result.rows[0] as Chat) : undefined;
+    });
   },
 
-  createChat(parameters: CreateChatParameters): Chat {
+  async createChat(parameters: CreateChatParameters): Promise<Chat> {
     const { user_id, title } = parameters;
-    const result = database.prepare('INSERT INTO chats (user_id, title) VALUES (?, ?)').run(user_id, title);
-
-    return this.getChatById(result.lastInsertRowid as number)!;
+    return withClient(async (client) => {
+      const result = await client.query(
+        'INSERT INTO chats (user_id, title) VALUES ($1, $2) RETURNING *',
+        [user_id, title]
+      );
+      return result.rows[0] as Chat;
+    });
   },
 
-  updateChatTimestamp(chatId: number): void {
-    database.prepare('UPDATE chats SET updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(chatId);
+  async updateChatTimestamp(chatId: number): Promise<void> {
+    return withClient(async (client) => {
+      await client.query(
+        'UPDATE chats SET updated_at = CURRENT_TIMESTAMP WHERE id = $1',
+        [chatId]
+      );
+    });
   },
 
-  updateChatTitle(chatId: number, title: string): void {
-    database.prepare('UPDATE chats SET title = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(title, chatId);
+  async updateChatTitle(chatId: number, title: string): Promise<void> {
+    return withClient(async (client) => {
+      await client.query(
+        'UPDATE chats SET title = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
+        [title, chatId]
+      );
+    });
   },
 
-  deleteChat(chatId: number): void {
-    database.prepare('DELETE FROM chats WHERE id = ?').run(chatId);
+  async deleteChat(chatId: number): Promise<void> {
+    return withClient(async (client) => {
+      await client.query('DELETE FROM chats WHERE id = $1', [chatId]);
+    });
   },
 
-  deleteAllChatsForUser(userId: number): void {
-    database.prepare('DELETE FROM chats WHERE user_id = ?').run(userId);
+  async deleteAllChatsForUser(userId: number): Promise<void> {
+    return withClient(async (client) => {
+      await client.query('DELETE FROM chats WHERE user_id = $1', [userId]);
+    });
   },
 
-  getChatsForUser(userId: number): Chat[] {
-    return database.prepare('SELECT * FROM chats WHERE user_id = ?').all(userId) as Chat[];
+  async getChatsForUser(userId: number): Promise<Chat[]> {
+    return withClient(async (client) => {
+      const result = await client.query(
+        'SELECT * FROM chats WHERE user_id = $1',
+        [userId]
+      );
+      return result.rows as Chat[];
+    });
   },
 };

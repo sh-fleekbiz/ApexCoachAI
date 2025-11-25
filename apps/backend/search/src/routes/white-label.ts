@@ -32,7 +32,7 @@ const whiteLabelRoutes: FastifyPluginAsync = async (_fastify, _options): Promise
     } as const,
     handler: async function (_request, reply) {
       try {
-        const settings = whiteLabelSettingsRepository.getSettings();
+        const settings = await await whiteLabelSettingsRepository.getSettings();
 
         if (!settings) {
           return reply.send({
@@ -101,7 +101,7 @@ const whiteLabelRoutes: FastifyPluginAsync = async (_fastify, _options): Promise
       };
 
       try {
-        const settings = whiteLabelSettingsRepository.updateSettings({
+        const settings = await await whiteLabelSettingsRepository.updateSettings({
           logo_url: logoUrl,
           brand_color: brandColor,
           app_name: appName,
@@ -109,7 +109,7 @@ const whiteLabelRoutes: FastifyPluginAsync = async (_fastify, _options): Promise
         });
 
         // Log admin action
-        adminActionLogRepository.createLog({
+        await adminActionLogRepository.createLog({
           user_id: request.user!.id,
           action: 'update_white_label_settings',
           entity_type: 'white_label_settings',
@@ -154,10 +154,10 @@ const whiteLabelRoutes: FastifyPluginAsync = async (_fastify, _options): Promise
     } as const,
     handler: async function (request, reply) {
       try {
-        whiteLabelSettingsRepository.resetSettings();
+        await whiteLabelSettingsRepository.resetSettings();
 
         // Log admin action
-        adminActionLogRepository.createLog({
+        await adminActionLogRepository.createLog({
           user_id: request.user!.id,
           action: 'reset_white_label_settings',
           entity_type: 'white_label_settings',

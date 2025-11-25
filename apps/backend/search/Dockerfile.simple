@@ -1,0 +1,28 @@
+FROM node:22-alpine
+
+WORKDIR /app
+
+# Copy package manifests first for dependency installation
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY apps/backend/search/package.json ./apps/backend/search/
+COPY packages/shared/package.json ./packages/shared/
+COPY packages/shared-data/package.json ./packages/shared-data/
+COPY packages/shared-ai/package.json ./packages/shared-ai/
+
+# Install pnpm and ALL dependencies (prod will still work in runtime)
+RUN npm install -g pnpm@10.0.0
+RUN pnpm install --frozen-lockfile
+
+# Now copy the built artifacts
+COPY apps/backend/search/dist ./apps/backend/search/dist
+COPY apps/backend/search/prisma ./apps/backend/search/prisma
+COPY packages/shared/dist ./packages/shared/dist
+COPY packages/shared-data/dist ./packages/shared-data/dist
+COPY packages/shared-ai/dist ./packages/shared-ai/dist
+
+# Set working directory and expose port
+WORKDIR /app/apps/backend/search
+EXPOSE 3000
+
+# Start the application
+CMD ["node", "dist/app.js"]

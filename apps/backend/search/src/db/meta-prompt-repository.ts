@@ -1,10 +1,10 @@
-import { database } from './database.js';
+import { withClient } from '@shared/data';
 
 export interface MetaPrompt {
   id: number;
   name: string;
   prompt_text: string;
-  is_default: number; // SQLite stores booleans as 0/1
+  is_default: boolean;
   created_at: string;
 }
 
@@ -15,64 +15,99 @@ export interface CreateMetaPromptParameters {
 }
 
 export const metaPromptRepository = {
-  getAllMetaPrompts(): MetaPrompt[] {
-    return database.prepare('SELECT * FROM meta_prompts ORDER BY created_at DESC').all() as MetaPrompt[];
+  async getAllMetaPrompts(): Promise<MetaPrompt[]> {
+    return withClient(async (client) => {
+      const result = await client.query(
+        'SELECT * FROM meta_prompts ORDER BY created_at DESC'
+      );
+      return result.rows as MetaPrompt[];
+    });
   },
 
-  getMetaPromptById(id: number): MetaPrompt | undefined {
-    return database.prepare('SELECT * FROM meta_prompts WHERE id = ?').get(id) as MetaPrompt | undefined;
+  async getMetaPromptById(id: number): Promise<MetaPrompt | undefined> {
+    return withClient(async (client) => {
+      const result = await client.query(
+        'SELECT * FROM meta_prompts WHERE id = $1',
+        [id]
+      );
+      return result.rows.length > 0
+        ? (result.rows[0] as MetaPrompt)
+        : undefined;
+    });
   },
 
-  getDefaultMetaPrompt(): MetaPrompt | undefined {
-    return database.prepare('SELECT * FROM meta_prompts WHERE is_default = 1 LIMIT 1').get() as MetaPrompt | undefined;
+  async getDefaultMetaPrompt(): Promise<MetaPrompt | undefined> {
+    return withClient(async (client) => {
+      const result = await client.query(
+        'SELECT * FROM meta_prompts WHERE is_default = TRUE LIMIT 1'
+      );
+      return result.rows.length > 0
+        ? (result.rows[0] as MetaPrompt)
+        : undefined;
+    });
   },
 
-  createMetaPrompt(parameters: CreateMetaPromptParameters): MetaPrompt {
+  async createMetaPrompt(
+    parameters: CreateMetaPromptParameters
+  ): Promise<MetaPrompt> {
     const { name, prompt_text, is_default } = parameters;
 
-    // If setting as default, unset other defaults first
-    if (is_default) {
-      database.prepare('UPDATE meta_prompts SET is_default = 0').run();
-    }
+    return withClient(async (client) => {
+      // If setting as default, unset other defaults first
+      if (is_default) {
+        await client.query('UPDATE meta_prompts SET is_default = FALSE');
+      }
 
-    const result = database
-      .prepare('INSERT INTO meta_prompts (name, prompt_text, is_default) VALUES (?, ?, ?)')
-      .run(name, prompt_text, is_default ? 1 : 0);
-
-    return this.getMetaPromptById(result.lastInsertRowid as number)!;
+      const result = await client.query(
+        'INSERT INTO meta_prompts (name, prompt_text, is_default) VALUES ($1, $2, $3) RETURNING *',
+        [name, prompt_text, is_default ?? false]
+      );
+      return result.rows[0] as MetaPrompt;
+    });
   },
 
-  updateMetaPrompt(id: number, parameters: Partial<CreateMetaPromptParameters>): void {
+  async updateMetaPrompt(
+    id: number,
+    parameters: Partial<CreateMetaPromptParameters>
+  ): Promise<void> {
     const { name, prompt_text, is_default } = parameters;
 
-    // If setting as default, unset other defaults first
-    if (is_default) {
-      database.prepare('UPDATE meta_prompts SET is_default = 0').run();
-    }
+    return withClient(async (client) => {
+      // If setting as default, unset other defaults first
+      if (is_default) {
+        await client.query('UPDATE meta_prompts SET is_default = FALSE');
+      }
 
-    const updates: string[] = [];
-    const values: any[] = [];
+      const updates: string[] = [];
+      const values: any[] = [];
+      let paramIndex = 1;
 
-    if (name !== undefined) {
-      updates.push('name = ?');
-      values.push(name);
-    }
-    if (prompt_text !== undefined) {
-      updates.push('prompt_text = ?');
-      values.push(prompt_text);
-    }
-    if (is_default !== undefined) {
-      updates.push('is_default = ?');
-      values.push(is_default ? 1 : 0);
-    }
+      if (name !== undefined) {
+        updates.push(`name = $${paramIndex++}`);
+        values.push(name);
+      }
+      if (prompt_text !== undefined) {
+        updates.push(`prompt_text = $${paramIndex++}`);
+        values.push(prompt_text);
+      }
+      if (is_default !== undefined) {
+        updates.push(`is_default = $${paramIndex++}`);
+        values.push(is_default);
+      }
 
-    if (updates.length > 0) {
-      values.push(id);
-      database.prepare(`UPDATE meta_prompts SET ${updates.join(', ')} WHERE id = ?`).run(...values);
-    }
+      if (updates.length > 0) {
+        values.push(id);
+        await client.query(
+          `UPDATE meta_prompts SET ${updates.join(', ')} WHERE id = $${paramIndex}`,
+          values
+        );
+      }
+    });
   },
 
-  deleteMetaPrompt(id: number): void {
-    database.prepare('DELETE FROM meta_prompts WHERE id = ?').run(id);
+  async deleteMetaPrompt(id: number): Promise<void> {
+    return withClient(async (client) => {
+      await client.query('DELETE FROM meta_prompts WHERE id = $1', [id]);
+    });
   },
 };

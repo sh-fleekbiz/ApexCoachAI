@@ -1,4 +1,4 @@
-import { database } from './database.js';
+import { withClient } from '@shared/data';
 
 export interface AdminActionLog {
   id: number;
@@ -21,49 +21,82 @@ export interface CreateAdminActionLogParameters {
 }
 
 export const adminActionLogRepository = {
-  createLog(parameters: CreateAdminActionLogParameters): AdminActionLog {
-    const { user_id, action, entity_type, entity_id, description, meta_json } = parameters;
-    const result = database
-      .prepare(
+  async createLog(
+    parameters: CreateAdminActionLogParameters
+  ): Promise<AdminActionLog> {
+    const { user_id, action, entity_type, entity_id, description, meta_json } =
+      parameters;
+    return withClient(async (client) => {
+      const result = await client.query(
         `INSERT INTO admin_action_logs (user_id, action, entity_type, entity_id, description, meta_json)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-      )
-      .run(
-        user_id,
-        action,
-        entity_type ?? null,
-        entity_id ?? null,
-        description ?? null,
-        meta_json ? JSON.stringify(meta_json) : null,
+         VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+        [
+          user_id,
+          action,
+          entity_type ?? null,
+          entity_id ?? null,
+          description ?? null,
+          meta_json ? JSON.stringify(meta_json) : null,
+        ]
       );
-
-    return this.getLogById(result.lastInsertRowid as number)!;
+      return result.rows[0] as AdminActionLog;
+    });
   },
 
-  getLogById(id: number): AdminActionLog | undefined {
-    return database.prepare('SELECT * FROM admin_action_logs WHERE id = ?').get(id) as AdminActionLog | undefined;
+  async getLogById(id: number): Promise<AdminActionLog | undefined> {
+    return withClient(async (client) => {
+      const result = await client.query(
+        'SELECT * FROM admin_action_logs WHERE id = $1',
+        [id]
+      );
+      return result.rows.length > 0
+        ? (result.rows[0] as AdminActionLog)
+        : undefined;
+    });
   },
 
-  getLogsByUserId(userId: number, limit = 100): AdminActionLog[] {
-    return database
-      .prepare('SELECT * FROM admin_action_logs WHERE user_id = ? ORDER BY created_at DESC LIMIT ?')
-      .all(userId, limit) as AdminActionLog[];
+  async getLogsByUserId(
+    userId: number,
+    limit = 100
+  ): Promise<AdminActionLog[]> {
+    return withClient(async (client) => {
+      const result = await client.query(
+        'SELECT * FROM admin_action_logs WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2',
+        [userId, limit]
+      );
+      return result.rows as AdminActionLog[];
+    });
   },
 
-  getLogsByAction(action: string, limit = 100): AdminActionLog[] {
-    return database
-      .prepare('SELECT * FROM admin_action_logs WHERE action = ? ORDER BY created_at DESC LIMIT ?')
-      .all(action, limit) as AdminActionLog[];
+  async getLogsByAction(
+    action: string,
+    limit = 100
+  ): Promise<AdminActionLog[]> {
+    return withClient(async (client) => {
+      const result = await client.query(
+        'SELECT * FROM admin_action_logs WHERE action = $1 ORDER BY created_at DESC LIMIT $2',
+        [action, limit]
+      );
+      return result.rows as AdminActionLog[];
+    });
   },
 
-  getAllLogs(limit = 100, offset = 0): AdminActionLog[] {
-    return database
-      .prepare('SELECT * FROM admin_action_logs ORDER BY created_at DESC LIMIT ? OFFSET ?')
-      .all(limit, offset) as AdminActionLog[];
+  async getAllLogs(limit = 100, offset = 0): Promise<AdminActionLog[]> {
+    return withClient(async (client) => {
+      const result = await client.query(
+        'SELECT * FROM admin_action_logs ORDER BY created_at DESC LIMIT $1 OFFSET $2',
+        [limit, offset]
+      );
+      return result.rows as AdminActionLog[];
+    });
   },
 
-  getLogsCount(): number {
-    const result = database.prepare('SELECT COUNT(*) as count FROM admin_action_logs').get() as { count: number };
-    return result.count;
+  async getLogsCount(): Promise<number> {
+    return withClient(async (client) => {
+      const result = await client.query(
+        'SELECT COUNT(*) as count FROM admin_action_logs'
+      );
+      return parseInt(result.rows[0].count, 10);
+    });
   },
 };

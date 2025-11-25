@@ -1,0 +1,28 @@
+FROM node:22-slim AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+FROM base AS build
+COPY . /usr/src/app
+WORKDIR /usr/src/app
+
+# Install and build
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm run build
+
+# Debug: Check what packages exist
+RUN pnpm list --depth 0
+
+# Try deploy with debug output
+RUN mkdir -p /prod && \
+  pnpm --filter=search deploy --prod /prod/search || true && \
+  echo "=== Deploy output ===" && \
+  ls -la /prod/ && \
+  if [ -d /prod/search ]; then ls -la /prod/search/; fi
+
+# Keep the image for inspection
+FROM base AS runtime
+COPY --from=build /usr/src/app /inspect
+WORKDIR /inspect
+CMD ["/bin/sh"]

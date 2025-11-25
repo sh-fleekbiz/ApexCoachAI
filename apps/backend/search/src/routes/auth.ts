@@ -46,7 +46,7 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
       try {
         // Check if user already exists
-        const existingUser = await userRepository.getUserByEmail(email);
+        const existingUser = await await userRepository.getUserByEmail(email);
         if (existingUser) {
           return reply
             .code(400)
@@ -57,7 +57,7 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
         const password_hash = await bcrypt.hash(password, 10);
 
         // Create user
-        const user = await userRepository.createUser({
+        const user = await await userRepository.createUser({
           email,
           password_hash,
           name,
@@ -71,7 +71,7 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
         });
 
         // Log usage event
-        usageEventRepository.createUsageEvent({
+        await usageEventRepository.createUsageEvent({
           user_id: user.id,
           type: 'login',
         });
@@ -139,7 +139,7 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
       try {
         // Find user
-        const user = await userRepository.getUserByEmail(email);
+        const user = await await userRepository.getUserByEmail(email);
         if (!user) {
           return reply.code(401).send({ error: 'Invalid email or password' });
         }
@@ -239,7 +239,7 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       }
 
       try {
-        const demoUsers = await userRepository.getDemoUsers();
+        const demoUsers = await await userRepository.getDemoUsers();
 
         return {
           demoUsers: demoUsers.map((user) => ({
@@ -304,7 +304,7 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
         // If role is specified, find demo user by role
         if (role) {
-          user = await userRepository.getDemoUserByRole(role);
+          user = await await userRepository.getDemoUserByRole(role);
           if (!user) {
             return reply
               .code(400)
@@ -312,7 +312,7 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
           }
         } else {
           // Fallback: get first demo user (for backward compatibility)
-          const demoUsers = await userRepository.getDemoUsers();
+          const demoUsers = await await userRepository.getDemoUsers();
           if (demoUsers.length === 0) {
             return reply.code(500).send({ error: 'No demo users available' });
           }
@@ -327,7 +327,7 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
         });
 
         // Log usage event
-        await usageEventRepository.createUsageEvent({
+        await await usageEventRepository.createUsageEvent({
           user_id: user.id,
           type: 'login',
         });
@@ -391,12 +391,12 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
       try {
         // Check if demo user exists
-        let user = await userRepository.getUserByEmail(demoEmail);
+        let user = await await userRepository.getUserByEmail(demoEmail);
 
         // Create demo user if it doesn't exist
         if (!user) {
           const password_hash = await bcrypt.hash(demoPassword, 10);
-          user = await userRepository.createUser({
+          user = await await userRepository.createUser({
             email: demoEmail,
             password_hash,
             name: 'Demo User',
@@ -411,7 +411,7 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
         });
 
         // Log usage event
-        await usageEventRepository.createUsageEvent({
+        await await usageEventRepository.createUsageEvent({
           user_id: user.id,
           type: 'login',
         });
@@ -466,7 +466,7 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       },
     },
     handler: async function (request, _reply) {
-      const user = await userRepository.getUserById(request.user!.id);
+      const user = await await userRepository.getUserById(request.user!.id);
       return {
         user: {
           id: user!.id,

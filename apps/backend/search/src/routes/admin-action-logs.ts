@@ -66,14 +66,14 @@ const adminActionLogRoutes: FastifyPluginAsync = async (_fastify, _options): Pro
         let logs;
 
         if (userId) {
-          logs = adminActionLogRepository.getLogsByUserId(userId, limit || 100);
+          logs = await adminActionLogRepository.getLogsByUserId(userId, limit || 100);
         } else if (action) {
-          logs = adminActionLogRepository.getLogsByAction(action, limit || 100);
+          logs = await adminActionLogRepository.getLogsByAction(action, limit || 100);
         } else {
-          logs = adminActionLogRepository.getAllLogs(limit || 100, offset || 0);
+          logs = await adminActionLogRepository.getAllLogs(limit || 100, offset || 0);
         }
 
-        const total = adminActionLogRepository.getLogsCount();
+        const total = await await adminActionLogRepository.getLogsCount();
 
         const formattedLogs = logs.map((log) => ({
           id: log.id,
@@ -147,7 +147,7 @@ const adminActionLogRoutes: FastifyPluginAsync = async (_fastify, _options): Pro
       const { limit } = request.query as { limit?: number };
 
       try {
-        const logs = adminActionLogRepository.getLogsByUserId(userId, limit || 100);
+        const logs = await await adminActionLogRepository.getLogsByUserId(userId, limit || 100);
 
         const formattedLogs = logs.map((log) => ({
           id: log.id,

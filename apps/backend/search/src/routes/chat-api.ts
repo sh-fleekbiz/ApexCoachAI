@@ -70,7 +70,7 @@ const chatApi: FastifyPluginAsync = async (_fastify, _options): Promise<void> =>
         // Get or create chat
         let chat;
         if (chatId) {
-          chat = chatRepository.getChatById(chatId);
+          chat = await chatRepository.getChatById(chatId);
           if (!chat || chat.user_id !== request.user!.id) {
             // @ts-expect-error: 403 status code not in schema but needed for RBAC
             return reply.code(403).send({ error: 'Forbidden' });
@@ -78,21 +78,21 @@ const chatApi: FastifyPluginAsync = async (_fastify, _options): Promise<void> =>
         } else {
           // Create new chat with title from first message
           const title = input.length > 50 ? input.slice(0, 50) + '...' : input;
-          chat = chatRepository.createChat({
+          chat = await chatRepository.createChat({
             user_id: request.user!.id,
             title,
           });
         }
 
         // Save user message
-        messageRepository.createMessage({
+        await messageRepository.createMessage({
           chat_id: chat.id,
           role: 'user',
           content: input,
         });
 
         // Log usage event
-        usageEventRepository.createUsageEvent({
+        await usageEventRepository.createUsageEvent({
           user_id: request.user!.id,
           type: 'chat_message',
           meta_json: { chatId: chat.id, role: 'user' },
@@ -101,21 +101,21 @@ const chatApi: FastifyPluginAsync = async (_fastify, _options): Promise<void> =>
         // Get personality/meta prompt
         let personalityPromptText = '';
         if (personalityId) {
-          const personality = metaPromptRepository.getMetaPromptById(personalityId);
+          const personality = await await metaPromptRepository.getMetaPromptById(personalityId);
           if (personality) {
             personalityPromptText = personality.prompt_text;
           }
         } else {
           // Use default personality from user settings
-          const settings = userSettingsRepository.getUserSettings(request.user!.id);
+          const settings = await await userSettingsRepository.getUserSettings(request.user!.id);
           if (settings?.default_personality_id) {
-            const personality = metaPromptRepository.getMetaPromptById(settings.default_personality_id);
+            const personality = await await metaPromptRepository.getMetaPromptById(settings.default_personality_id);
             if (personality) {
               personalityPromptText = personality.prompt_text;
             }
           } else {
             // Use global default
-            const defaultPersonality = metaPromptRepository.getDefaultMetaPrompt();
+            const defaultPersonality = await await metaPromptRepository.getDefaultMetaPrompt();
             if (defaultPersonality) {
               personalityPromptText = defaultPersonality.prompt_text;
             }
@@ -123,7 +123,7 @@ const chatApi: FastifyPluginAsync = async (_fastify, _options): Promise<void> =>
         }
 
         // Get recent messages for context (last 10 messages)
-        const recentDatabaseMessages = messageRepository.getRecentMessages(chat.id, 10);
+        const recentDatabaseMessages = await await messageRepository.getRecentMessages(chat.id, 10);
 
         // Build messages array with system prompt
         const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [];
@@ -192,7 +192,7 @@ const chatApi: FastifyPluginAsync = async (_fastify, _options): Promise<void> =>
 
           // Save assistant response
           if (fullResponse) {
-            messageRepository.createMessage({
+            await messageRepository.createMessage({
               chat_id: chat.id,
               role: 'assistant',
               content: fullResponse,
@@ -200,7 +200,7 @@ const chatApi: FastifyPluginAsync = async (_fastify, _options): Promise<void> =>
             });
 
             // Log usage event
-            usageEventRepository.createUsageEvent({
+            await usageEventRepository.createUsageEvent({
               user_id: request.user!.id,
               type: 'chat_message',
               meta_json: { chatId: chat.id, role: 'assistant' },
@@ -208,7 +208,7 @@ const chatApi: FastifyPluginAsync = async (_fastify, _options): Promise<void> =>
           }
 
           // Update chat timestamp
-          chatRepository.updateChatTimestamp(chat.id);
+          await chatRepository.updateChatTimestamp(chat.id);
 
           // Send final metadata
           buffer.push(JSON.stringify({ chatId: chat.id, done: true }) + '\n');
@@ -233,7 +233,7 @@ const chatApi: FastifyPluginAsync = async (_fastify, _options): Promise<void> =>
             }
 
             // Save assistant response
-            messageRepository.createMessage({
+            await messageRepository.createMessage({
               chat_id: chat.id,
               role: 'assistant',
               content: assistantMessage.content,
@@ -241,7 +241,7 @@ const chatApi: FastifyPluginAsync = async (_fastify, _options): Promise<void> =>
             });
 
             // Log usage event
-            usageEventRepository.createUsageEvent({
+            await usageEventRepository.createUsageEvent({
               user_id: request.user!.id,
               type: 'chat_message',
               meta_json: { chatId: chat.id, role: 'assistant' },
@@ -249,7 +249,7 @@ const chatApi: FastifyPluginAsync = async (_fastify, _options): Promise<void> =>
           }
 
           // Update chat timestamp
-          chatRepository.updateChatTimestamp(chat.id);
+          await chatRepository.updateChatTimestamp(chat.id);
 
           return {
             ...response,

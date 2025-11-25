@@ -1,4 +1,4 @@
-import { database } from './database.js';
+import { withClient } from '@shared/data';
 
 export interface Program {
   id: number;
@@ -17,42 +17,85 @@ export interface ProgramAssignment {
 }
 
 export const programRepository = {
-  createProgram(program: Omit<Program, 'id' | 'created_at'>): Program {
-    const stmt = database.prepare('INSERT INTO programs (name, description, created_by_user_id) VALUES (?, ?, ?)');
-    const result = stmt.run(program.name, program.description, program.created_by_user_id);
-    return this.getProgramById(result.lastInsertRowid as number)!;
+  async createProgram(
+    program: Omit<Program, 'id' | 'created_at'>
+  ): Promise<Program> {
+    return withClient(async (client) => {
+      const result = await client.query(
+        'INSERT INTO programs (name, description, created_by_user_id) VALUES ($1, $2, $3) RETURNING *',
+        [program.name, program.description, program.created_by_user_id]
+      );
+      return result.rows[0] as Program;
+    });
   },
 
-  getProgramById(id: number): Program | undefined {
-    return database.prepare('SELECT * FROM programs WHERE id = ?').get(id) as Program | undefined;
+  async getProgramById(id: number): Promise<Program | undefined> {
+    return withClient(async (client) => {
+      const result = await client.query(
+        'SELECT * FROM programs WHERE id = $1',
+        [id]
+      );
+      return result.rows.length > 0 ? (result.rows[0] as Program) : undefined;
+    });
   },
 
-  getAllPrograms(): Program[] {
-    return database.prepare('SELECT * FROM programs').all() as Program[];
+  async getAllPrograms(): Promise<Program[]> {
+    return withClient(async (client) => {
+      const result = await client.query('SELECT * FROM programs');
+      return result.rows as Program[];
+    });
   },
 
-  createProgramAssignment(assignment: Omit<ProgramAssignment, 'id' | 'created_at'>): ProgramAssignment {
-    const stmt = database.prepare('INSERT INTO program_assignments (program_id, user_id, role) VALUES (?, ?, ?)');
-    const result = stmt.run(assignment.program_id, assignment.user_id, assignment.role);
-    return this.getProgramAssignmentById(result.lastInsertRowid as number)!;
+  async createProgramAssignment(
+    assignment: Omit<ProgramAssignment, 'id' | 'created_at'>
+  ): Promise<ProgramAssignment> {
+    return withClient(async (client) => {
+      const result = await client.query(
+        'INSERT INTO program_assignments (program_id, user_id, role) VALUES ($1, $2, $3) RETURNING *',
+        [assignment.program_id, assignment.user_id, assignment.role]
+      );
+      return result.rows[0] as ProgramAssignment;
+    });
   },
 
-  getProgramAssignmentById(id: number): ProgramAssignment | undefined {
-    return database.prepare('SELECT * FROM program_assignments WHERE id = ?').get(id) as ProgramAssignment | undefined;
+  async getProgramAssignmentById(
+    id: number
+  ): Promise<ProgramAssignment | undefined> {
+    return withClient(async (client) => {
+      const result = await client.query(
+        'SELECT * FROM program_assignments WHERE id = $1',
+        [id]
+      );
+      return result.rows.length > 0
+        ? (result.rows[0] as ProgramAssignment)
+        : undefined;
+    });
   },
 
-  getProgramAssignments(programId: number): ProgramAssignment[] {
-    return database
-      .prepare('SELECT * FROM program_assignments WHERE program_id = ?')
-      .all(programId) as ProgramAssignment[];
+  async getProgramAssignments(programId: number): Promise<ProgramAssignment[]> {
+    return withClient(async (client) => {
+      const result = await client.query(
+        'SELECT * FROM program_assignments WHERE program_id = $1',
+        [programId]
+      );
+      return result.rows as ProgramAssignment[];
+    });
   },
 
-  getUserProgramAssignments(userId: number): ProgramAssignment[] {
-    return database.prepare('SELECT * FROM program_assignments WHERE user_id = ?').all(userId) as ProgramAssignment[];
+  async getUserProgramAssignments(
+    userId: number
+  ): Promise<ProgramAssignment[]> {
+    return withClient(async (client) => {
+      const result = await client.query(
+        'SELECT * FROM program_assignments WHERE user_id = $1',
+        [userId]
+      );
+      return result.rows as ProgramAssignment[];
+    });
   },
 
-  getUserProgramIds(userId: number): number[] {
-    const assignments = this.getUserProgramAssignments(userId);
+  async getUserProgramIds(userId: number): Promise<number[]> {
+    const assignments = await this.getUserProgramAssignments(userId);
     return assignments.map((a) => a.program_id);
   },
 };

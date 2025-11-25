@@ -123,3 +123,4 @@ TODO
 # GitHub Copilot instructions - keep in sync
 # ====================
 !.github/instructions/
+deploy/

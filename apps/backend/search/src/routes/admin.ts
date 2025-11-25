@@ -20,7 +20,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
   // Get all users
   fastify.get('/admin/users', async (_request, _reply) => {
-    return userRepository.getAllUsers();
+    return await await userRepository.getAllUsers();
   });
 
   // Update user role
@@ -49,7 +49,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
     try {
       // Get user before update for logging
-      const user = userRepository.getUserById(userId);
+      const user = await await userRepository.getUserById(userId);
       if (!user) {
         return reply.code(404).send({
           error: 'User not found',
@@ -58,11 +58,11 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       }
 
       const oldRole = user.role;
-      userRepository.updateUserRole(userId, role);
+      await userRepository.updateUserRole(userId, role);
 
       // Log admin action
       try {
-        adminActionLogRepository.createLog({
+        await adminActionLogRepository.createLog({
           user_id: (request as unknown as AuthenticatedRequest).user.id,
           action: 'update_user_role',
           entity_type: 'user',
@@ -87,7 +87,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
   // Get all invitations
   fastify.get('/admin/invitations', async (_request, _reply) => {
-    return invitationRepository.getAllInvitations();
+    return await await invitationRepository.getAllInvitations();
   });
 
   // Create invitation
@@ -105,10 +105,10 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
     }
 
     try {
-      const invitation = invitationRepository.createInvitation({ email, role, invited_by_user_id });
+      const invitation = await await invitationRepository.createInvitation({ email, role, invited_by_user_id });
 
       // Log admin action
-      adminActionLogRepository.createLog({
+      await adminActionLogRepository.createLog({
         user_id: invited_by_user_id,
         action: 'create_invitation',
         entity_type: 'invitation',
@@ -139,7 +139,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
     try {
       // Get invitation before update for logging
-      const invitation = invitationRepository.getInvitationById(invitationId);
+      const invitation = await await invitationRepository.getInvitationById(invitationId);
       if (!invitation) {
         return reply.code(404).send({
           error: 'Invitation not found',
@@ -147,10 +147,10 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
         });
       }
 
-      invitationRepository.updateInvitationStatus(invitationId, 'cancelled');
+      await invitationRepository.updateInvitationStatus(invitationId, 'cancelled');
 
       // Log admin action
-      adminActionLogRepository.createLog({
+      await adminActionLogRepository.createLog({
         user_id: (request as unknown as AuthenticatedRequest).user.id,
         action: 'cancel_invitation',
         entity_type: 'invitation',
@@ -168,7 +168,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
   // Get all programs
   fastify.get('/admin/programs', async (_request, _reply) => {
-    return programRepository.getAllPrograms();
+    return await await programRepository.getAllPrograms();
   });
 
   // Get program by id
@@ -185,7 +185,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
     }
 
     try {
-      const program = programRepository.getProgramById(programId);
+      const program = await await programRepository.getProgramById(programId);
       if (!program) {
         return reply.code(404).send({
           error: 'Program not found',
@@ -214,10 +214,10 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
     }
 
     try {
-      const program = programRepository.createProgram({ name, description, created_by_user_id });
+      const program = await await programRepository.createProgram({ name, description, created_by_user_id });
 
       // Log admin action
-      adminActionLogRepository.createLog({
+      await adminActionLogRepository.createLog({
         user_id: created_by_user_id,
         action: 'create_program',
         entity_type: 'program',
@@ -246,7 +246,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       });
     }
 
-    return programRepository.getProgramAssignments(programId);
+    return await await programRepository.getProgramAssignments(programId);
   });
 
   // Create program assignment
@@ -283,7 +283,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
     try {
       // Verify user exists
-      const user = userRepository.getUserById(user_id);
+      const user = await await userRepository.getUserById(user_id);
       if (!user) {
         return reply.code(404).send({
           error: 'User not found',
@@ -292,7 +292,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       }
 
       // Verify program exists
-      const program = programRepository.getProgramById(programId);
+      const program = await await programRepository.getProgramById(programId);
       if (!program) {
         return reply.code(404).send({
           error: 'Program not found',
@@ -300,11 +300,11 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
         });
       }
 
-      const assignment = programRepository.createProgramAssignment({ program_id: programId, user_id, role });
+      const assignment = await await programRepository.createProgramAssignment({ program_id: programId, user_id, role });
 
       // Log admin action
       try {
-        adminActionLogRepository.createLog({
+        await adminActionLogRepository.createLog({
           user_id: (request as unknown as AuthenticatedRequest).user.id,
           action: 'create_program_assignment',
           entity_type: 'program_assignment',

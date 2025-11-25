@@ -94,13 +94,15 @@ async function seedDemoUsers() {
 }
 
 // Run if executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  seedDemoUsers()
-    .then(() => process.exit(0))
-    .catch((error) => {
-      console.error(error);
-      process.exit(1);
-    });
-}
+console.log('🌱 Starting demo user seed script...');
+seedDemoUsers()
+  .then(() => {
+    console.log('✅ Seed script completed successfully');
+    process.exit(0);
+  })
+  .catch((error) => {
+    console.error('❌ Seed script failed:', error);
+    process.exit(1);
+  });
 
 export { seedDemoUsers };

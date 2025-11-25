@@ -31,7 +31,7 @@ const chats: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       },
     },
     handler: async function (request, _reply) {
-      const chats = chatRepository.getChatsByUserId(request.user!.id);
+      const chats = await await chatRepository.getChatsByUserId(request.user!.id);
 
       return {
         chats: chats.map((chat) => ({
@@ -85,7 +85,7 @@ const chats: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       const chatId = (request.params as { id: number }).id;
 
       // Verify chat belongs to user
-      const chat = chatRepository.getChatById(chatId);
+      const chat = await await chatRepository.getChatById(chatId);
       if (!chat) {
         return reply.code(404).send({ error: 'Chat not found' });
       }
@@ -93,7 +93,7 @@ const chats: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
         return reply.code(403).send({ error: 'Forbidden' });
       }
 
-      const messages = messageRepository.getMessagesByChatId(chatId);
+      const messages = await await messageRepository.getMessagesByChatId(chatId);
 
       return {
         messages: messages.map((message) => ({
@@ -136,7 +136,7 @@ const chats: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       const chatId = (request.params as { id: number }).id;
 
       // Verify chat belongs to user
-      const chat = chatRepository.getChatById(chatId);
+      const chat = await await chatRepository.getChatById(chatId);
       if (!chat) {
         return reply.code(404).send({ error: 'Chat not found' });
       }
@@ -144,7 +144,7 @@ const chats: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
         return reply.code(403).send({ error: 'Forbidden' });
       }
 
-      chatRepository.deleteChat(chatId);
+      await chatRepository.deleteChat(chatId);
 
       return { message: 'Chat deleted successfully' };
     },
