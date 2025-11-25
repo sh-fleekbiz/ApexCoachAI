@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { apiBaseUrl } from '../../../api/index.js';
 
 interface KnowledgeBaseOverview {
   totalResources: number;
@@ -9,7 +10,9 @@ interface KnowledgeBaseOverview {
 }
 
 const KnowledgeBase: React.FC = () => {
-  const [overview, setOverview] = useState<KnowledgeBaseOverview | undefined>(undefined);
+  const [overview, setOverview] = useState<KnowledgeBaseOverview | undefined>(
+    undefined
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -19,7 +22,9 @@ const KnowledgeBase: React.FC = () => {
   const fetchOverview = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/admin/knowledge-base');
+      const response = await fetch(`${apiBaseUrl}/api/admin/knowledge-base`, {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         setOverview(data);
@@ -70,12 +75,20 @@ const KnowledgeBase: React.FC = () => {
             <tbody>
               {overview.documents.map((document) => (
                 <tr key={document.id}>
-                  <td className="border px-4 py-2">{document.resource_title}</td>
+                  <td className="border px-4 py-2">
+                    {document.resource_title}
+                  </td>
                   <td className="border px-4 py-2">{document.type}</td>
-                  <td className="border px-4 py-2">{document.program || '-'}</td>
+                  <td className="border px-4 py-2">
+                    {document.program || '-'}
+                  </td>
                   <td className="border px-4 py-2">{document.status}</td>
-                  <td className="border px-4 py-2">{new Date(document.created_at).toLocaleDateString()}</td>
-                  <td className="border px-4 py-2">{new Date(document.updated_at).toLocaleDateString()}</td>
+                  <td className="border px-4 py-2">
+                    {new Date(document.created_at).toLocaleDateString()}
+                  </td>
+                  <td className="border px-4 py-2">
+                    {new Date(document.updated_at).toLocaleDateString()}
+                  </td>
                 </tr>
               ))}
             </tbody>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { apiBaseUrl } from '../../api/index.js';
 
 interface SettingsProps {
   onClose: () => void;
@@ -12,7 +13,7 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
     setIsLoading(true);
     setError(undefined);
     try {
-      const response = await fetch('/me/export-data', {
+      const response = await fetch(`${apiBaseUrl}/me/export-data`, {
         method: 'POST',
         credentials: 'include',
       });
@@ -31,21 +32,27 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
       a.remove();
       window.URL.revokeObjectURL(url);
     } catch (error_) {
-      setError(error_ instanceof Error ? error_.message : 'Failed to export data');
+      setError(
+        error_ instanceof Error ? error_.message : 'Failed to export data'
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDeleteAllChats = async () => {
-    if (!window.confirm('Are you sure you want to delete all your chats? This action cannot be undone.')) {
+    if (
+      !window.confirm(
+        'Are you sure you want to delete all your chats? This action cannot be undone.'
+      )
+    ) {
       return;
     }
 
     setIsLoading(true);
     setError(undefined);
     try {
-      const response = await fetch('/me/delete-all-chats', {
+      const response = await fetch(`${apiBaseUrl}/me/delete-all-chats`, {
         method: 'POST',
         credentials: 'include',
       });
@@ -56,20 +63,26 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
 
       window.location.reload();
     } catch (error_) {
-      setError(error_ instanceof Error ? error_.message : 'Failed to delete chats');
+      setError(
+        error_ instanceof Error ? error_.message : 'Failed to delete chats'
+      );
       setIsLoading(false);
     }
   };
 
   const handleDeleteAccount = async () => {
-    if (!window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+    if (
+      !window.confirm(
+        'Are you sure you want to delete your account? This action cannot be undone.'
+      )
+    ) {
       return;
     }
 
     setIsLoading(true);
     setError(undefined);
     try {
-      const response = await fetch('/me/delete-account', {
+      const response = await fetch(`${apiBaseUrl}/me/delete-account`, {
         method: 'POST',
         credentials: 'include',
       });
@@ -80,7 +93,9 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
 
       window.location.href = '/#/login';
     } catch (error_) {
-      setError(error_ instanceof Error ? error_.message : 'Failed to delete account');
+      setError(
+        error_ instanceof Error ? error_.message : 'Failed to delete account'
+      );
       setIsLoading(false);
     }
   };
@@ -89,7 +104,11 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
       <div className="bg-white p-8 rounded-lg">
         <h2 className="text-2xl font-bold mb-4">Settings</h2>
-        {error && <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">{error}</div>}
+        {error && (
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+            {error}
+          </div>
+        )}
         <div className="mb-4">
           <h3 className="text-xl font-bold mb-2">Data & Privacy</h3>
           <button
@@ -114,7 +133,11 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
             {isLoading ? 'Processing...' : 'Delete Account'}
           </button>
         </div>
-        <button onClick={onClose} className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600" disabled={isLoading}>
+        <button
+          onClick={onClose}
+          className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600"
+          disabled={isLoading}
+        >
           Close
         </button>
       </div>

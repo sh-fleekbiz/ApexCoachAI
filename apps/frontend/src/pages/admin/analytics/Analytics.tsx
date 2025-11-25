@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { apiBaseUrl } from '../../../api/index.js';
 
 interface AnalyticsSnapshot {
   totalUsers: number;
@@ -9,7 +10,9 @@ interface AnalyticsSnapshot {
 }
 
 const Analytics: React.FC = () => {
-  const [snapshot, setSnapshot] = useState<AnalyticsSnapshot | undefined>(undefined);
+  const [snapshot, setSnapshot] = useState<AnalyticsSnapshot | undefined>(
+    undefined
+  );
   const [loading, setLoading] = useState(true);
   const [range, setRange] = useState<'7d' | '30d' | '90d' | '365d'>('7d');
 
@@ -17,7 +20,10 @@ const Analytics: React.FC = () => {
     const fetchSnapshot = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`/api/admin/analytics?range=${range}`);
+        const response = await fetch(
+          `${apiBaseUrl}/api/admin/analytics?range=${range}`,
+          { credentials: 'include' }
+        );
         if (response.ok) {
           const data = await response.json();
           setSnapshot(data);
@@ -36,7 +42,10 @@ const Analytics: React.FC = () => {
     <div>
       <h1 className="text-2xl font-bold mb-4">Analytics</h1>
       <div className="mb-4">
-        <select value={range} onChange={(event) => setRange(event.target.value as any)}>
+        <select
+          value={range}
+          onChange={(event) => setRange(event.target.value as any)}
+        >
           <option value="7d">Last 7 Days</option>
           <option value="30d">Last 30 Days</option>
           <option value="90d">Last 90 Days</option>

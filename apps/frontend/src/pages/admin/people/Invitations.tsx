@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { apiBaseUrl } from '../../../api/index.js';
 
 interface Invitation {
   id: number;
@@ -19,7 +20,9 @@ const Invitations: React.FC = () => {
   const fetchInvitations = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/admin/invitations');
+      const response = await fetch(`${apiBaseUrl}/api/admin/invitations`, {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         setInvitations(data);
@@ -33,9 +36,13 @@ const Invitations: React.FC = () => {
 
   const handleCancelInvitation = async (invitationId: number) => {
     try {
-      await fetch(`/api/admin/invitations/${invitationId}/cancel`, {
-        method: 'POST',
-      });
+      await fetch(
+        `${apiBaseUrl}/api/admin/invitations/${invitationId}/cancel`,
+        {
+          method: 'POST',
+          credentials: 'include',
+        }
+      );
       fetchInvitations();
     } catch (error) {
       console.error('Failed to cancel invitation:', error);
@@ -64,9 +71,13 @@ const Invitations: React.FC = () => {
                 <td className="border px-4 py-2">{invitation.email}</td>
                 <td className="border px-4 py-2">{invitation.role}</td>
                 <td className="border px-4 py-2">{invitation.status}</td>
-                <td className="border px-4 py-2">{new Date(invitation.created_at).toLocaleDateString()}</td>
                 <td className="border px-4 py-2">
-                  <button onClick={() => handleCancelInvitation(invitation.id)}>Cancel</button>
+                  {new Date(invitation.created_at).toLocaleDateString()}
+                </td>
+                <td className="border px-4 py-2">
+                  <button onClick={() => handleCancelInvitation(invitation.id)}>
+                    Cancel
+                  </button>
                 </td>
               </tr>
             ))}

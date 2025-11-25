@@ -1,5 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Spinner, SpinnerSize, MessageBar, MessageBarType } from '@fluentui/react';
+import {
+  MessageBar,
+  MessageBarType,
+  Spinner,
+  SpinnerSize,
+} from '@fluentui/react';
+import React, { useEffect, useState } from 'react';
+import { apiBaseUrl } from '../../../api/index.js';
 
 interface AdminActionLog {
   id: number;
@@ -28,9 +34,12 @@ const ActionLogs: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/admin-action-logs?limit=${limit}&offset=${(page - 1) * limit}`, {
-        credentials: 'include',
-      });
+      const response = await fetch(
+        `${apiBaseUrl}/api/admin-action-logs?limit=${limit}&offset=${(page - 1) * limit}`,
+        {
+          credentials: 'include',
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -57,7 +66,8 @@ const ActionLogs: React.FC = () => {
   const getActionColor = (action: string): string => {
     if (action.includes('create')) return 'text-green-600 bg-green-50';
     if (action.includes('update')) return 'text-blue-600 bg-blue-50';
-    if (action.includes('delete') || action.includes('cancel')) return 'text-red-600 bg-red-50';
+    if (action.includes('delete') || action.includes('cancel'))
+      return 'text-red-600 bg-red-50';
     return 'text-gray-600 bg-gray-50';
   };
 
@@ -73,18 +83,26 @@ const ActionLogs: React.FC = () => {
     <div>
       <div className="mb-6">
         <h2 className="text-2xl font-bold mb-2">Admin Action Logs</h2>
-        <p className="text-gray-600">View all administrative actions performed in the system</p>
+        <p className="text-gray-600">
+          View all administrative actions performed in the system
+        </p>
       </div>
 
       {error && (
-        <MessageBar messageBarType={MessageBarType.error} onDismiss={() => setError(null)} className="mb-4">
+        <MessageBar
+          messageBarType={MessageBarType.error}
+          onDismiss={() => setError(null)}
+          className="mb-4"
+        >
           {error}
         </MessageBar>
       )}
 
       <div className="bg-white shadow rounded-lg overflow-hidden">
         {logs.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">No action logs found</div>
+          <div className="p-8 text-center text-gray-500">
+            No action logs found
+          </div>
         ) : (
           <>
             <div className="overflow-x-auto">
@@ -121,7 +139,9 @@ const ActionLogs: React.FC = () => {
                           {formatAction(log.action)}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{log.user_id}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {log.user_id}
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {log.entity_type && log.entity_id ? (
                           <span>
@@ -133,7 +153,11 @@ const ActionLogs: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
                         <div className="max-w-md">
-                          {log.description || <span className="text-gray-400">No description</span>}
+                          {log.description || (
+                            <span className="text-gray-400">
+                              No description
+                            </span>
+                          )}
                         </div>
                       </td>
                     </tr>

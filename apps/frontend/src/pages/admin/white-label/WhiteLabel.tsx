@@ -1,5 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { PrimaryButton, TextField, MessageBar, MessageBarType, Spinner, SpinnerSize } from '@fluentui/react';
+import {
+  MessageBar,
+  MessageBarType,
+  PrimaryButton,
+  Spinner,
+  SpinnerSize,
+  TextField,
+} from '@fluentui/react';
+import React, { useEffect, useState } from 'react';
+import { apiBaseUrl } from '../../../api/index.js';
 
 interface WhiteLabelSettings {
   id: number;
@@ -14,7 +22,10 @@ const WhiteLabel: React.FC = () => {
   const [settings, setSettings] = useState<WhiteLabelSettings | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
-  const [message, setMessage] = useState<{ type: MessageBarType; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: MessageBarType;
+    text: string;
+  } | null>(null);
 
   const [logoUrl, setLogoUrl] = useState<string>('');
   const [brandColor, setBrandColor] = useState<string>('');
@@ -28,7 +39,7 @@ const WhiteLabel: React.FC = () => {
   const loadSettings = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/white-label-settings', {
+      const response = await fetch(`${apiBaseUrl}/api/white-label-settings`, {
         credentials: 'include',
       });
 
@@ -42,7 +53,10 @@ const WhiteLabel: React.FC = () => {
       }
     } catch (error) {
       console.error('Failed to load white label settings:', error);
-      setMessage({ type: MessageBarType.error, text: 'Failed to load settings' });
+      setMessage({
+        type: MessageBarType.error,
+        text: 'Failed to load settings',
+      });
     } finally {
       setLoading(false);
     }
@@ -53,7 +67,7 @@ const WhiteLabel: React.FC = () => {
       setSaving(true);
       setMessage(null);
 
-      const response = await fetch('/api/white-label-settings', {
+      const response = await fetch(`${apiBaseUrl}/api/white-label-settings`, {
         method: 'PUT',
         credentials: 'include',
         headers: {
@@ -70,21 +84,34 @@ const WhiteLabel: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         setSettings(data);
-        setMessage({ type: MessageBarType.success, text: 'Settings saved successfully!' });
+        setMessage({
+          type: MessageBarType.success,
+          text: 'Settings saved successfully!',
+        });
       } else {
         const error = await response.json();
-        setMessage({ type: MessageBarType.error, text: error.error || 'Failed to save settings' });
+        setMessage({
+          type: MessageBarType.error,
+          text: error.error || 'Failed to save settings',
+        });
       }
     } catch (error) {
       console.error('Failed to save white label settings:', error);
-      setMessage({ type: MessageBarType.error, text: 'Failed to save settings' });
+      setMessage({
+        type: MessageBarType.error,
+        text: 'Failed to save settings',
+      });
     } finally {
       setSaving(false);
     }
   };
 
   const handleReset = async () => {
-    if (!window.confirm('Are you sure you want to reset all white label settings to default?')) {
+    if (
+      !window.confirm(
+        'Are you sure you want to reset all white label settings to default?'
+      )
+    ) {
       return;
     }
 
@@ -92,7 +119,7 @@ const WhiteLabel: React.FC = () => {
       setSaving(true);
       setMessage(null);
 
-      const response = await fetch('/api/white-label-settings', {
+      const response = await fetch(`${apiBaseUrl}/api/white-label-settings`, {
         method: 'DELETE',
         credentials: 'include',
       });
@@ -102,14 +129,23 @@ const WhiteLabel: React.FC = () => {
         setBrandColor('');
         setAppName('');
         setCustomCss('');
-        setMessage({ type: MessageBarType.success, text: 'Settings reset to default' });
+        setMessage({
+          type: MessageBarType.success,
+          text: 'Settings reset to default',
+        });
       } else {
         const error = await response.json();
-        setMessage({ type: MessageBarType.error, text: error.error || 'Failed to reset settings' });
+        setMessage({
+          type: MessageBarType.error,
+          text: error.error || 'Failed to reset settings',
+        });
       }
     } catch (error) {
       console.error('Failed to reset white label settings:', error);
-      setMessage({ type: MessageBarType.error, text: 'Failed to reset settings' });
+      setMessage({
+        type: MessageBarType.error,
+        text: 'Failed to reset settings',
+      });
     } finally {
       setSaving(false);
     }
@@ -127,11 +163,17 @@ const WhiteLabel: React.FC = () => {
     <div className="max-w-4xl">
       <div className="mb-6">
         <h2 className="text-2xl font-bold mb-2">White Label Settings</h2>
-        <p className="text-gray-600">Customize the branding and appearance of your application</p>
+        <p className="text-gray-600">
+          Customize the branding and appearance of your application
+        </p>
       </div>
 
       {message && (
-        <MessageBar messageBarType={message.type} onDismiss={() => setMessage(null)} className="mb-4">
+        <MessageBar
+          messageBarType={message.type}
+          onDismiss={() => setMessage(null)}
+          className="mb-4"
+        >
           {message.text}
         </MessageBar>
       )}
@@ -162,7 +204,12 @@ const WhiteLabel: React.FC = () => {
                 src={logoUrl}
                 alt="Logo preview"
                 className="max-h-12"
-                onError={() => setMessage({ type: MessageBarType.warning, text: 'Failed to load logo image' })}
+                onError={() =>
+                  setMessage({
+                    type: MessageBarType.warning,
+                    text: 'Failed to load logo image',
+                  })
+                }
               />
             </div>
           )}
@@ -183,7 +230,9 @@ const WhiteLabel: React.FC = () => {
               placeholder="#0078D4"
               styles={{ root: { width: 120 } }}
             />
-            <span className="text-sm text-gray-600">Primary brand color for buttons and accents</span>
+            <span className="text-sm text-gray-600">
+              Primary brand color for buttons and accents
+            </span>
           </div>
         </div>
 
@@ -199,12 +248,22 @@ const WhiteLabel: React.FC = () => {
             rows={10}
             className="w-full p-3 border border-gray-300 rounded font-mono text-sm"
           />
-          <p className="text-sm text-gray-600 mt-2">Advanced: Add custom CSS to further customize the appearance</p>
+          <p className="text-sm text-gray-600 mt-2">
+            Advanced: Add custom CSS to further customize the appearance
+          </p>
         </div>
 
         <div className="flex gap-3 pt-4 border-t">
-          <PrimaryButton text={saving ? 'Saving...' : 'Save Settings'} onClick={handleSave} disabled={saving} />
-          <PrimaryButton text="Reset to Default" onClick={handleReset} disabled={saving} />
+          <PrimaryButton
+            text={saving ? 'Saving...' : 'Save Settings'}
+            onClick={handleSave}
+            disabled={saving}
+          />
+          <PrimaryButton
+            text="Reset to Default"
+            onClick={handleReset}
+            disabled={saving}
+          />
         </div>
 
         {settings && (

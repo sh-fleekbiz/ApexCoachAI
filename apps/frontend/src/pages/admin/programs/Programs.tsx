@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { apiBaseUrl } from '../../../api/index.js';
 
 interface Program {
   id: number;
@@ -20,7 +21,9 @@ const Programs: React.FC = () => {
   const fetchPrograms = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/admin/programs');
+      const response = await fetch(`${apiBaseUrl}/api/admin/programs`, {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         setPrograms(data);
@@ -35,12 +38,16 @@ const Programs: React.FC = () => {
   const handleCreateProgram = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
-      await fetch('/api/admin/programs', {
+      await fetch(`${apiBaseUrl}/api/admin/programs`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name: newProgramName, description: newProgramDescription }),
+        body: JSON.stringify({
+          name: newProgramName,
+          description: newProgramDescription,
+        }),
       });
       setNewProgramName('');
       setNewProgramDescription('');
@@ -88,9 +95,13 @@ const Programs: React.FC = () => {
             {programs.map((program) => (
               <tr key={program.id}>
                 <td className="border px-4 py-2">
-                  <Link to={`/admin/programs/${program.id}`}>{program.name}</Link>
+                  <Link to={`/admin/programs/${program.id}`}>
+                    {program.name}
+                  </Link>
                 </td>
-                <td className="border px-4 py-2">{program.description || '-'}</td>
+                <td className="border px-4 py-2">
+                  {program.description || '-'}
+                </td>
               </tr>
             ))}
           </tbody>

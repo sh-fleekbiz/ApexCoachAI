@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { apiBaseUrl } from '../../../api/index.js';
 
 interface User {
   id: number;
@@ -19,7 +20,9 @@ const PeopleList: React.FC = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/admin/users');
+      const response = await fetch(`${apiBaseUrl}/api/admin/users`, {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         setUsers(data);
@@ -33,8 +36,9 @@ const PeopleList: React.FC = () => {
 
   const handleRoleChange = async (userId: number, role: User['role']) => {
     try {
-      await fetch(`/api/admin/users/${userId}/role`, {
+      await fetch(`${apiBaseUrl}/api/admin/users/${userId}/role`, {
         method: 'PUT',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -68,14 +72,21 @@ const PeopleList: React.FC = () => {
                 <td className="border px-4 py-2">
                   <select
                     value={user.role}
-                    onChange={(event) => handleRoleChange(user.id, event.target.value as User['role'])}
+                    onChange={(event) =>
+                      handleRoleChange(
+                        user.id,
+                        event.target.value as User['role']
+                      )
+                    }
                   >
                     <option value="admin">Admin</option>
                     <option value="coach">Coach</option>
                     <option value="user">User</option>
                   </select>
                 </td>
-                <td className="border px-4 py-2">{new Date(user.created_at).toLocaleDateString()}</td>
+                <td className="border px-4 py-2">
+                  {new Date(user.created_at).toLocaleDateString()}
+                </td>
               </tr>
             ))}
           </tbody>

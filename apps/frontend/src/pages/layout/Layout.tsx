@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
+import { apiBaseUrl } from '../../api/index.js';
+import { OnboardingTour } from '../../components/Onboarding/OnboardingTour.tsx';
 import { useAuth } from '../../contexts/AuthContext.js';
 import Settings from '../settings/Settings.tsx';
-import { OnboardingTour } from '../../components/Onboarding/OnboardingTour.tsx';
 
 import styles from './Layout.module.css';
 
@@ -23,7 +24,9 @@ const Layout = () => {
 
   // Helper to detect mobile devices
   function isMobileDevice() {
-    return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|Windows Phone/i.test(navigator.userAgent);
+    return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|Windows Phone/i.test(
+      navigator.userAgent
+    );
   }
 
   // Check if user has completed onboarding
@@ -65,7 +68,7 @@ const Layout = () => {
   const fetchChats = async () => {
     setIsLoadingChats(true);
     try {
-      const response = await fetch('/chats', {
+      const response = await fetch(`${apiBaseUrl}/chats`, {
         credentials: 'include',
       });
 
@@ -154,13 +157,25 @@ const Layout = () => {
           </div>
           <div className={styles.navSection}>
             <h3 className={styles.navSectionTitle}>Settings</h3>
-            <button className={styles.navSectionButton} onClick={() => navigate('/settings')} type="button">
+            <button
+              className={styles.navSectionButton}
+              onClick={() => navigate('/settings')}
+              type="button"
+            >
               Profile & Preferences
             </button>
-            <button className={styles.navSectionButton} onClick={() => setIsSettingsOpen(true)} type="button">
+            <button
+              className={styles.navSectionButton}
+              onClick={() => setIsSettingsOpen(true)}
+              type="button"
+            >
               Data & Privacy
             </button>
-            <button className={styles.navSectionButton} onClick={() => setShowOnboarding(true)} type="button">
+            <button
+              className={styles.navSectionButton}
+              onClick={() => setShowOnboarding(true)}
+              type="button"
+            >
               Replay Tour
             </button>
           </div>
@@ -174,7 +189,11 @@ const Layout = () => {
               </a>
             )}
           </div>
-          <button className={styles.logoutButton} onClick={handleLogout} type="button">
+          <button
+            className={styles.logoutButton}
+            onClick={handleLogout}
+            type="button"
+          >
             Logout
           </button>
         </div>
@@ -183,7 +202,12 @@ const Layout = () => {
         <Outlet />
       </main>
       {isSettingsOpen && <Settings onClose={() => setIsSettingsOpen(false)} />}
-      {showOnboarding && <OnboardingTour onComplete={handleOnboardingComplete} onSkip={handleOnboardingSkip} />}
+      {showOnboarding && (
+        <OnboardingTour
+          onComplete={handleOnboardingComplete}
+          onSkip={handleOnboardingSkip}
+        />
+      )}
     </div>
   );
 };

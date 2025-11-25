@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { apiBaseUrl } from '../../../api/index.js';
 
 interface Program {
   id: number;
@@ -27,7 +28,9 @@ const ProgramDetails: React.FC = () => {
 
   const fetchProgram = async () => {
     try {
-      const response = await fetch(`/api/admin/programs/${id}`);
+      const response = await fetch(`${apiBaseUrl}/api/admin/programs/${id}`, {
+        credentials: 'include',
+      });
       if (response.ok) {
         const data = await response.json();
         setProgram(data);
@@ -40,7 +43,10 @@ const ProgramDetails: React.FC = () => {
   const fetchAssignments = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/admin/programs/${id}/assignments`);
+      const response = await fetch(
+        `${apiBaseUrl}/api/admin/programs/${id}/assignments`,
+        { credentials: 'include' }
+      );
       if (response.ok) {
         const data = await response.json();
         setAssignments(data);
