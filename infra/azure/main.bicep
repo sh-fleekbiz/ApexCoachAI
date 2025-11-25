@@ -206,11 +206,11 @@ module searchApi './core/host/container-app.bicep' = {
       }
       {
         name: 'AZURE_STORAGE_ACCOUNT'
-        value: storage.outputs.name
+        value: 'stmahumsharedapps'
       }
       {
         name: 'AZURE_STORAGE_CONTAINER'
-        value: storageContainerName
+        value: 'apexcoachai'
       }
       {
         name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
@@ -286,11 +286,11 @@ module indexerApi './core/host/container-app.bicep' = {
       }
       {
         name: 'AZURE_STORAGE_ACCOUNT'
-        value: storage.outputs.name
+        value: 'stmahumsharedapps'
       }
       {
         name: 'AZURE_STORAGE_CONTAINER'
-        value: storageContainerName
+        value: 'apexcoachai'
       }
       {
         name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
@@ -362,28 +362,11 @@ module searchService 'core/search/search-services.bicep' = {
   }
 }
 
-module storage 'core/storage/storage-account.bicep' = {
-  name: 'storage'
-  scope: storageResourceGroup
-  params: {
-    name: !empty(storageAccountName) ? storageAccountName : '${abbrs.storageStorageAccounts}${resourceToken}'
-    location: storageResourceGroupLocation
-    tags: tags
-    publicNetworkAccess: 'Enabled'
-    sku: {
-      name: storageSkuName
-    }
-    deleteRetentionPolicy: {
-      enabled: true
-      days: 2
-    }
-    containers: [
-      {
-        name: storageContainerName
-        publicAccess: 'None'
-      }
-    ]
-  }
+// Reference existing shared storage account (stmahumsharedapps)
+// Container 'apexcoachai' should be created via: az storage container create --account-name stmahumsharedapps --name apexcoachai
+resource sharedStorage 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
+  name: 'stmahumsharedapps'
+  scope: resourceGroup('rg-shared-apps')
 }
 
 // USER ROLES
@@ -528,9 +511,9 @@ output AZURE_SEARCH_SERVICE string = searchService.outputs.name
 output AZURE_SEARCH_SERVICE_RESOURCE_GROUP string = searchServiceResourceGroup.name
 output AZURE_SEARCH_SEMANTIC_RANKER string = searchServiceSkuName == 'standard' ? 'enabled' : 'disabled'
 
-output AZURE_STORAGE_ACCOUNT string = storage.outputs.name
-output AZURE_STORAGE_CONTAINER string = storageContainerName
-output AZURE_STORAGE_RESOURCE_GROUP string = storageResourceGroup.name
+output AZURE_STORAGE_ACCOUNT string = 'stmahumsharedapps'
+output AZURE_STORAGE_CONTAINER string = 'apexcoachai'
+output AZURE_STORAGE_RESOURCE_GROUP string = 'rg-shared-apps'
 
 output WEBAPP_URI string = webApp.outputs.uri
 output SEARCH_API_URI string = searchApi.outputs.uri
