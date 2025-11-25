@@ -40,7 +40,7 @@ Write-Host "   apps/backend/search/migrations/001_add_demo_fields.sql" -Foregrou
 Write-Host ""
 Write-Host "   Please run this SQL against your database:" -ForegroundColor Yellow
 Write-Host "   - Database: pg-shared-apps-eastus2" -ForegroundColor Gray
-Write-Host "   - Database name: apex_db" -ForegroundColor Gray
+Write-Host "   - Database name: apexcoachai_db" -ForegroundColor Gray
 Write-Host ""
 $continue = Read-Host "   Have you run the migration? (y/n)"
 if ($continue -ne "y") {

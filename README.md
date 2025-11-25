@@ -19,7 +19,7 @@ Apex Coach AI transforms proprietary coaching content (videos, documents, traini
 
 - **Frontend**: React, TypeScript, TailwindCSS, Vite
 - **Backend**: Fastify (Node.js, TypeScript)
-- **Database**: Azure PostgreSQL (`pg-shared-apps-eastus2`, database: `apex_db`) with pgvector
+- **Database**: Azure PostgreSQL (`pg-shared-apps-eastus2`, database: `apexcoachai_db`) with pgvector
 - **AI**: Azure OpenAI exclusively (via `@shared/ai` package)
   - Chat: `gpt-5.1`
   - Embeddings: `text-embedding-3-small`
@@ -66,7 +66,7 @@ AZURE_OPENAI_MODEL_EMBED=text-embedding-3-small
 AZURE_OPENAI_MODEL_IMAGE=gpt-image-1-mini
 
 # PostgreSQL (Shared - via @shared/data package)
-SHARED_PG_CONNECTION_STRING=postgresql://<user>:<pass>@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apex_db?sslmode=require
+SHARED_PG_CONNECTION_STRING=postgresql://<user>:<pass>@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apexcoachai_db?sslmode=require
 
 # Azure AI Search (Shared - via @shared/data package)
 AZURE_SEARCH_ENDPOINT=https://shared-search-standard-eastus2.search.windows.net

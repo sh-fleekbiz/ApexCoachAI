@@ -32,7 +32,7 @@ AZURE_STORAGE_ACCOUNT=stmahumsharedapps
 AZURE_STORAGE_CONTAINER_PREFIX=apexcoachai
 
 # PostgreSQL Database
-SHARED_PG_CONNECTION_STRING=postgresql://username:password@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apex_db?sslmode=require
+SHARED_PG_CONNECTION_STRING=postgresql://username:password@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apexcoachai_db?sslmode=require
 
 # Backend Configuration
 BACKEND_URI=http://localhost:3000

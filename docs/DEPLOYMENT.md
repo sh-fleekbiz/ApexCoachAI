@@ -9,7 +9,7 @@ This guide provides step-by-step instructions for deploying Apex Coach AI to Azu
 - **Frontend**: Azure Static Web App (`apexcoachai` in `rg-shared-web`)
 - **Backend API**: Azure Container App (`apexcoachai-api` in `rg-shared-apps`)
 - **Indexer**: Azure Container App (`apexcoachai-indexer` in `rg-shared-apps`)
-- **Database**: Azure PostgreSQL (`pg-shared-apps-eastus2`, database: `apex_db`)
+- **Database**: Azure PostgreSQL (`pg-shared-apps-eastus2`, database: `apexcoachai_db`)
 - **AI Services**: Shared Azure OpenAI (`shared-openai-eastus2` in `rg-shared-ai`)
 - **Search**: Shared Azure AI Search (`shared-search-standard-eastus2` in `rg-shared-ai`)
 - **Storage**: Shared Azure Blob Storage (`stmahumsharedapps` in `rg-shared-data`)
@@ -170,7 +170,7 @@ git push origin main
 az postgres flexible-server db create \
   --resource-group rg-shared-data \
   --server-name pg-shared-apps-eastus2 \
-  --database-name apex_db
+  --database-name apexcoachai_db
 ```
 
 ### Run Migrations

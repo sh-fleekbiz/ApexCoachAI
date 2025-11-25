@@ -4,7 +4,7 @@
 
 Canonical identifiers:
 
-- PostgreSQL database: `apex_db` (server `pg-shared-apps-eastus2`)
+- PostgreSQL database: `apexcoachai_db` (server `pg-shared-apps-eastus2`)
 - Blob container: `apexcoachai` (storage account `stmahumsharedapps`)
 
 Use these in secrets, IaC modules, and documentation.
@@ -75,7 +75,7 @@ DNS Notes: Ensure `api.apexcoachai.shtrial.com` is a CNAME to the Container App 
 
 **Shared Resources** (all in shared resource groups):
 
-- Database: `pg-shared-apps-eastus2` (database: `apex_db`)
+- Database: `pg-shared-apps-eastus2` (database: `apexcoachai_db`)
 - Azure OpenAI: `shared-openai-eastus2` (in `rg-shared-ai`)
 - Azure AI Search: `shared-search-standard-eastus2` (in `rg-shared-ai`)
 - Storage: `stmahumsharedapps` (in `rg-shared-data`)
@@ -87,7 +87,7 @@ DNS Notes: Ensure `api.apexcoachai.shtrial.com` is a CNAME to the Container App 
 - **Monorepo**: pnpm workspaces with Turborepo
 - **Frontend**: React + TypeScript (apps/frontend)
 - **Backend**: Node.js + Fastify (apps/backend/search, apps/backend/indexer)
-- **Database**: Azure PostgreSQL (`pg-shared-apps-eastus2`, database: `apex_db`) with pgvector
+- **Database**: Azure PostgreSQL (`pg-shared-apps-eastus2`, database: `apexcoachai_db`) with pgvector
 - **RAG**: Azure OpenAI exclusively (via `@shared/ai` package)
   - Chat: `gpt-4o` (default), `gpt-5.1` (heavy tasks)
   - Embeddings: `text-embedding-3-small`

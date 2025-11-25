@@ -19,14 +19,14 @@ You need to run the migration against your Azure Postgres database:
 
 ```bash
 # Option 1: Using psql (if you have it installed)
-psql "postgresql://username@pg-shared-apps-eastus2.postgres.database.azure.com/apex_db?sslmode=require" \
+psql "postgresql://username@pg-shared-apps-eastus2.postgres.database.azure.com/apexcoachai_db?sslmode=require" \
   -f apps/backend/search/migrations/001_add_demo_fields.sql
 
 # Option 2: Using Azure CLI
 az postgres flexible-server execute \
   --name pg-shared-apps-eastus2 \
   --admin-user <your-admin-username> \
-  --database-name apex_db \
+  --database-name apexcoachai_db \
   --file-path apps/backend/search/migrations/001_add_demo_fields.sql
 ```
 

@@ -218,7 +218,7 @@ AZURE_STORAGE_CONNECTION_STRING=<your-connection-string>
 AZURE_STORAGE_ACCOUNT=stmahumsharedapps
 
 # PostgreSQL
-SHARED_PG_CONNECTION_STRING=postgresql://username:password@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apex_db?sslmode=require
+SHARED_PG_CONNECTION_STRING=postgresql://username:password@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apexcoachai_db?sslmode=require
 
 # Backend
 BACKEND_URI=http://localhost:3000
@@ -237,7 +237,7 @@ VITE_SEARCH_API_URI=http://localhost:3000
 - **Frontend**: Azure Static Web App `apexcoachai` (Free tier)
 - **Backend API**: Azure Container App `apexcoachai-api` (Consumption plan)
 - **Indexer**: Azure Container App `apexcoachai-indexer` (Consumption plan)
-- **Database**: PostgreSQL `pg-shared-apps-eastus2` (database: `apex_db`)
+- **Database**: PostgreSQL `pg-shared-apps-eastus2` (database: `apexcoachai_db`)
 - **AI Services**: Shared Azure OpenAI `shared-openai-eastus2`
 - **Search**: Shared Azure AI Search `shared-search-standard-eastus2`
 - **Storage**: Shared Blob Storage `stmahumsharedapps`

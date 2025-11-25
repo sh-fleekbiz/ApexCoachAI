@@ -13,7 +13,7 @@ The demo login feature provides three role-based demo accounts:
 ## Prerequisites
 
 - Access to Azure Portal or Azure CLI
-- Database connection to `pg-shared-apps-eastus2` (database: `apex_db`)
+- Database connection to `pg-shared-apps-eastus2` (database: `apexcoachai_db`)
 - Backend environment variables configured
 
 ## Deployment Steps
@@ -24,7 +24,7 @@ Run the migration to add demo fields to the users table:
 
 ```bash
 # Connect to Postgres database
-psql "postgresql://username@pg-shared-apps-eastus2.postgres.database.azure.com/apex_db?sslmode=require"
+psql "postgresql://username@pg-shared-apps-eastus2.postgres.database.azure.com/apexcoachai_db?sslmode=require"
 
 # Run migration
 \i apps/backend/search/migrations/001_add_demo_fields.sql
@@ -36,7 +36,7 @@ Or using Azure CLI:
 az postgres flexible-server execute \
   --name pg-shared-apps-eastus2 \
   --admin-user <admin-username> \
-  --database-name apex_db \
+  --database-name apexcoachai_db \
   --file-path apps/backend/search/migrations/001_add_demo_fields.sql
 ```
 
