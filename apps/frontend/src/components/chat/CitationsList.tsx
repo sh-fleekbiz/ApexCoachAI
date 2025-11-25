@@ -1,4 +1,4 @@
-import type { Citation } from 'shared/chat-types';
+import type { Citation } from '../../types/chat-types.js';
 import styles from './CitationsList.module.css';
 
 interface CitationsListProps {

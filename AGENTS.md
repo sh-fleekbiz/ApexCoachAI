@@ -19,7 +19,7 @@ AI coding agent guide for Apex Coach AI, an AI-powered coaching and development 
 **URL**: https://apexcoachai.shtrial.com
 **Stack**: Monorepo with React frontend + Fastify search/indexer backends + Azure OpenAI/Azure AI Search
 **Target Market**: Content-focused SMBs, coaches, consultants, and training companies
-**Monorepo**: Yes (apps/frontend, apps/backend/search, apps/backend/indexer, packages/\*)
+**Monorepo**: Yes (apps/frontend, apps/backend/search, apps/backend/indexer)
 
 ## Business Context
 
@@ -37,15 +37,10 @@ Apex Coach AI is a consumer-to-business (C2B) solution that enables:
 ```
 ApexCoachAI/
 ├── apps/
-│   ├── frontend/          # React coaching UI
+│   ├── frontend/          # React coaching UI with integrated chat component
 │   └── backend/
-│       ├── search/        # Fastify RAG backend
-│       └── indexer/       # Content indexing service
-├── packages/
-│   ├── shared-ai/         # Shared Azure OpenAI client (@shared/ai)
-│   ├── shared-data/       # Shared Postgres, Search, Storage clients (@shared/data)
-│   ├── shared/            # Shared types and utilities
-│   └── ui/                # Shared UI components
+│       ├── search/        # Fastify RAG backend with integrated data utilities
+│       └── indexer/       # Content indexing service with integrated config
 ```
 
 ## Deployment Architecture

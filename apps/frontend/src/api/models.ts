@@ -37,4 +37,4 @@ export type RequestOverrides = {
 };
 
 // Citation types - re-exported from shared package
-export type { Citation, CitationType } from 'shared/chat-types';
+export type { Citation, CitationType } from '../types/chat-types.js';

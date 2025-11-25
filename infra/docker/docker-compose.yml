@@ -56,21 +56,6 @@ services:
     depends_on:
       - search
 
-  ui:
-    build:
-      context: ../..
-      dockerfile: packages/ui/Dockerfile
-    ports:
-      - '8000:8000'
-    environment:
-      NODE_ENV: development
-    volumes:
-      - ../..:/workspace:rw
-    working_dir: /workspace
-    command: [ 'pnpm', 'dev', '--filter=chat-component' ]
-    depends_on:
-      - search
-
 networks:
   default:
     name: apexcoach-ai-dev

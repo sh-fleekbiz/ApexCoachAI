@@ -1,16 +1,19 @@
-import { Readable } from 'node:stream';
-import { type FastifyPluginAsync } from 'fastify';
 import { type JsonSchemaToTsProvider } from '@fastify/type-provider-json-schema-to-ts';
-import { type SchemaTypes } from '../plugins/schemas.js';
-import { type ApproachContext } from '../lib/index.js';
+import { type FastifyPluginAsync } from 'fastify';
+import { Readable } from 'node:stream';
 import { chatRepository } from '../db/chat-repository.js';
 import { messageRepository } from '../db/message-repository.js';
 import { metaPromptRepository } from '../db/meta-prompt-repository.js';
-import { userSettingsRepository } from '../db/user-settings-repository.js';
 import { usageEventRepository } from '../db/usage-event-repository.js';
-import type { Citation } from 'shared/chat-types.js';
+import { userSettingsRepository } from '../db/user-settings-repository.js';
+import { type ApproachContext } from '../lib/index.js';
+import { type SchemaTypes } from '../plugins/schemas.js';
+import type { Citation } from '../types/chat-types.js';
 
-const chatApi: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
+const chatApi: FastifyPluginAsync = async (
+  _fastify,
+  _options
+): Promise<void> => {
   const fastify = _fastify.withTypeProvider<
     JsonSchemaToTsProvider<{
       ValidatorSchemaOptions: { references: SchemaTypes };
@@ -33,7 +36,10 @@ const chatApi: FastifyPluginAsync = async (_fastify, _options): Promise<void> =>
             type: 'object',
             properties: {
               approach: { type: 'string' },
-              retrieval_mode: { type: 'string', enum: ['hybrid', 'text', 'vectors'] },
+              retrieval_mode: {
+                type: 'string',
+                enum: ['hybrid', 'text', 'vectors'],
+              },
               semantic_ranker: { type: 'boolean' },
               semantic_captions: { type: 'boolean' },
               top: { type: 'number' },
@@ -58,13 +64,14 @@ const chatApi: FastifyPluginAsync = async (_fastify, _options): Promise<void> =>
       },
     } as const,
     handler: async function (request, reply) {
-      const { chatId, input, personalityId, context, stream } = request.body as {
-        chatId?: number | null;
-        input: string;
-        personalityId?: number | null;
-        context?: any;
-        stream?: boolean;
-      };
+      const { chatId, input, personalityId, context, stream } =
+        request.body as {
+          chatId?: number | null;
+          input: string;
+          personalityId?: number | null;
+          context?: any;
+          stream?: boolean;
+        };
 
       try {
         // Get or create chat
@@ -101,21 +108,28 @@ const chatApi: FastifyPluginAsync = async (_fastify, _options): Promise<void> =>
         // Get personality/meta prompt
         let personalityPromptText = '';
         if (personalityId) {
-          const personality = await await metaPromptRepository.getMetaPromptById(personalityId);
+          const personality =
+            await await metaPromptRepository.getMetaPromptById(personalityId);
           if (personality) {
             personalityPromptText = personality.prompt_text;
           }
         } else {
           // Use default personality from user settings
-          const settings = await await userSettingsRepository.getUserSettings(request.user!.id);
+          const settings = await await userSettingsRepository.getUserSettings(
+            request.user!.id
+          );
           if (settings?.default_personality_id) {
-            const personality = await await metaPromptRepository.getMetaPromptById(settings.default_personality_id);
+            const personality =
+              await await metaPromptRepository.getMetaPromptById(
+                settings.default_personality_id
+              );
             if (personality) {
               personalityPromptText = personality.prompt_text;
             }
           } else {
             // Use global default
-            const defaultPersonality = await await metaPromptRepository.getDefaultMetaPrompt();
+            const defaultPersonality =
+              await await metaPromptRepository.getDefaultMetaPrompt();
             if (defaultPersonality) {
               personalityPromptText = defaultPersonality.prompt_text;
             }
@@ -123,10 +137,14 @@ const chatApi: FastifyPluginAsync = async (_fastify, _options): Promise<void> =>
         }
 
         // Get recent messages for context (last 10 messages)
-        const recentDatabaseMessages = await await messageRepository.getRecentMessages(chat.id, 10);
+        const recentDatabaseMessages =
+          await await messageRepository.getRecentMessages(chat.id, 10);
 
         // Build messages array with system prompt
-        const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [];
+        const messages: Array<{
+          role: 'system' | 'user' | 'assistant';
+          content: string;
+        }> = [];
 
         // Add system message with personality
         if (personalityPromptText) {
@@ -150,7 +168,9 @@ const chatApi: FastifyPluginAsync = async (_fastify, _options): Promise<void> =>
         const { approach } = context ?? {};
         const chatApproach = fastify.approaches.chat[approach ?? 'rrr'];
         if (!chatApproach) {
-          return reply.badRequest(`Chat approach "${approach}" is unknown or not implemented.`);
+          return reply.badRequest(
+            `Chat approach "${approach}" is unknown or not implemented.`
+          );
         }
 
         let approachContext: ApproachContext = (context as any) ?? {};
@@ -164,7 +184,10 @@ const chatApi: FastifyPluginAsync = async (_fastify, _options): Promise<void> =>
           buffer._read = () => {};
           reply.type('application/x-ndjson').send(buffer);
 
-          const chunks = await chatApproach.runWithStreaming(messages, approachContext);
+          const chunks = await chatApproach.runWithStreaming(
+            messages,
+            approachContext
+          );
           let fullResponse = '';
           let citations: Citation[] = [];
 
@@ -177,7 +200,8 @@ const chatApi: FastifyPluginAsync = async (_fastify, _options): Promise<void> =>
             }
 
             // Extract citations if present in delta context
-            const dataPoints = chunk.choices?.[0]?.delta?.context?.data_points?.text;
+            const dataPoints =
+              chunk.choices?.[0]?.delta?.context?.data_points?.text;
             if (dataPoints && Array.isArray(dataPoints)) {
               // Store citations from the response
               citations = dataPoints.map((text: string, index: number) => ({
@@ -221,7 +245,10 @@ const chatApi: FastifyPluginAsync = async (_fastify, _options): Promise<void> =>
             // Parse citations from context
             const citations: Citation[] = [];
             if (assistantMessage.context?.data_points?.text) {
-              for (const [index, text] of assistantMessage.context.data_points.text.entries()) {
+              for (const [
+                index,
+                text,
+              ] of assistantMessage.context.data_points.text.entries()) {
                 citations.push({
                   id: `cite-${index}`,
                   type: 'text',

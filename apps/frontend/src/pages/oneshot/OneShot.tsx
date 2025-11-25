@@ -22,8 +22,8 @@ import {
 } from '../../api/index.js';
 import { SettingsButton } from '../../components/SettingsButton/SettingsButton.jsx';
 
-import '../../chat-component/index.js';
 import { toolTipText, toolTipTextCalloutProps } from '../../i18n/tooltips.js';
+import '/chat-component.js';
 
 export function Component(): JSX.Element {
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
