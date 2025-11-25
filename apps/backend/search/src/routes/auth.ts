@@ -46,7 +46,7 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
       try {
         // Check if user already exists
-        const existingUser = userRepository.getUserByEmail(email);
+        const existingUser = await userRepository.getUserByEmail(email);
         if (existingUser) {
           return reply
             .code(400)
@@ -57,7 +57,11 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
         const password_hash = await bcrypt.hash(password, 10);
 
         // Create user
-        const user = userRepository.createUser({ email, password_hash, name });
+        const user = await userRepository.createUser({
+          email,
+          password_hash,
+          name,
+        });
 
         // Generate JWT token
         const token = fastify.jwt.sign({
@@ -135,7 +139,7 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
       try {
         // Find user
-        const user = userRepository.getUserByEmail(email);
+        const user = await userRepository.getUserByEmail(email);
         if (!user) {
           return reply.code(401).send({ error: 'Invalid email or password' });
         }
@@ -201,11 +205,168 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
     },
   });
 
-  // Demo login route
+  // Get demo users route
+  fastify.get('/auth/demo-users', {
+    schema: {
+      description: 'Get available demo user roles',
+      tags: ['auth'],
+      response: {
+        200: {
+          type: 'object',
+          properties: {
+            demoUsers: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  role: { type: 'string' },
+                  label: { type: 'string' },
+                  email: { type: 'string' },
+                  userRole: { type: 'string' },
+                },
+              },
+            },
+          },
+        },
+        500: { $ref: 'httpError' },
+      },
+    },
+    handler: async function (_request, reply) {
+      const enableDemoLogin = process.env.ENABLE_DEMO_LOGIN === 'true';
+
+      if (!enableDemoLogin) {
+        return reply.code(403).send({ error: 'Demo login is disabled' });
+      }
+
+      try {
+        const demoUsers = await userRepository.getDemoUsers();
+
+        return {
+          demoUsers: demoUsers.map((user) => ({
+            role: user.demo_role || 'unknown',
+            label: user.demo_label || user.name || 'Demo User',
+            email: user.email,
+            userRole: user.role,
+          })),
+        };
+      } catch (error: any) {
+        fastify.log.error(error);
+        return reply.code(500).send({ error: 'Failed to fetch demo users' });
+      }
+    },
+  });
+
+  // Demo login route (updated to support role selection)
   fastify.post('/auth/demo-login', {
     schema: {
       description: 'Log in with demo account',
       tags: ['auth'],
+      body: {
+        type: 'object',
+        properties: {
+          role: { type: 'string' },
+        },
+      },
+      response: {
+        200: {
+          type: 'object',
+          properties: {
+            user: {
+              type: 'object',
+              properties: {
+                id: { type: 'number' },
+                email: { type: 'string' },
+                name: { type: 'string' },
+                role: { type: 'string' },
+                isDemo: { type: 'boolean' },
+                demoRole: { type: 'string' },
+                demoLabel: { type: 'string' },
+              },
+            },
+          },
+        },
+        400: { $ref: 'httpError' },
+        403: { $ref: 'httpError' },
+        500: { $ref: 'httpError' },
+      },
+    },
+    handler: async function (request, reply) {
+      const enableDemoLogin = process.env.ENABLE_DEMO_LOGIN === 'true';
+
+      if (!enableDemoLogin) {
+        return reply.code(403).send({ error: 'Demo login is disabled' });
+      }
+
+      const { role } = (request.body as { role?: string }) || {};
+
+      try {
+        let user;
+
+        // If role is specified, find demo user by role
+        if (role) {
+          user = await userRepository.getDemoUserByRole(role);
+          if (!user) {
+            return reply
+              .code(400)
+              .send({ error: `Demo user with role '${role}' not found` });
+          }
+        } else {
+          // Fallback: get first demo user (for backward compatibility)
+          const demoUsers = await userRepository.getDemoUsers();
+          if (demoUsers.length === 0) {
+            return reply.code(500).send({ error: 'No demo users available' });
+          }
+          user = demoUsers[0];
+        }
+
+        // Generate JWT token
+        const token = fastify.jwt.sign({
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        });
+
+        // Log usage event
+        await usageEventRepository.createUsageEvent({
+          user_id: user.id,
+          type: 'login',
+        });
+
+        // Set cookie
+        reply.setCookie('token', token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          path: '/',
+          maxAge: 7 * 24 * 60 * 60, // 7 days
+        });
+
+        return {
+          user: {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            isDemo: user.is_demo,
+            demoRole: user.demo_role,
+            demoLabel: user.demo_label,
+          },
+        };
+      } catch (error: any) {
+        fastify.log.error(error);
+        return reply
+          .code(500)
+          .send({ error: 'Failed to log in with demo account' });
+      }
+    },
+  });
+
+  // Old demo login route (deprecated, kept for backward compatibility)
+  fastify.post('/auth/demo-login-legacy', {
+    schema: {
+      description: 'Log in with demo account (deprecated)',
+      tags: ['auth'],
+      deprecated: true,
       response: {
         200: {
           type: 'object',
@@ -230,12 +391,12 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
       try {
         // Check if demo user exists
-        let user = userRepository.getUserByEmail(demoEmail);
+        let user = await userRepository.getUserByEmail(demoEmail);
 
         // Create demo user if it doesn't exist
         if (!user) {
           const password_hash = await bcrypt.hash(demoPassword, 10);
-          user = userRepository.createUser({
+          user = await userRepository.createUser({
             email: demoEmail,
             password_hash,
             name: 'Demo User',
@@ -250,7 +411,7 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
         });
 
         // Log usage event
-        usageEventRepository.createUsageEvent({
+        await usageEventRepository.createUsageEvent({
           user_id: user.id,
           type: 'login',
         });
@@ -305,7 +466,7 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       },
     },
     handler: async function (request, _reply) {
-      const user = userRepository.getUserById(request.user!.id);
+      const user = await userRepository.getUserById(request.user!.id);
       return {
         user: {
           id: user!.id,

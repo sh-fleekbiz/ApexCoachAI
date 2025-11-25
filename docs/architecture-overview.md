@@ -8,47 +8,47 @@ This application is a ChatGPT + Enterprise Data solution implementing the Retrie
 
 ### Frontend Stack
 
-**Framework**: React 18 with TypeScript  
-**Build Tool**: Vite  
-**Routing**: React Router v6 (Hash Router)  
-**UI Components**: Fluent UI React  
+**Framework**: React 18 with TypeScript
+**Build Tool**: Vite
+**Routing**: React Router v6 (Hash Router)
+**UI Components**: Fluent UI React
 **Chat Component**: Custom Lit web component (`chat-component` package)
 
-**Main Entry Point**: `packages/webapp/src/index.tsx`
+**Main Entry Point**: `apps/frontend/src/index.tsx`
 
 - Sets up the React Router with hash-based routing
 - Defines routes for Chat (`/`), Q&A (`/qa`), and 404 pages
 
-**Layout**: `packages/webapp/src/pages/layout/Layout.tsx`
+**Layout**: `apps/frontend/src/pages/layout/Layout.tsx`
 
 - Provides the main app shell with sidebar navigation
 - Contains sections for Chats, Library, and Settings
 - Displays Apex Coach AI branding with logo
 
-**Chat Page**: `packages/webapp/src/pages/chat/Chat.tsx`
+**Chat Page**: `apps/frontend/src/pages/chat/Chat.tsx`
 
 - Main conversational UI using the `<chat-component>` web component
 - Contains settings panel for configuring RAG behavior
 - Manages state for retrieval options, streaming, semantic search, etc.
 
-**API Client**: `packages/webapp/src/api/`
+**API Client**: `apps/frontend/src/api/`
 
 - `index.ts`: Exports API base URL from environment variable
 - `models.ts`: Defines TypeScript types for Approaches, RetrievalMode, RequestOverrides
 
 ### Backend Stack
 
-**Framework**: Fastify (Node.js)  
-**Language**: TypeScript  
-**Main Server**: `packages/search/src/app.ts`
+**Framework**: Fastify (Node.js)
+**Language**: TypeScript
+**Main Server**: `apps/backend/search/src/app.ts`
 
-**Entry Point**: `packages/search/src/app.ts`
+**Entry Point**: `apps/backend/search/src/app.ts`
 
 - Uses Fastify's auto-loading for plugins and routes
-- Loads plugins from `packages/search/src/plugins/`
-- Loads routes from `packages/search/src/routes/`
+- Loads plugins from `apps/backend/search/src/plugins/`
+- Loads routes from `apps/backend/search/src/routes/`
 
-**Main Routes**: `packages/search/src/routes/root.ts`
+**Main Routes**: `apps/backend/search/src/routes/root.ts`
 
 - `POST /chat`: Chat endpoint with conversation history
 - `POST /ask`: Single-question Q&A endpoint
@@ -67,7 +67,7 @@ This application is a ChatGPT + Enterprise Data solution implementing the Retrie
 
 #### RAG Implementation Location
 
-**Approaches Directory**: `packages/search/src/lib/approaches/`
+**Approaches Directory**: `apps/backend/search/src/lib/approaches/`
 
 The application implements multiple RAG strategies:
 
@@ -76,7 +76,7 @@ The application implements multiple RAG strategies:
 
 #### Chat Read-Retrieve-Read Flow (Main RAG Strategy)
 
-**File**: `packages/search/src/lib/approaches/chat-read-retrieve-read.ts`
+**File**: `apps/backend/search/src/lib/approaches/chat-read-retrieve-read.ts`
 
 **Step 1: Query Generation**
 
@@ -122,7 +122,7 @@ Frontend Display
 
 #### Azure OpenAI Integration
 
-**Location**: `packages/search/src/plugins/openai.ts`
+**Location**: `apps/backend/search/src/plugins/openai.ts`
 
 - Creates OpenAI client using Azure OpenAI endpoint
 - Manages both chat and embedding models
@@ -132,7 +132,7 @@ Frontend Display
 
 #### Azure AI Search Integration
 
-**Location**: `packages/search/src/plugins/azure.ts` and `approach-base.ts`
+**Location**: `apps/backend/search/src/plugins/azure.ts` and `approach-base.ts`
 
 **Search Client Setup**:
 
@@ -191,7 +191,7 @@ Frontend Display
 
 ## Data Indexing
 
-**Indexer Service**: `packages/indexer/`
+**Indexer Service**: `apps/backend/indexer/`
 
 - Separate service for ingesting documents
 - Processes documents (markdown, PDF, etc.)
@@ -270,13 +270,13 @@ The application maintains five core tables:
 
 **Repository Pattern**: The application uses a repository pattern for data access:
 
-- `packages/search/src/db/userRepository.ts`: User CRUD operations
-- `packages/search/src/db/chatRepository.ts`: Chat management
-- `packages/search/src/db/messageRepository.ts`: Message storage and retrieval
-- `packages/search/src/db/metaPromptRepository.ts`: Personality management
-- `packages/search/src/db/userSettingsRepository.ts`: User preferences
+- `apps/backend/search/src/db/userRepository.ts`: User CRUD operations
+- `apps/backend/search/src/db/chatRepository.ts`: Chat management
+- `apps/backend/search/src/db/messageRepository.ts`: Message storage and retrieval
+- `apps/backend/search/src/db/metaPromptRepository.ts`: Personality management
+- `apps/backend/search/src/db/userSettingsRepository.ts`: User preferences
 
-All repositories are exported from `packages/search/src/db/index.ts` for convenient importing.
+All repositories are exported from `apps/backend/search/src/db/index.ts` for convenient importing.
 
 ### Database Initialization
 
@@ -298,13 +298,13 @@ The database schema is automatically initialized on application startup via the 
 - `@fastify/cookie`: Cookie management
 - `bcryptjs`: Password hashing (10 rounds)
 
-**Auth Plugin**: `packages/search/src/plugins/auth.ts`
+**Auth Plugin**: `apps/backend/search/src/plugins/auth.ts`
 
 - Registers JWT and cookie support
 - Provides `fastify.authenticate` decorator for protecting routes
 - JWT secret configurable via `JWT_SECRET` environment variable
 
-**Auth Routes**: `packages/search/src/routes/auth.ts`
+**Auth Routes**: `apps/backend/search/src/routes/auth.ts`
 
 - `POST /auth/signup`: Create new user account
   - Validates email uniqueness
@@ -358,7 +358,7 @@ The application now supports a role-based access control (RBAC) system to distin
 **Implementation**:
 
 - The `users` table now has a `role` column.
-- A `requireRole` middleware in `packages/search/src/plugins/auth.ts` protects routes based on user roles.
+- A `requireRole` middleware in `apps/backend/search/src/plugins/auth.ts` protects routes based on user roles.
 - Admin routes under `/api/admin` are protected with `requireRole('admin')`.
 
 ## Admin Console

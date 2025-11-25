@@ -4,10 +4,10 @@ This document outlines how to run the Apex Coach AI monorepo services via Docker
 
 ### Services
 
-- `search` (packages/search) – search API service.
-- `indexer` (packages/indexer) – indexing service feeding search.
-- `webapp` (packages/webapp) – front-end application (Vite).
-- `chat-component` (packages/chat-component) – standalone UI component preview.
+- `search` (apps/backend/search) – search API service.
+- `indexer` (apps/backend/indexer) – indexing service feeding search.
+- `frontend` (apps/frontend) – front-end application (Vite).
+- `ui` (packages/ui) – standalone UI component preview.
 
 ### Prerequisites
 
@@ -38,10 +38,10 @@ docker compose build search
 
 ### Production Images
 
-The provided Dockerfiles are multi-stage. For a production build/publish of the webapp only:
+The provided Dockerfiles are multi-stage. For a production build/publish of the frontend only:
 
 ```bash
-docker build -f packages/webapp/Dockerfile -t apexcoach-ai-webapp:prod .
+docker build -f apps/frontend/Dockerfile -t apexcoach-ai-frontend:prod .
 ```
 
 ### Updating Dependencies

@@ -11,12 +11,16 @@ export interface User {
   email: string;
   name: string | null;
   role: 'admin' | 'coach' | 'user';
+  isDemo?: boolean;
+  demoRole?: string;
+  demoLabel?: string;
 }
 
 interface AuthContextType {
   user: User | undefined;
   login: (email: string, password: string) => Promise<void>;
   demoLogin: () => Promise<void>;
+  demoLoginWithRole: (role: string) => Promise<void>;
   signup: (email: string, password: string, name?: string) => Promise<void>;
   logout: () => Promise<void>;
   loading: boolean;
@@ -83,6 +87,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(data.user);
   };
 
+  const demoLoginWithRole = async (role: string) => {
+    const response = await fetch('/auth/demo-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ role }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Demo login failed');
+    }
+
+    const data = await response.json();
+    setUser(data.user);
+  };
+
   const signup = async (email: string, password: string, name?: string) => {
     const response = await fetch('/auth/signup', {
       method: 'POST',
@@ -110,7 +131,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, login, demoLogin, signup, logout, loading }}
+      value={{
+        user,
+        login,
+        demoLogin,
+        demoLoginWithRole,
+        signup,
+        logout,
+        loading,
+      }}
     >
       {children}
     </AuthContext.Provider>

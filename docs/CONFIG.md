@@ -40,12 +40,18 @@ AZURE_STORAGE_CONNECTION_STRING=<storage-connection-string>
 APP_STORAGE_PREFIX=apexcoachai
 ```
 
+### Demo Login
+
+```bash
+ENABLE_DEMO_LOGIN=true  # Set to 'true' to enable demo login endpoints
+```
+
 ## Frontend Environment Variables
 
 Location: `apps/frontend/.env` or App Settings in Azure Static Web App
 
 ```bash
-VITE_API_BASE_URL=https://<apexcoachai-api-url>
+VITE_SEARCH_API_URI=https://<apexcoachai-api-url>
 VITE_APP_NAME=ApexCoachAI
 ```
 
@@ -78,6 +84,6 @@ VITE_APP_NAME=ApexCoachAI
 ## Production Deployment
 
 Environment variables are set as App Settings in:
+
 - **Static Web App**: Azure Portal → Static Web App `apexcoachai` → Configuration → Application settings
 - **Container Apps**: Azure Portal → Container Apps `apexcoachai-api` and `apexcoachai-indexer` → Configuration → Environment variables
-

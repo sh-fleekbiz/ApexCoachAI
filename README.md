@@ -85,8 +85,10 @@ AZURE_STORAGE_CONTAINER=apexcoachai
 pnpm install
 
 # Set up environment
-cp packages/search/.env.example packages/search/.env
-# Edit packages/search/.env with your Azure credentials
+cp apps/backend/search/.env.example apps/backend/search/.env
+cp apps/backend/indexer/.env.example apps/backend/indexer/.env
+cp apps/frontend/.env.example apps/frontend/.env
+# Edit the .env files with your Azure credentials
 
 # Development
 pnpm dev              # Start all services

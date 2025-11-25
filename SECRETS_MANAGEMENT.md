@@ -19,6 +19,8 @@ This document outlines how to securely manage secrets for the Apex Coach AI proj
 - **GitHub Copilot**: Environment configuration
 - **Azure Services**: Key Vault and managed identities (recommended for production)
 
+**Note for ApexCoachAI**: For the current deployment, we use environment variables and GitHub/Azure App Settings only; Key Vault is optional and not part of the default deployment path.
+
 ---
 
 ## Required Secrets Inventory

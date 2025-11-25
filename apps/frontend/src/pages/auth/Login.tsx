@@ -1,5 +1,4 @@
 import {
-  DefaultButton,
   MessageBar,
   MessageBarType,
   PrimaryButton,
@@ -9,6 +8,7 @@ import {
 } from '@fluentui/react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import DemoLoginButtons from '../../components/auth/DemoLoginButtons.js';
 import { useAuth } from '../../contexts/AuthContext.js';
 import styles from './Auth.module.css';
 
@@ -17,18 +17,26 @@ export function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isDemoLoading, setIsDemoLoading] = useState(false);
-  const { login, demoLogin, user } = useAuth();
+  const { login, demoLoginWithRole, user } = useAuth();
   const navigate = useNavigate();
 
-  // Auto-login with demo account on first visit
+  // Auto-login with demo coach account on first visit
   useEffect(() => {
     const hasVisited = localStorage.getItem('hasVisited');
     if (!hasVisited && !user) {
       localStorage.setItem('hasVisited', 'true');
-      handleDemoLogin();
+      handleAutoLogin();
     }
   }, [user]);
+
+  const handleAutoLogin = async () => {
+    try {
+      await demoLoginWithRole('coach');
+      navigate('/');
+    } catch (error_: any) {
+      console.error('Auto-login failed:', error_);
+    }
+  };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -42,20 +50,6 @@ export function Login() {
       setError(error_.message || 'Login failed');
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleDemoLogin = async () => {
-    setError('');
-    setIsDemoLoading(true);
-
-    try {
-      await demoLogin();
-      navigate('/');
-    } catch (error_: any) {
-      setError(error_.message || 'Demo login failed');
-    } finally {
-      setIsDemoLoading(false);
     }
   };
 
@@ -101,16 +95,16 @@ export function Login() {
               <PrimaryButton
                 text={isLoading ? 'Signing in...' : 'Sign In'}
                 type="submit"
-                disabled={isLoading || isDemoLoading}
+                disabled={isLoading}
               />
 
-              <DefaultButton
-                text={
-                  isDemoLoading ? 'Logging in with demo...' : 'Try Demo Account'
-                }
-                onClick={handleDemoLogin}
-                disabled={isLoading || isDemoLoading}
-              />
+              <div style={{ margin: '20px 0', textAlign: 'center' }}>
+                <Text variant="medium" style={{ color: '#666' }}>
+                  or
+                </Text>
+              </div>
+
+              <DemoLoginButtons />
 
               <Text variant="small" className={styles.authLink}>
                 Don&apos;t have an account? <Link to="/signup">Sign up</Link>
