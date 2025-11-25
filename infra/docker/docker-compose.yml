@@ -3,18 +3,18 @@ version: '3.9'
 services:
   search:
     build:
-      context: .
-      dockerfile: packages/search/Dockerfile
+      context: ../..
+      dockerfile: apps/backend/search/Dockerfile
     ports:
       - '3000:3000'
     environment:
       NODE_ENV: development
     volumes:
-      - .:/workspace:rw
+      - ../..:/workspace:rw
     working_dir: /workspace
-    command: ['npm', 'run', 'dev', '--workspace=search']
+    command: [ 'pnpm', 'dev', '--filter=search' ]
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:3000/health']
+      test: [ 'CMD', 'wget', '--spider', '-q', 'http://localhost:3000/health' ]
       interval: 30s
       timeout: 5s
       retries: 5
@@ -22,18 +22,18 @@ services:
 
   indexer:
     build:
-      context: .
-      dockerfile: packages/indexer/Dockerfile
+      context: ../..
+      dockerfile: apps/backend/indexer/Dockerfile
     ports:
       - '3001:3001'
     environment:
       NODE_ENV: development
     volumes:
-      - .:/workspace:rw
+      - ../..:/workspace:rw
     working_dir: /workspace
-    command: ['npm', 'run', 'dev', '--workspace=indexer']
+    command: [ 'pnpm', 'dev', '--filter=indexer' ]
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:3001/health']
+      test: [ 'CMD', 'wget', '--spider', '-q', 'http://localhost:3001/health' ]
       interval: 30s
       timeout: 5s
       retries: 5
@@ -41,33 +41,33 @@ services:
     depends_on:
       - search
 
-  webapp:
+  frontend:
     build:
-      context: .
-      dockerfile: packages/webapp/Dockerfile
+      context: ../..
+      dockerfile: apps/frontend/Dockerfile
     ports:
       - '5173:5173'
     environment:
       NODE_ENV: development
     volumes:
-      - .:/workspace:rw
+      - ../..:/workspace:rw
     working_dir: /workspace
-    command: ['npm', 'run', 'dev', '--workspace=webapp', '--', '--host']
+    command: [ 'pnpm', 'dev', '--filter=frontend' ]
     depends_on:
       - search
 
-  chat-component:
+  ui:
     build:
-      context: .
-      dockerfile: packages/chat-component/Dockerfile
+      context: ../..
+      dockerfile: packages/ui/Dockerfile
     ports:
-      - '5174:5173'
+      - '8000:8000'
     environment:
       NODE_ENV: development
     volumes:
-      - .:/workspace:rw
+      - ../..:/workspace:rw
     working_dir: /workspace
-    command: ['npm', 'run', 'dev', '--workspace=chat-component', '--', '--host']
+    command: [ 'pnpm', 'dev', '--filter=chat-component' ]
     depends_on:
       - search
 

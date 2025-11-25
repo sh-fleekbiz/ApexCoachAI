@@ -1,4 +1,10 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from 'react';
 
 export interface User {
   id: number;
@@ -10,6 +16,7 @@ export interface User {
 interface AuthContextType {
   user: User | undefined;
   login: (email: string, password: string) => Promise<void>;
+  demoLogin: () => Promise<void>;
   signup: (email: string, password: string, name?: string) => Promise<void>;
   logout: () => Promise<void>;
   loading: boolean;
@@ -60,6 +67,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(data.user);
   };
 
+  const demoLogin = async () => {
+    const response = await fetch('/auth/demo-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Demo login failed');
+    }
+
+    const data = await response.json();
+    setUser(data.user);
+  };
+
   const signup = async (email: string, password: string, name?: string) => {
     const response = await fetch('/auth/signup', {
       method: 'POST',
@@ -85,7 +108,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(undefined);
   };
 
-  return <AuthContext.Provider value={{ user, login, signup, logout, loading }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider
+      value={{ user, login, demoLogin, signup, logout, loading }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {

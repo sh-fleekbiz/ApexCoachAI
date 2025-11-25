@@ -8,7 +8,7 @@ requiredVersions:
 
 services:
   webapp:
-    project: ./packages/webapp
+    project: ./apps/frontend
     dist: dist
     language: ts
     host: staticwebapp
@@ -16,17 +16,17 @@ services:
       predeploy:
         windows:
           shell: pwsh
-          run: npm run build
+          run: cd apps/frontend && npm run build
           interactive: true
           continueOnError: false
         posix:
           shell: sh
-          run: export SEARCH_API_URI && npm run build
+          run: export SEARCH_API_URI && cd apps/frontend && npm run build
           interactive: true
           continueOnError: false
 
   search:
-    project: ./packages/search
+    project: ./apps/backend/search
     language: ts
     host: containerapp
     docker:
@@ -34,7 +34,7 @@ services:
       remoteBuild: true
 
   indexer:
-    project: ./packages/indexer
+    project: ./apps/backend/indexer
     language: ts
     host: containerapp
     docker:

@@ -1,6 +1,14 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { TextField, PrimaryButton, Stack, Text, MessageBar, MessageBarType } from '@fluentui/react';
+import {
+  DefaultButton,
+  MessageBar,
+  MessageBarType,
+  PrimaryButton,
+  Stack,
+  Text,
+  TextField,
+} from '@fluentui/react';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext.js';
 import styles from './Auth.module.css';
 
@@ -9,8 +17,18 @@ export function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
+  const { login, demoLogin, user } = useAuth();
   const navigate = useNavigate();
+
+  // Auto-login with demo account on first visit
+  useEffect(() => {
+    const hasVisited = localStorage.getItem('hasVisited');
+    if (!hasVisited && !user) {
+      localStorage.setItem('hasVisited', 'true');
+      handleDemoLogin();
+    }
+  }, [user]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -27,6 +45,20 @@ export function Login() {
     }
   };
 
+  const handleDemoLogin = async () => {
+    setError('');
+    setIsDemoLoading(true);
+
+    try {
+      await demoLogin();
+      navigate('/');
+    } catch (error_: any) {
+      setError(error_.message || 'Demo login failed');
+    } finally {
+      setIsDemoLoading(false);
+    }
+  };
+
   return (
     <div className={styles.authContainer}>
       <div className={styles.authCard}>
@@ -40,7 +72,11 @@ export function Login() {
             </Text>
           </div>
 
-          {error && <MessageBar messageBarType={MessageBarType.error}>{error}</MessageBar>}
+          {error && (
+            <MessageBar messageBarType={MessageBarType.error}>
+              {error}
+            </MessageBar>
+          )}
 
           <form onSubmit={handleSubmit}>
             <Stack tokens={{ childrenGap: 15 }}>
@@ -62,7 +98,19 @@ export function Login() {
                 autoComplete="current-password"
               />
 
-              <PrimaryButton text={isLoading ? 'Signing in...' : 'Sign In'} type="submit" disabled={isLoading} />
+              <PrimaryButton
+                text={isLoading ? 'Signing in...' : 'Sign In'}
+                type="submit"
+                disabled={isLoading || isDemoLoading}
+              />
+
+              <DefaultButton
+                text={
+                  isDemoLoading ? 'Logging in with demo...' : 'Try Demo Account'
+                }
+                onClick={handleDemoLogin}
+                disabled={isLoading || isDemoLoading}
+              />
 
               <Text variant="small" className={styles.authLink}>
                 Don&apos;t have an account? <Link to="/signup">Sign up</Link>

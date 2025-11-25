@@ -6,14 +6,14 @@ WORKDIR /app
 
 FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY packages/search/package.json packages/search/
+COPY apps/backend/search/package.json apps/backend/search/
 COPY packages/shared/package.json packages/shared/
 RUN pnpm install --frozen-lockfile --filter search...
 
 FROM base AS build
 COPY . .
 COPY --from=deps /app/node_modules ./node_modules
-WORKDIR /app/packages/search
+WORKDIR /app/apps/backend/search
 RUN npx prisma generate
 WORKDIR /app
 RUN pnpm run build --filter=shared
@@ -23,9 +23,9 @@ FROM base AS runtime
 ENV NODE_ENV=production
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=build /app/packages/search/dist ./packages/search/dist
-COPY --from=build /app/packages/search/package.json ./packages/search/
-COPY --from=build /app/packages/search/prisma ./packages/search/prisma
+COPY --from=build /app/apps/backend/search/dist ./apps/backend/search/dist
+COPY --from=build /app/apps/backend/search/package.json ./apps/backend/search/
+COPY --from=build /app/apps/backend/search/prisma ./apps/backend/search/prisma
 COPY --from=build /app/packages/shared/dist ./packages/shared/dist
 COPY --from=build /app/packages/shared/package.json ./packages/shared/
 EXPOSE 3000

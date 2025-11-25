@@ -102,5 +102,9 @@ export async function generateImage(opts: {
     size: opts.size ?? '1024x1024',
   });
 
+  if (!result.data || !result.data[0]) {
+    throw new Error('Failed to generate image');
+  }
+
   return result.data[0]; // contains b64_json or URL depending on config
 }

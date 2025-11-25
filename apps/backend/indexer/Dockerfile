@@ -6,7 +6,7 @@ WORKDIR /app
 
 FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY packages/indexer/package.json packages/indexer/
+COPY apps/backend/indexer/package.json apps/backend/indexer/
 RUN pnpm install --frozen-lockfile --filter indexer...
 
 FROM base AS build
@@ -19,7 +19,7 @@ FROM base AS runtime
 ENV NODE_ENV=production
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=build /app/packages/indexer/dist ./packages/indexer/dist
-COPY --from=build /app/packages/indexer/package.json ./packages/indexer/
+COPY --from=build /app/apps/backend/indexer/dist ./apps/backend/indexer/dist
+COPY --from=build /app/apps/backend/indexer/package.json ./apps/backend/indexer/
 EXPOSE 3001
 CMD [ "pnpm", "start", "--filter=indexer" ]

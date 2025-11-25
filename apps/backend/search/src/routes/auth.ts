@@ -1,7 +1,7 @@
-import { type FastifyPluginAsync } from 'fastify';
 import bcrypt from 'bcryptjs';
-import { userRepository } from '../db/user-repository.js';
+import { type FastifyPluginAsync } from 'fastify';
 import { usageEventRepository } from '../db/usage-event-repository.js';
+import { userRepository } from '../db/user-repository.js';
 
 const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
   // Signup route
@@ -38,13 +38,19 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       },
     },
     handler: async function (request, reply) {
-      const { email, password, name } = request.body as { email: string; password: string; name?: string };
+      const { email, password, name } = request.body as {
+        email: string;
+        password: string;
+        name?: string;
+      };
 
       try {
         // Check if user already exists
         const existingUser = userRepository.getUserByEmail(email);
         if (existingUser) {
-          return reply.code(400).send({ error: 'User with this email already exists' });
+          return reply
+            .code(400)
+            .send({ error: 'User with this email already exists' });
         }
 
         // Hash password
@@ -54,10 +60,17 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
         const user = userRepository.createUser({ email, password_hash, name });
 
         // Generate JWT token
-        const token = fastify.jwt.sign({ id: user.id, email: user.email, role: user.role });
+        const token = fastify.jwt.sign({
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        });
 
         // Log usage event
-        usageEventRepository.createUsageEvent({ user_id: user.id, type: 'login' });
+        usageEventRepository.createUsageEvent({
+          user_id: user.id,
+          type: 'login',
+        });
 
         // Set cookie
         reply.setCookie('token', token, {
@@ -115,7 +128,10 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       },
     },
     handler: async function (request, reply) {
-      const { email, password } = request.body as { email: string; password: string };
+      const { email, password } = request.body as {
+        email: string;
+        password: string;
+      };
 
       try {
         // Find user
@@ -125,13 +141,20 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
         }
 
         // Verify password
-        const isValidPassword = await bcrypt.compare(password, user.password_hash);
+        const isValidPassword = await bcrypt.compare(
+          password,
+          user.password_hash
+        );
         if (!isValidPassword) {
           return reply.code(401).send({ error: 'Invalid email or password' });
         }
 
         // Generate JWT token
-        const token = fastify.jwt.sign({ id: user.id, email: user.email, role: user.role });
+        const token = fastify.jwt.sign({
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        });
 
         // Set cookie
         reply.setCookie('token', token, {
@@ -175,6 +198,86 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       // Clear cookie
       reply.clearCookie('token', { path: '/' });
       return { message: 'Logged out successfully' };
+    },
+  });
+
+  // Demo login route
+  fastify.post('/auth/demo-login', {
+    schema: {
+      description: 'Log in with demo account',
+      tags: ['auth'],
+      response: {
+        200: {
+          type: 'object',
+          properties: {
+            user: {
+              type: 'object',
+              properties: {
+                id: { type: 'number' },
+                email: { type: 'string' },
+                name: { type: 'string' },
+                role: { type: 'string' },
+              },
+            },
+          },
+        },
+        500: { $ref: 'httpError' },
+      },
+    },
+    handler: async function (request, reply) {
+      const demoEmail = 'demo@apexcoachai.com';
+      const demoPassword = 'demo123456';
+
+      try {
+        // Check if demo user exists
+        let user = userRepository.getUserByEmail(demoEmail);
+
+        // Create demo user if it doesn't exist
+        if (!user) {
+          const password_hash = await bcrypt.hash(demoPassword, 10);
+          user = userRepository.createUser({
+            email: demoEmail,
+            password_hash,
+            name: 'Demo User',
+          });
+        }
+
+        // Generate JWT token
+        const token = fastify.jwt.sign({
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        });
+
+        // Log usage event
+        usageEventRepository.createUsageEvent({
+          user_id: user.id,
+          type: 'login',
+        });
+
+        // Set cookie
+        reply.setCookie('token', token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          path: '/',
+          maxAge: 7 * 24 * 60 * 60, // 7 days
+        });
+
+        return {
+          user: {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+          },
+        };
+      } catch (error: any) {
+        fastify.log.error(error);
+        return reply
+          .code(500)
+          .send({ error: 'Failed to log in with demo account' });
+      }
     },
   });
 

@@ -31,7 +31,10 @@ Apex Coach AI transforms proprietary coaching content (videos, documents, traini
   - Backend: Azure Container Apps `apexcoachai-api` and `apexcoachai-indexer` in `cae-shared-apps` (Consumption plan)
     - Container Apps Environment: `cae-shared-apps` in `rg-shared-apps`
     - Images: `shacrapps.azurecr.io/apexcoachai-api:latest`, `shacrapps.azurecr.io/apexcoachai-indexer:latest`
-- **Custom Domain**: `apexcoachai.shtrial.com`
+- **Custom Domains**:
+  - Frontend: `https://apexcoachai.shtrial.com`
+  - Backend API: `https://api.apexcoachai.shtrial.com`
+  - Swagger UI: `https://api.apexcoachai.shtrial.com/swagger`
 
 ## Architecture
 
