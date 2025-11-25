@@ -124,3 +124,8 @@ TODO
 # ====================
 !.github/instructions/
 deploy/
+
+# Environment files
+prod.env
+*.env.local
+
