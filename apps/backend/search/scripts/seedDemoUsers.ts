@@ -1,5 +1,5 @@
-import { withClient } from '@shared/data';
 import bcrypt from 'bcryptjs';
+import { withClient } from '../src/lib/db.js';
 
 interface DemoUser {
   email: string;

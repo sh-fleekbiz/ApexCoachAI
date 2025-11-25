@@ -1,5 +1,5 @@
-import { createSearchAzureConfig, type AzureConfig } from '@shared/data';
 import fp from 'fastify-plugin';
+import { createSearchAzureConfig, type AzureConfig } from '../lib/config.js';
 
 export interface AppConfig extends AzureConfig {
   enableDemoLogin: boolean;

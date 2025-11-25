@@ -1,5 +1,5 @@
-import { withClient } from '@shared/data';
 import { type FastifyPluginAsync } from 'fastify';
+import { withClient } from '../lib/db.js';
 
 interface LibraryFilters {
   status?: string;

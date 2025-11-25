@@ -1,5 +1,5 @@
-import { withClient } from '@shared/data';
 import type { Citation, Role } from 'shared/chat-types.js';
+import { withClient } from '../lib/db.js';
 
 export interface ChatMessage {
   id: number;

@@ -9,7 +9,6 @@ import {
   TooltipHost,
 } from '@fluentui/react';
 import type { IDropdownOption } from '@fluentui/react/lib-commonjs/Dropdown';
-import 'chat-component';
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
@@ -19,6 +18,7 @@ import {
   type RequestOverrides,
 } from '../../api/index.js';
 import type { Citation } from '../../api/models.js';
+import '../../chat-component/index.js';
 import { SettingsButton } from '../../components/SettingsButton/index.js';
 import type { CustomStylesState } from '../../components/SettingsStyles/SettingsStyles.js';
 import { SettingsStyles } from '../../components/SettingsStyles/SettingsStyles.js';

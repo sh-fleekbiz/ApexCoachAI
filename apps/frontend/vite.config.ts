@@ -35,9 +35,18 @@ export default defineConfig({
   },
   server: {
     proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:3000',
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+      '/auth': 'http://127.0.0.1:3000',
       '/ask': 'http://127.0.0.1:3000',
       '/chat': 'http://127.0.0.1:3000',
+      '/chats': 'http://127.0.0.1:3000',
       '/content': 'http://127.0.0.1:3000',
+      '/meta-prompts': 'http://127.0.0.1:3000',
+      '/me': 'http://127.0.0.1:3000',
+      '/library': 'http://127.0.0.1:3000',
     },
   },
 });

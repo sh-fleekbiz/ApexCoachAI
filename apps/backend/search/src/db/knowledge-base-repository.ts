@@ -1,4 +1,4 @@
-import { withClient } from '@shared/data';
+import { withClient } from '../lib/db.js';
 
 interface KnowledgeBaseDocument {
   id: number;

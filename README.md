@@ -40,14 +40,9 @@ Apex Coach AI transforms proprietary coaching content (videos, documents, traini
 
 - **Monorepo**: pnpm workspaces with Turborepo
 - **Apps**:
-  - `apps/frontend`: React frontend
-  - `apps/backend/search`: Fastify RAG backend
-  - `apps/backend/indexer`: Content indexing service
-- **Packages**:
-  - `packages/shared-ai`: Shared Azure OpenAI client (`@shared/ai`)
-  - `packages/shared-data`: Shared Postgres, Search, Storage clients (`@shared/data`)
-  - `packages/shared`: Shared types and utilities
-  - `packages/ui`: Shared UI components
+  - `apps/frontend`: React frontend with integrated chat component
+  - `apps/backend/search`: Fastify RAG backend with integrated data utilities
+  - `apps/backend/indexer`: Content indexing service with integrated config utilities
 
 ## Environment Variables
 

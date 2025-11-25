@@ -14,70 +14,95 @@ import { useState } from 'react';
 
 import styles from './OneShot.module.css';
 
-import { Approaches, RetrievalMode, apiBaseUrl, type RequestOverrides } from '../../api/index.js';
+import {
+  Approaches,
+  RetrievalMode,
+  apiBaseUrl,
+  type RequestOverrides,
+} from '../../api/index.js';
 import { SettingsButton } from '../../components/SettingsButton/SettingsButton.jsx';
 
-import 'chat-component';
+import '../../chat-component/index.js';
 import { toolTipText, toolTipTextCalloutProps } from '../../i18n/tooltips.js';
 
 export function Component(): JSX.Element {
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
-  const [approach, setApproach] = useState<Approaches>(Approaches.ReadRetrieveRead);
+  const [approach, setApproach] = useState<Approaches>(
+    Approaches.ReadRetrieveRead
+  );
   const [promptTemplate, setPromptTemplate] = useState<string>('');
   const [promptTemplatePrefix, setPromptTemplatePrefix] = useState<string>('');
   const [promptTemplateSuffix, setPromptTemplateSuffix] = useState<string>('');
-  const [retrievalMode, setRetrievalMode] = useState<RetrievalMode>(RetrievalMode.Hybrid);
+  const [retrievalMode, setRetrievalMode] = useState<RetrievalMode>(
+    RetrievalMode.Hybrid
+  );
   const [retrieveCount, setRetrieveCount] = useState<number>(3);
   const [useSemanticRanker, setUseSemanticRanker] = useState<boolean>(true);
-  const [useSemanticCaptions, setUseSemanticCaptions] = useState<boolean>(false);
+  const [useSemanticCaptions, setUseSemanticCaptions] =
+    useState<boolean>(false);
   const [excludeCategory, setExcludeCategory] = useState<string>('');
 
   const onPromptTemplateChange = (
     _event?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
-    newValue?: string,
+    newValue?: string
   ) => {
     setPromptTemplate(newValue || '');
   };
 
   const onPromptTemplatePrefixChange = (
     _event?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
-    newValue?: string,
+    newValue?: string
   ) => {
     setPromptTemplatePrefix(newValue || '');
   };
 
   const onPromptTemplateSuffixChange = (
     _event?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
-    newValue?: string,
+    newValue?: string
   ) => {
     setPromptTemplateSuffix(newValue || '');
   };
 
-  const onRetrieveCountChange = (_event?: React.SyntheticEvent<HTMLElement, Event>, newValue?: string) => {
+  const onRetrieveCountChange = (
+    _event?: React.SyntheticEvent<HTMLElement, Event>,
+    newValue?: string
+  ) => {
     setRetrieveCount(Number.parseInt(newValue || '3'));
   };
 
   const onRetrievalModeChange = (
     _event: React.FormEvent<HTMLDivElement>,
     option?: IDropdownOption<RetrievalMode> | undefined,
-    _index?: number | undefined,
+    _index?: number | undefined
   ) => {
     setRetrievalMode(option?.data || RetrievalMode.Hybrid);
   };
 
-  const onApproachChange = (_event?: React.FormEvent<HTMLElement | HTMLInputElement>, option?: IChoiceGroupOption) => {
+  const onApproachChange = (
+    _event?: React.FormEvent<HTMLElement | HTMLInputElement>,
+    option?: IChoiceGroupOption
+  ) => {
     setApproach((option?.key as Approaches) || Approaches.RetrieveThenRead);
   };
 
-  const onUseSemanticRankerChange = (_event?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
+  const onUseSemanticRankerChange = (
+    _event?: React.FormEvent<HTMLElement | HTMLInputElement>,
+    checked?: boolean
+  ) => {
     setUseSemanticRanker(!!checked);
   };
 
-  const onUseSemanticCaptionsChange = (_event?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
+  const onUseSemanticCaptionsChange = (
+    _event?: React.FormEvent<HTMLElement | HTMLInputElement>,
+    checked?: boolean
+  ) => {
     setUseSemanticCaptions(!!checked);
   };
 
-  const onExcludeCategoryChanged = (_event?: React.FormEvent, newValue?: string) => {
+  const onExcludeCategoryChanged = (
+    _event?: React.FormEvent,
+    newValue?: string
+  ) => {
     setExcludeCategory(newValue || '');
   };
 
@@ -106,7 +131,10 @@ export function Component(): JSX.Element {
   return (
     <div className={styles.oneshotContainer}>
       <div className={styles.oneshotTopSection}>
-        <SettingsButton className={styles.settingsButton} onClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)} />
+        <SettingsButton
+          className={styles.settingsButton}
+          onClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)}
+        />
         <chat-component
           title="Ask your data"
           data-input-position="sticky"
@@ -124,10 +152,17 @@ export function Component(): JSX.Element {
         isBlocking={false}
         onDismiss={() => setIsConfigPanelOpen(false)}
         closeButtonAriaLabel="Close"
-        onRenderFooterContent={() => <DefaultButton onClick={() => setIsConfigPanelOpen(false)}>Close</DefaultButton>}
+        onRenderFooterContent={() => (
+          <DefaultButton onClick={() => setIsConfigPanelOpen(false)}>
+            Close
+          </DefaultButton>
+        )}
         isFooterAtBottom={true}
       >
-        <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.approaches}>
+        <TooltipHost
+          calloutProps={toolTipTextCalloutProps}
+          content={toolTipText.approaches}
+        >
           <ChoiceGroup
             className={styles.oneshotSettingsSeparator}
             label="Approach"
@@ -137,8 +172,12 @@ export function Component(): JSX.Element {
           />
         </TooltipHost>
 
-        {(approach === Approaches.RetrieveThenRead || approach === Approaches.ReadDecomposeAsk) && (
-          <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
+        {(approach === Approaches.RetrieveThenRead ||
+          approach === Approaches.ReadDecomposeAsk) && (
+          <TooltipHost
+            calloutProps={toolTipTextCalloutProps}
+            content={toolTipText.promptTemplate}
+          >
             <TextField
               className={styles.oneshotSettingsSeparator}
               defaultValue={promptTemplate}
@@ -152,7 +191,10 @@ export function Component(): JSX.Element {
 
         {approach === Approaches.ReadRetrieveRead && (
           <>
-            <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplatePrefix}>
+            <TooltipHost
+              calloutProps={toolTipTextCalloutProps}
+              content={toolTipText.promptTemplatePrefix}
+            >
               <TextField
                 className={styles.oneshotSettingsSeparator}
                 defaultValue={promptTemplatePrefix}
@@ -162,7 +204,10 @@ export function Component(): JSX.Element {
                 onChange={onPromptTemplatePrefixChange}
               />
             </TooltipHost>
-            <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplateSuffix}>
+            <TooltipHost
+              calloutProps={toolTipTextCalloutProps}
+              content={toolTipText.promptTemplateSuffix}
+            >
               <TextField
                 className={styles.oneshotSettingsSeparator}
                 defaultValue={promptTemplateSuffix}
@@ -174,7 +219,10 @@ export function Component(): JSX.Element {
             </TooltipHost>
           </>
         )}
-        <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.retrieveNumber}>
+        <TooltipHost
+          calloutProps={toolTipTextCalloutProps}
+          content={toolTipText.retrieveNumber}
+        >
           <SpinButton
             className={styles.oneshotSettingsSeparator}
             label="Retrieve this many search results:"
@@ -184,14 +232,20 @@ export function Component(): JSX.Element {
             onChange={onRetrieveCountChange}
           />
         </TooltipHost>
-        <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.excludeCategory}>
+        <TooltipHost
+          calloutProps={toolTipTextCalloutProps}
+          content={toolTipText.excludeCategory}
+        >
           <TextField
             className={styles.oneshotSettingsSeparator}
             label="Exclude category"
             onChange={onExcludeCategoryChanged}
           />
         </TooltipHost>
-        <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.useSemanticRanker}>
+        <TooltipHost
+          calloutProps={toolTipTextCalloutProps}
+          content={toolTipText.useSemanticRanker}
+        >
           <Checkbox
             className={styles.oneshotSettingsSeparator}
             checked={useSemanticRanker}
@@ -199,7 +253,10 @@ export function Component(): JSX.Element {
             onChange={onUseSemanticRankerChange}
           />
         </TooltipHost>
-        <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.useQueryContextSummaries}>
+        <TooltipHost
+          calloutProps={toolTipTextCalloutProps}
+          content={toolTipText.useQueryContextSummaries}
+        >
           <Checkbox
             className={styles.oneshotSettingsSeparator}
             checked={useSemanticCaptions}
@@ -208,7 +265,10 @@ export function Component(): JSX.Element {
             disabled={!useSemanticRanker}
           />
         </TooltipHost>
-        <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.retrievalMode}>
+        <TooltipHost
+          calloutProps={toolTipTextCalloutProps}
+          content={toolTipText.retrievalMode}
+        >
           <Dropdown
             className={styles.oneshotSettingsSeparator}
             label="Retrieval mode"
@@ -225,7 +285,12 @@ export function Component(): JSX.Element {
                 selected: retrievalMode == RetrievalMode.Vectors,
                 data: RetrievalMode.Vectors,
               },
-              { key: 'text', text: 'Text', selected: retrievalMode == RetrievalMode.Text, data: RetrievalMode.Text },
+              {
+                key: 'text',
+                text: 'Text',
+                selected: retrievalMode == RetrievalMode.Text,
+                data: RetrievalMode.Text,
+              },
             ]}
             required
             onChange={onRetrievalModeChange}

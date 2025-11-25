@@ -1,4 +1,4 @@
-import { withClient } from '@shared/data';
+import { withClient } from '../src/lib/db.js';
 
 async function seedDemoData() {
   console.log('Starting realistic demo data seeding...');

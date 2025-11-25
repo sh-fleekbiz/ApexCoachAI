@@ -1,4 +1,4 @@
-import { withClient } from '@shared/data';
+import { withClient } from '../lib/db.js';
 
 export const analyticsRepository = {
   async getSnapshot(range: '7d' | '30d' | '90d' | '365d') {

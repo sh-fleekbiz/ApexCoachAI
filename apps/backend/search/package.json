@@ -36,7 +36,6 @@
     "@langchain/core": "^0.3.40",
     "@langchain/openai": "^0.4.4",
     "@prisma/client": "^6.19.0",
-    "@shared/data": "workspace:*",
     "@supabase/supabase-js": "^2.81.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
@@ -49,8 +48,7 @@
     "jsonwebtoken": "^9.0.2",
     "langchain": "^0.3.15",
     "openai": "^4.4.0",
-    "prisma": "^6.19.0",
-    "shared": "workspace:*"
+    "prisma": "^6.19.0"
   },
   "devDependencies": {
     "@types/node": "^22.13.4",

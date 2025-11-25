@@ -1,4 +1,4 @@
-import { getPgPool, withClient } from '@shared/data';
+import { getPgPool, withClient } from '../lib/db.js';
 
 // Export database pool for direct access if needed
 export const database = getPgPool();
