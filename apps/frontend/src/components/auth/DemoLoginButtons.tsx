@@ -6,8 +6,21 @@ import { useAuth } from '../../contexts/AuthContext';
 interface DemoRole {
   role: string;
   label: string;
-  description: string;
+  email: string;
+  userRole: string;
 }
+
+const roleDescriptions: Record<string, string> = {
+  admin: 'Full platform access & settings',
+  coach: 'Guide clients through coaching',
+  client: 'Experience the coaching journey',
+};
+
+const roleIcons: Record<string, string> = {
+  admin: '⚙️',
+  coach: '🎓',
+  client: '💬',
+};
 
 const DemoLoginButtons: React.FC = () => {
   const { demoLoginWithRole } = useAuth();
@@ -56,12 +69,18 @@ const DemoLoginButtons: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="text-center text-gray-600">Loading demo options...</div>
+      <div style={{ textAlign: 'center', color: '#6b7280', padding: '12px 0' }}>
+        Loading demo options...
+      </div>
     );
   }
 
   if (error) {
-    return <div className="text-center text-red-600">{error}</div>;
+    return (
+      <div style={{ textAlign: 'center', color: '#dc2626', padding: '12px 0' }}>
+        {error}
+      </div>
+    );
   }
 
   if (demoRoles.length === 0) {
@@ -69,37 +88,61 @@ const DemoLoginButtons: React.FC = () => {
   }
 
   return (
-    <div className="space-y-3">
-      <div className="text-center text-sm text-gray-600 mb-4">
-        Try ApexCoach AI with different personas:
-      </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
       {demoRoles.map((demoRole) => (
         <button
           key={demoRole.role}
           onClick={() => handleDemoLogin(demoRole.role)}
           disabled={loggingIn !== null}
-          className={`
-            w-full px-4 py-3 rounded-md text-sm font-medium
-            transition-colors duration-200
-            ${
-              loggingIn === demoRole.role
-                ? 'bg-blue-700 text-white cursor-wait'
-                : loggingIn !== null
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
+          style={{
+            width: '100%',
+            padding: '12px 16px',
+            borderRadius: '8px',
+            border: '2px solid #e5e7eb',
+            background: loggingIn === demoRole.role ? '#667eea' : 'white',
+            color: loggingIn === demoRole.role ? 'white' : '#374151',
+            fontSize: '14px',
+            cursor: loggingIn !== null ? 'not-allowed' : 'pointer',
+            opacity:
+              loggingIn !== null && loggingIn !== demoRole.role ? 0.5 : 1,
+            transition: 'all 0.2s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            textAlign: 'left',
+          }}
+          onMouseOver={(e) => {
+            if (loggingIn === null) {
+              e.currentTarget.style.borderColor = '#667eea';
             }
-          `}
+          }}
+          onMouseOut={(e) => {
+            if (loggingIn !== demoRole.role) {
+              e.currentTarget.style.borderColor = '#e5e7eb';
+            }
+          }}
         >
           {loggingIn === demoRole.role ? (
-            <span className="flex items-center justify-center">
+            <span
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                margin: '0 auto',
+              }}
+            >
               <svg
-                className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                style={{
+                  width: '16px',
+                  height: '16px',
+                  animation: 'spin 1s linear infinite',
+                }}
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
               >
                 <circle
-                  className="opacity-25"
+                  style={{ opacity: 0.25 }}
                   cx="12"
                   cy="12"
                   r="10"
@@ -107,7 +150,7 @@ const DemoLoginButtons: React.FC = () => {
                   strokeWidth="4"
                 />
                 <path
-                  className="opacity-75"
+                  style={{ opacity: 0.75 }}
                   fill="currentColor"
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 />
@@ -115,15 +158,31 @@ const DemoLoginButtons: React.FC = () => {
               Logging in...
             </span>
           ) : (
-            <div className="text-left">
-              <div className="font-semibold">{demoRole.label}</div>
-              <div className="text-xs opacity-90 mt-1">
-                {demoRole.description}
-              </div>
-            </div>
+            <>
+              <span style={{ fontSize: '20px' }}>
+                {roleIcons[demoRole.role] || '👤'}
+              </span>
+              <span style={{ flex: 1 }}>
+                <strong style={{ display: 'block', marginBottom: '2px' }}>
+                  {demoRole.role.charAt(0).toUpperCase() +
+                    demoRole.role.slice(1)}
+                </strong>
+                <span style={{ fontSize: '12px', color: '#6b7280' }}>
+                  {roleDescriptions[demoRole.role] || demoRole.label}
+                </span>
+              </span>
+            </>
           )}
         </button>
       ))}
+      <style>
+        {`
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+        `}
+      </style>
     </div>
   );
 };
