@@ -83,7 +83,7 @@ DNS Notes: Ensure `api.apexcoachai.shtrial.com` is a CNAME to the Container App 
 - **Frontend**: React + TypeScript (apps/frontend)
 - **Backend**: Node.js + Fastify (apps/backend/search, apps/backend/indexer)
 - **Database**: Azure PostgreSQL (`pg-shared-apps-eastus2`, database: `apexcoachai_db`) with pgvector
-- **RAG**: Azure OpenAI exclusively (via `@shared/ai` package)
+- **RAG**: Azure OpenAI exclusively
   - Chat: `gpt-4o` (default), `gpt-5.1` (heavy tasks)
   - Embeddings: `text-embedding-3-small`
   - Image: `gpt-image-1-mini`

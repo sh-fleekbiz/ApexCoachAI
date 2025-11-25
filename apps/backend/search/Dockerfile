@@ -16,14 +16,6 @@ COPY apps/backend/search/package.json apps/backend/search/
 COPY apps/backend/search/prisma ./apps/backend/search/prisma
 COPY apps/backend/search/dist ./apps/backend/search/dist
 
-# Copy shared packages (pre-built from local)
-COPY packages/shared/package.json packages/shared/
-COPY packages/shared/dist packages/shared/dist
-COPY packages/shared-data/package.json packages/shared-data/
-COPY packages/shared-data/dist packages/shared-data/dist
-COPY packages/shared-ai/package.json packages/shared-ai/
-COPY packages/shared-ai/dist packages/shared-ai/dist
-
 # Install production dependencies only
 RUN pnpm install --prod --frozen-lockfile
 

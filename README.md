@@ -20,7 +20,7 @@ Apex Coach AI transforms proprietary coaching content (videos, documents, traini
 - **Frontend**: React, TypeScript, TailwindCSS, Vite
 - **Backend**: Fastify (Node.js, TypeScript)
 - **Database**: Azure PostgreSQL (`pg-shared-apps-eastus2`, database: `apexcoachai_db`) with pgvector
-- **AI**: Azure OpenAI exclusively (via `@shared/ai` package)
+- **AI**: Azure OpenAI exclusively
   - Chat: `gpt-5.1`
   - Embeddings: `text-embedding-3-small`
   - Image: `gpt-image-1-mini`
@@ -53,22 +53,22 @@ Apex Coach AI transforms proprietary coaching content (videos, documents, traini
 See `docs/CONFIG.md` and `.env.example` for the complete schema. Key variables:
 
 ```env
-# Azure OpenAI (Shared - via @shared/ai package)
+# Azure OpenAI
 AZURE_OPENAI_ENDPOINT=https://shared-openai-eastus2.openai.azure.com/openai/v1/
 AZURE_OPENAI_API_KEY=<your-key>
 AZURE_OPENAI_DEFAULT_CHAT_MODEL=gpt-5.1
 AZURE_OPENAI_MODEL_EMBED=text-embedding-3-small
 AZURE_OPENAI_MODEL_IMAGE=gpt-image-1-mini
 
-# PostgreSQL (Shared - via @shared/data package)
+# PostgreSQL
 SHARED_PG_CONNECTION_STRING=postgresql://<user>:<pass>@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apexcoachai_db?sslmode=require
 
-# Azure AI Search (Shared - via @shared/data package)
+# Azure AI Search
 AZURE_SEARCH_ENDPOINT=https://shared-search-standard-eastus2.search.windows.net
 AZURE_SEARCH_API_KEY=<your-key>
 AZURE_SEARCH_INDEX=apexcoachai-dev-index
 
-# Azure Storage (Shared - via @shared/data package)
+# Azure Storage
 AZURE_STORAGE_CONNECTION_STRING=<connection-string>
 AZURE_STORAGE_CONTAINER=apexcoachai
 ```
