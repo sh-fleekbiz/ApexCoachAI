@@ -1,0 +1,49 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.videoContainer {
+  position: relative;
+  width: 100%;
+  background-color: #000;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.video {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-height: 70vh;
+}
+
+.transcriptContainer {
+  width: 100%;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .video {
+    max-height: 50vh;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    flex-direction: row;
+    gap: 2rem;
+  }
+
+  .videoContainer {
+    flex: 1.5;
+  }
+
+  .transcriptContainer {
+    flex: 1;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+}

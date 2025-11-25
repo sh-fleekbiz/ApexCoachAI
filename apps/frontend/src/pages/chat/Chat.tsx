@@ -12,13 +12,13 @@ import type { IDropdownOption } from '@fluentui/react/lib-commonjs/Dropdown';
 import 'chat-component';
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import type { Citation } from 'shared/chat-types.js';
 import {
   RetrievalMode,
   apiBaseUrl,
   getChatMessages,
   type RequestOverrides,
 } from '../../api/index.js';
+import type { Citation } from '../../api/models.js';
 import { SettingsButton } from '../../components/SettingsButton/index.js';
 import type { CustomStylesState } from '../../components/SettingsStyles/SettingsStyles.js';
 import { SettingsStyles } from '../../components/SettingsStyles/SettingsStyles.js';
@@ -377,36 +377,49 @@ const Chat = () => {
           <p className={styles.chatSubtitle}>
             Ready to help you grow, learn, and achieve your goals.
           </p>
-          {personalities.length > 0 && (
-            <div className={styles.personalityDropdown}>
-              <label
-                htmlFor="personality-select"
-                className={styles.personalityLabel}
-              >
-                Personality:
-              </label>
-              <select
-                id="personality-select"
-                className={styles.personalitySelect}
-                value={selectedPersonalityId || ''}
-                onChange={(event) =>
-                  setSelectedPersonalityId(Number(event.target.value))
-                }
-                disabled={personalitiesLoading}
-                aria-label="Select coaching personality"
-              >
-                {personalitiesLoading && (
-                  <option value="">Loading personalities...</option>
-                )}
-                {!personalitiesLoading &&
-                  personalities.map((personality) => (
-                    <option key={personality.id} value={personality.id}>
-                      {personality.name}
-                    </option>
-                  ))}
-              </select>
-            </div>
-          )}
+          <div className={styles.personalityDropdown}>
+            <label
+              htmlFor="personality-select"
+              className={styles.personalityLabel}
+            >
+              Coaching Personality:
+            </label>
+            <select
+              id="personality-select"
+              className={styles.personalitySelect}
+              value={selectedPersonalityId || ''}
+              onChange={(event) =>
+                setSelectedPersonalityId(Number(event.target.value))
+              }
+              disabled={personalitiesLoading || personalities.length === 0}
+              aria-label="Select coaching personality"
+              title={
+                personalities.length === 0
+                  ? 'No personalities available'
+                  : personalities.find((p) => p.id === selectedPersonalityId)
+                      ?.promptText || ''
+              }
+            >
+              {personalitiesLoading && (
+                <option value="">Loading personalities...</option>
+              )}
+              {!personalitiesLoading && personalities.length === 0 && (
+                <option value="">No personalities available</option>
+              )}
+              {!personalitiesLoading &&
+                personalities.length > 0 &&
+                personalities.map((personality) => (
+                  <option
+                    key={personality.id}
+                    value={personality.id}
+                    title={personality.promptText}
+                  >
+                    {personality.name}
+                    {personality.isDefault ? ' (Default)' : ''}
+                  </option>
+                ))}
+            </select>
+          </div>
         </div>
         {isAdmin && (
           <div className={styles.headerActions}>

@@ -20,6 +20,7 @@ interface PersonalityContextType {
   setSelectedPersonalityId: (id: number) => void;
   isLoading: boolean;
   error: string | undefined;
+  refreshPersonalities: () => Promise<void>;
 }
 
 const PersonalityContext = createContext<PersonalityContextType | undefined>(
@@ -35,31 +36,36 @@ export function PersonalityProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    async function fetchPersonalities() {
-      try {
-        const data = await getMetaPrompts();
-        const personalityList = data.metaPrompts || [];
-        setPersonalities(personalityList);
-
-        // Set default personality
-        const defaultPersonality = personalityList.find(
-          (p: Personality) => p.isDefault
-        );
-        if (defaultPersonality) {
-          setSelectedPersonalityId(defaultPersonality.id);
-        } else if (personalityList.length > 0) {
-          setSelectedPersonalityId(personalityList[0].id);
-        }
-      } catch (error_) {
-        console.error('Failed to load personalities:', error_);
-        setError('Failed to load personalities');
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
     fetchPersonalities();
   }, []);
+
+  const fetchPersonalities = async () => {
+    setIsLoading(true);
+    try {
+      const data = await getMetaPrompts();
+      const personalityList = data.metaPrompts || [];
+      setPersonalities(personalityList);
+
+      // Set default personality
+      const defaultPersonality = personalityList.find(
+        (p: Personality) => p.isDefault
+      );
+      if (defaultPersonality) {
+        setSelectedPersonalityId(defaultPersonality.id);
+      } else if (personalityList.length > 0) {
+        setSelectedPersonalityId(personalityList[0].id);
+      }
+    } catch (error_) {
+      console.error('Failed to load personalities:', error_);
+      setError('Failed to load personalities');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const refreshPersonalities = async () => {
+    await fetchPersonalities();
+  };
 
   return (
     <PersonalityContext.Provider
@@ -69,6 +75,7 @@ export function PersonalityProvider({ children }: { children: ReactNode }) {
         setSelectedPersonalityId,
         isLoading,
         error,
+        refreshPersonalities,
       }}
     >
       {children}

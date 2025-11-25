@@ -153,6 +153,13 @@ const Layout = () => {
             <h3 className={styles.navSectionTitle}>Settings</h3>
             <button
               className={styles.navSectionButton}
+              onClick={() => navigate('/library')}
+              type="button"
+            >
+              📚 Library
+            </button>
+            <button
+              className={styles.navSectionButton}
               onClick={() => navigate('/settings')}
               type="button"
             >

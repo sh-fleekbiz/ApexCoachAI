@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { getUserSettings, updateUserSettings } from '../../api/index.js';
+import { useAuth } from '../../contexts/AuthContext.js';
 import { usePersonality } from '../../contexts/PersonalityContext.js';
 import styles from './SettingsPage.module.css';
 
@@ -12,6 +14,8 @@ interface UserSettings {
 
 export default function SettingsPage() {
   const { personalities, isLoading: personalitiesLoading } = usePersonality();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
   const [settings, setSettings] = useState<UserSettings>({
     userId: 0,
     defaultPersonalityId: undefined,
@@ -78,44 +82,66 @@ export default function SettingsPage() {
       <h1 className={styles.title}>Settings</h1>
 
       <form onSubmit={handleSave} className={styles.form}>
-        {/* Default Personality Section - only show if personalities exist */}
-        {personalities.length > 0 && (
-          <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>
-              Default Coaching Personality
-            </h2>
-            <p className={styles.helpText}>
-              This personality will be used for new chats by default. You can
-              change it for any individual chat.
-            </p>
-            <div className={styles.formGroup}>
-              <label htmlFor="defaultPersonality" className={styles.label}>
-                Default Personality
-              </label>
-              <select
-                id="defaultPersonality"
-                className={styles.select}
-                value={settings.defaultPersonalityId || ''}
-                onChange={(event) => {
-                  const value = Number(event.target.value);
-                  setSettings({
-                    ...settings,
-                    defaultPersonalityId: Number.isNaN(value)
-                      ? undefined
-                      : value,
-                  });
-                }}
-              >
-                <option value="">None selected</option>
-                {personalities.map((personality) => (
-                  <option key={personality.id} value={personality.id}>
-                    {personality.name}
-                  </option>
-                ))}
-              </select>
+        {/* Default Personality Section - always show */}
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Default Coaching Personality</h2>
+          {personalities.length === 0 ? (
+            <div className={styles.emptyPersonalityState}>
+              <p className={styles.helpText}>
+                No coaching personalities are available yet.
+              </p>
+              {isAdmin && (
+                <p className={styles.helpText}>
+                  <Link to="/admin/meta-prompts" className={styles.link}>
+                    Create your first personality
+                  </Link>{' '}
+                  to get started.
+                </p>
+              )}
             </div>
-          </section>
-        )}
+          ) : (
+            <>
+              <p className={styles.helpText}>
+                This personality will be used for new chats by default. You can
+                change it for any individual chat.
+              </p>
+              <div className={styles.formGroup}>
+                <label htmlFor="defaultPersonality" className={styles.label}>
+                  Default Personality
+                </label>
+                <select
+                  id="defaultPersonality"
+                  className={styles.select}
+                  value={settings.defaultPersonalityId || ''}
+                  onChange={(event) => {
+                    const value = Number(event.target.value);
+                    setSettings({
+                      ...settings,
+                      defaultPersonalityId: Number.isNaN(value)
+                        ? undefined
+                        : value,
+                    });
+                  }}
+                >
+                  <option value="">None selected</option>
+                  {personalities.map((personality) => (
+                    <option key={personality.id} value={personality.id}>
+                      {personality.name}
+                      {personality.isDefault ? ' (Default)' : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {isAdmin && (
+                <p className={styles.helpText}>
+                  <Link to="/admin/meta-prompts" className={styles.link}>
+                    Manage personalities
+                  </Link>
+                </p>
+              )}
+            </>
+          )}
+        </section>
 
         {/* Profile Section */}
         <section className={styles.section}>

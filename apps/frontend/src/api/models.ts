@@ -35,3 +35,6 @@ export type RequestOverrides = {
   prompt_template_suffix?: string;
   suggest_followup_questions?: boolean;
 };
+
+// Citation types - re-exported from shared package
+export type { Citation, CitationType } from 'shared/chat-types';

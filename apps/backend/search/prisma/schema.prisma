@@ -107,6 +107,7 @@ model Program {
   createdByUser  User               @relation("CreatedByUser", fields: [createdByUserId], references: [id], onDelete: Cascade)
   assignments     ProgramAssignment[]
   libraryResources LibraryResource[]
+  knowledgeBaseDocuments KnowledgeBaseDocument[]
 
   @@map("programs")
 }
@@ -202,6 +203,29 @@ model WhiteLabelSettings {
   updatedAt      DateTime @updatedAt @map("updated_at")
 
   @@map("white_label_settings")
+}
+
+model KnowledgeBaseDocument {
+  id             Int      @id @default(autoincrement())
+  programId      Int?     @map("program_id")
+  title          String   @db.VarChar(500)
+  type           String   @db.VarChar(50) // pdf, docx, txt, url
+  source         String   // file path or URL
+  status         String   @default("pending") @db.VarChar(50) // pending, indexed, failed
+  trainingStatus String   @default("not_trained") @map("training_status") @db.VarChar(50) // not_trained, training, trained, failed
+  metadata       Json?    @db.JsonB
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  program Program? @relation(fields: [programId], references: [id], onDelete: SetNull)
+
+  @@index([programId])
+  @@index([status])
+  @@index([trainingStatus])
+  @@index([type])
+  @@index([createdAt(sort: Desc)])
+  @@map("knowledge_base_documents")
 }
 
 // Enums

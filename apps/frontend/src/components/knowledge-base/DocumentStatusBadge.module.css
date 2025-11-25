@@ -1,0 +1,86 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Sizes */
+.small {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  gap: 4px;
+}
+
+.medium {
+  font-size: 0.875rem;
+  padding: 4px 12px;
+  gap: 6px;
+}
+
+.large {
+  font-size: 1rem;
+  padding: 6px 16px;
+  gap: 8px;
+}
+
+/* Icon */
+.icon {
+  display: inline-block;
+  font-size: 1em;
+}
+
+.spinning {
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Label */
+.label {
+  font-weight: 500;
+}
+
+/* Status-specific styles */
+.trained {
+  border: 1px solid #10b98140;
+}
+
+.training {
+  border: 1px solid #3b82f640;
+}
+
+.not_trained {
+  border: 1px solid #6b728040;
+}
+
+.failed {
+  border: 1px solid #ef444440;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .badge .label {
+    display: none;
+  }
+
+  .badge {
+    padding: 4px 8px;
+  }
+}

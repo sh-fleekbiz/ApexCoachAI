@@ -1,28 +1,29 @@
+import { initializeIcons } from '@fluentui/react';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createHashRouter, RouterProvider } from 'react-router-dom';
-import { initializeIcons } from '@fluentui/react';
 
 import './index.css';
 
+import { AdminRoute } from './components/AdminRoute.tsx';
+import { ProtectedRoute } from './components/ProtectedRoute.jsx';
 import { AuthProvider } from './contexts/AuthContext.jsx';
 import { PersonalityProvider } from './contexts/PersonalityContext.tsx';
-import { ProtectedRoute } from './components/ProtectedRoute.jsx';
-import Layout from './pages/layout/Layout.jsx';
-import Chat from './pages/chat/Chat.jsx';
-import Login from './pages/auth/Login.jsx';
-import Signup from './pages/auth/Signup.jsx';
-import SettingsPage from './pages/settings/SettingsPage.tsx';
+import ActionLogs from './pages/admin/action-logs/ActionLogs.tsx';
 import AdminLayout from './pages/admin/AdminLayout.tsx';
-import People from './pages/admin/people/People.tsx';
-import Programs from './pages/admin/programs/Programs.tsx';
-import ProgramDetails from './pages/admin/programs/ProgramDetails.tsx';
+import Analytics from './pages/admin/analytics/Analytics.tsx';
 import KnowledgeBase from './pages/admin/knowledge-base/KnowledgeBase.tsx';
 import MetaPrompts from './pages/admin/meta-prompts/MetaPrompts.tsx';
-import Analytics from './pages/admin/analytics/Analytics.tsx';
+import People from './pages/admin/people/People.tsx';
+import ProgramDetails from './pages/admin/programs/ProgramDetails.tsx';
+import Programs from './pages/admin/programs/Programs.tsx';
 import WhiteLabel from './pages/admin/white-label/WhiteLabel.tsx';
-import ActionLogs from './pages/admin/action-logs/ActionLogs.tsx';
-import { AdminRoute } from './components/AdminRoute.tsx';
+import Login from './pages/auth/Login.jsx';
+import Signup from './pages/auth/Signup.jsx';
+import Chat from './pages/chat/Chat.jsx';
+import Layout from './pages/layout/Layout.jsx';
+import Library from './pages/library/Library.tsx';
+import SettingsPage from './pages/settings/SettingsPage.tsx';
 
 initializeIcons();
 
@@ -50,6 +51,10 @@ const router = createHashRouter([
       {
         path: 'settings',
         element: <SettingsPage />,
+      },
+      {
+        path: 'library',
+        element: <Library />,
       },
       {
         path: 'qa',
@@ -116,5 +121,5 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         <RouterProvider router={router} />
       </PersonalityProvider>
     </AuthProvider>
-  </React.StrictMode>,
+  </React.StrictMode>
 );
