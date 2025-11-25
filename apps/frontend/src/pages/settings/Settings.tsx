@@ -101,33 +101,35 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg">
-        <h2 className="text-2xl font-bold mb-4">Settings</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white p-8 rounded-lg max-w-md w-full mx-4 shadow-xl">
+        <h2 className="text-2xl font-bold mb-4">Data & Privacy</h2>
         {error && (
           <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
             {error}
           </div>
         )}
-        <div className="mb-4">
-          <h3 className="text-xl font-bold mb-2">Data & Privacy</h3>
+        <div className="mb-6 space-y-3">
+          <p className="text-gray-600 mb-4">
+            Manage your data and account settings.
+          </p>
           <button
             onClick={handleExportData}
-            className="bg-blue-500 text-white p-2 rounded mr-2 hover:bg-blue-600 disabled:opacity-50"
+            className="w-full bg-blue-500 text-white p-3 rounded hover:bg-blue-600 disabled:opacity-50 transition-colors"
             disabled={isLoading}
           >
             {isLoading ? 'Processing...' : 'Export My Data'}
           </button>
           <button
             onClick={handleDeleteAllChats}
-            className="bg-red-500 text-white p-2 rounded mr-2 hover:bg-red-600 disabled:opacity-50"
+            className="w-full bg-red-500 text-white p-3 rounded hover:bg-red-600 disabled:opacity-50 transition-colors"
             disabled={isLoading}
           >
             {isLoading ? 'Processing...' : 'Delete All Chats'}
           </button>
           <button
             onClick={handleDeleteAccount}
-            className="bg-red-700 text-white p-2 rounded hover:bg-red-800 disabled:opacity-50"
+            className="w-full bg-red-700 text-white p-3 rounded hover:bg-red-800 disabled:opacity-50 transition-colors"
             disabled={isLoading}
           >
             {isLoading ? 'Processing...' : 'Delete Account'}
@@ -135,7 +137,7 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
         </div>
         <button
           onClick={onClose}
-          className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600"
+          className="w-full bg-gray-200 text-gray-700 p-3 rounded hover:bg-gray-300 transition-colors"
           disabled={isLoading}
         >
           Close

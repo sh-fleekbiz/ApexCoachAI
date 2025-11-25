@@ -1,11 +1,17 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from 'react';
 import { getMetaPrompts } from '../api/index.ts';
 
 interface Personality {
   id: number;
   name: string;
-  prompt_text: string;
-  is_default: boolean;
+  promptText: string;
+  isDefault: boolean;
 }
 
 interface PersonalityContextType {
@@ -16,11 +22,15 @@ interface PersonalityContextType {
   error: string | undefined;
 }
 
-const PersonalityContext = createContext<PersonalityContextType | undefined>(undefined);
+const PersonalityContext = createContext<PersonalityContextType | undefined>(
+  undefined
+);
 
 export function PersonalityProvider({ children }: { children: ReactNode }) {
   const [personalities, setPersonalities] = useState<Personality[]>([]);
-  const [selectedPersonalityId, setSelectedPersonalityId] = useState<number | undefined>();
+  const [selectedPersonalityId, setSelectedPersonalityId] = useState<
+    number | undefined
+  >();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | undefined>(undefined);
 
@@ -32,7 +42,9 @@ export function PersonalityProvider({ children }: { children: ReactNode }) {
         setPersonalities(personalityList);
 
         // Set default personality
-        const defaultPersonality = personalityList.find((p: Personality) => p.is_default);
+        const defaultPersonality = personalityList.find(
+          (p: Personality) => p.isDefault
+        );
         if (defaultPersonality) {
           setSelectedPersonalityId(defaultPersonality.id);
         } else if (personalityList.length > 0) {

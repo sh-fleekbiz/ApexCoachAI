@@ -6,11 +6,15 @@
 
 .sidebar {
   width: 280px;
+  min-width: 280px;
+  max-width: 280px;
   background-color: #ffffff;
   border-right: 1px solid #e5e5e5;
   display: flex;
   flex-direction: column;
   padding: 20px;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .sidebarHeader {

@@ -1,5 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { PrimaryButton, DefaultButton, IconButton, Icon } from '@fluentui/react';
+import {
+  DefaultButton,
+  Icon,
+  IconButton,
+  PrimaryButton,
+} from '@fluentui/react';
+import React, { useEffect, useState } from 'react';
 
 interface OnboardingStep {
   title: string;
@@ -56,7 +61,10 @@ const onboardingSteps: OnboardingStep[] = [
   },
 ];
 
-export const OnboardingTour: React.FC<OnboardingTourProps> = ({ onComplete, onSkip }) => {
+export const OnboardingTour: React.FC<OnboardingTourProps> = ({
+  onComplete,
+  onSkip,
+}) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [highlightPosition, setHighlightPosition] = useState<{
     top: number;
@@ -71,7 +79,9 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ onComplete, onSk
 
   useEffect(() => {
     if (currentStepData.targetElement) {
-      const element = document.querySelector(`[data-tour="${currentStepData.targetElement}"]`);
+      const element = document.querySelector(
+        `[data-tour="${currentStepData.targetElement}"]`
+      );
       if (element) {
         const rect = element.getBoundingClientRect();
         setHighlightPosition({
@@ -106,12 +116,15 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ onComplete, onSk
   return (
     <>
       {/* Overlay */}
-      <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={onSkip} />
+      <div
+        className="fixed inset-0 bg-black bg-opacity-50 z-[60]"
+        onClick={onSkip}
+      />
 
       {/* Highlight spotlight for target elements */}
       {highlightPosition && (
         <div
-          className="fixed z-40 border-4 border-blue-500 rounded-lg pointer-events-none"
+          className="fixed z-[60] border-4 border-blue-500 rounded-lg pointer-events-none"
           style={{
             top: `${highlightPosition.top - 8}px`,
             left: `${highlightPosition.left - 8}px`,
@@ -124,7 +137,7 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ onComplete, onSk
 
       {/* Tour Card */}
       <div
-        className="fixed z-50 bg-white rounded-lg shadow-2xl max-w-md w-full"
+        className="fixed z-[70] bg-white rounded-lg shadow-2xl max-w-md w-full mx-4"
         style={{
           top: '20vh',
           left: '50%',
@@ -133,7 +146,11 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ onComplete, onSk
       >
         {/* Close button */}
         <div className="absolute top-4 right-4">
-          <IconButton iconProps={{ iconName: 'Cancel' }} onClick={onSkip} title="Close tour" />
+          <IconButton
+            iconProps={{ iconName: 'Cancel' }}
+            onClick={onSkip}
+            title="Close tour"
+          />
         </div>
 
         {/* Content */}
@@ -141,15 +158,22 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ onComplete, onSk
           {/* Icon */}
           <div className="flex justify-center mb-6">
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-              <Icon iconName={currentStepData.icon} style={{ fontSize: 32, color: '#0078D4' }} />
+              <Icon
+                iconName={currentStepData.icon}
+                style={{ fontSize: 32, color: '#0078D4' }}
+              />
             </div>
           </div>
 
           {/* Title */}
-          <h2 className="text-2xl font-bold text-center mb-4">{currentStepData.title}</h2>
+          <h2 className="text-2xl font-bold text-center mb-4">
+            {currentStepData.title}
+          </h2>
 
           {/* Description */}
-          <p className="text-gray-600 text-center mb-6">{currentStepData.description}</p>
+          <p className="text-gray-600 text-center mb-6">
+            {currentStepData.description}
+          </p>
 
           {/* Progress indicators */}
           <div className="flex justify-center gap-2 mb-6">
@@ -165,13 +189,21 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ onComplete, onSk
 
           {/* Navigation buttons */}
           <div className="flex justify-between items-center">
-            <div>{!isFirstStep && <DefaultButton text="Previous" onClick={handlePrevious} />}</div>
+            <div>
+              {!isFirstStep && (
+                <DefaultButton text="Previous" onClick={handlePrevious} />
+              )}
+            </div>
             <div className="flex gap-2">
               <DefaultButton text="Skip Tour" onClick={onSkip} />
               <PrimaryButton
                 text={isLastStep ? 'Get Started' : 'Next'}
                 onClick={handleNext}
-                iconProps={isLastStep ? { iconName: 'Rocket' } : { iconName: 'ChevronRight' }}
+                iconProps={
+                  isLastStep
+                    ? { iconName: 'Rocket' }
+                    : { iconName: 'ChevronRight' }
+                }
               />
             </div>
           </div>
