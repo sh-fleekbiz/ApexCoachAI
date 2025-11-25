@@ -82,3 +82,61 @@ export async function updateUserSettings(settings: {
 
   return response.json();
 }
+
+// Admin API functions for meta prompts management
+export async function createMetaPrompt(data: {
+  name: string;
+  promptText: string;
+  isDefault?: boolean;
+}) {
+  const response = await fetch(`${apiBaseUrl}/admin/meta-prompts`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || 'Failed to create personality');
+  }
+
+  return response.json();
+}
+
+export async function updateMetaPrompt(
+  id: number,
+  data: {
+    name?: string;
+    promptText?: string;
+    isDefault?: boolean;
+  }
+) {
+  const response = await fetch(`${apiBaseUrl}/admin/meta-prompts/${id}`, {
+    method: 'PUT',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || 'Failed to update personality');
+  }
+
+  return response.json();
+}
+
+export async function deleteMetaPrompt(id: number) {
+  const response = await fetch(`${apiBaseUrl}/admin/meta-prompts/${id}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || 'Failed to delete personality');
+  }
+
+  return response.json();
+}

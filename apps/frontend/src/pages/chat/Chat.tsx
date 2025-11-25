@@ -12,6 +12,7 @@ import type { IDropdownOption } from '@fluentui/react/lib-commonjs/Dropdown';
 import 'chat-component';
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import type { Citation } from 'shared/chat-types.js';
 import {
   RetrievalMode,
   apiBaseUrl,
@@ -22,6 +23,9 @@ import { SettingsButton } from '../../components/SettingsButton/index.js';
 import type { CustomStylesState } from '../../components/SettingsStyles/SettingsStyles.js';
 import { SettingsStyles } from '../../components/SettingsStyles/SettingsStyles.js';
 import { ThemeSwitch } from '../../components/ThemeSwitch/ThemeSwitch.js';
+import { CitationsList } from '../../components/chat/CitationsList.js';
+import { PersonalityIndicator } from '../../components/chat/PersonalityIndicator.js';
+import { RAGVisualizer } from '../../components/chat/RAGVisualizer.js';
 import { useAuth } from '../../contexts/AuthContext.js';
 import { usePersonality } from '../../contexts/PersonalityContext.js';
 import { toolTipText, toolTipTextCalloutProps } from '../../i18n/tooltips.js';
@@ -41,6 +45,9 @@ const Chat = () => {
   const chatComponentReference = useRef<any>(null);
   const [currentChatId, setCurrentChatId] = useState<number | undefined>();
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [isRagActive, setIsRagActive] = useState(false);
+  const [lastCitations, setLastCitations] = useState<Citation[]>([]);
+  const [ragSourcesCount, setRagSourcesCount] = useState(0);
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
   const {
@@ -84,6 +91,58 @@ const Chat = () => {
     };
   }, [currentChatId, setSearchParams]);
 
+  // Listen for chat message events to show RAG visualization and citations
+  useEffect(() => {
+    const handleMessageStart = () => {
+      setIsRagActive(true);
+      setRagSourcesCount(0);
+    };
+
+    const handleMessageUpdate = (event: CustomEvent) => {
+      const { citations } = event.detail || {};
+      if (citations && Array.isArray(citations) && citations.length > 0) {
+        setRagSourcesCount(citations.length);
+        setLastCitations(citations);
+      }
+    };
+
+    const handleMessageComplete = (event: CustomEvent) => {
+      setIsRagActive(false);
+      const { citations } = event.detail || {};
+      if (citations && Array.isArray(citations)) {
+        setLastCitations(citations);
+      }
+    };
+
+    window.addEventListener(
+      'chat-message-start',
+      handleMessageStart as EventListener
+    );
+    window.addEventListener(
+      'chat-message-update',
+      handleMessageUpdate as EventListener
+    );
+    window.addEventListener(
+      'chat-message-complete',
+      handleMessageComplete as EventListener
+    );
+
+    return () => {
+      window.removeEventListener(
+        'chat-message-start',
+        handleMessageStart as EventListener
+      );
+      window.removeEventListener(
+        'chat-message-update',
+        handleMessageUpdate as EventListener
+      );
+      window.removeEventListener(
+        'chat-message-complete',
+        handleMessageComplete as EventListener
+      );
+    };
+  }, []);
+
   // Load chat history when chatId changes
   const loadChatHistory = async (chatId: number) => {
     setIsLoadingHistory(true);
@@ -107,6 +166,14 @@ const Chat = () => {
                 : [],
           }));
           chatComponent.loadMessages(formattedMessages);
+
+          // Show citations from the last assistant message if available
+          const lastAssistantMessage = formattedMessages
+            .filter((m: any) => m.role === 'assistant')
+            .pop();
+          if (lastAssistantMessage?.citations?.length > 0) {
+            setLastCitations(lastAssistantMessage.citations);
+          }
         }
       }, 100);
     } catch (error) {
@@ -376,24 +443,41 @@ const Chat = () => {
             {isLoadingHistory ? (
               <div className={styles.loadingState}>Loading chat history...</div>
             ) : (
-              <chat-component
-                ref={chatComponentReference}
-                title=""
-                data-input-position="sticky"
-                data-interaction-model="chat"
-                data-api-url={apiBaseUrl}
-                data-use-stream={useStream}
-                data-approach="rrr"
-                data-overrides={JSON.stringify(overrides)}
-                data-custom-styles={JSON.stringify(customStyles)}
-                data-custom-branding={JSON.stringify(isBrandingEnabled)}
-                data-theme={isDarkTheme ? 'dark' : ''}
-                data-chat-id={currentChatId?.toString() || ''}
-                data-personality-id={selectedPersonalityId?.toString() || ''}
-              ></chat-component>
+              <>
+                <chat-component
+                  ref={chatComponentReference}
+                  title=""
+                  data-input-position="sticky"
+                  data-interaction-model="chat"
+                  data-api-url={apiBaseUrl}
+                  data-use-stream={useStream}
+                  data-approach="rrr"
+                  data-overrides={JSON.stringify(overrides)}
+                  data-custom-styles={JSON.stringify(customStyles)}
+                  data-custom-branding={JSON.stringify(isBrandingEnabled)}
+                  data-theme={isDarkTheme ? 'dark' : ''}
+                  data-chat-id={currentChatId?.toString() || ''}
+                  data-personality-id={selectedPersonalityId?.toString() || ''}
+                ></chat-component>
+
+                {/* Display citations below the chat if available */}
+                {lastCitations.length > 0 && (
+                  <div className={styles.citationsContainer}>
+                    <CitationsList citations={lastCitations} />
+                  </div>
+                )}
+
+                {/* Show personality indicator */}
+                <div className={styles.personalityIndicatorContainer}>
+                  <PersonalityIndicator />
+                </div>
+              </>
             )}
           </div>
         </div>
+
+        {/* RAG Visualizer */}
+        <RAGVisualizer isActive={isRagActive} sourcesCount={ragSourcesCount} />
       </div>
 
       <Panel
