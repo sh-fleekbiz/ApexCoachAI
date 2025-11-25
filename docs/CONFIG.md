@@ -22,7 +22,7 @@ AZURE_OPENAI_MODEL_IMAGE=gpt-image-1-mini
 ### PostgreSQL (Shared)
 
 ```bash
-SHARED_PG_CONNECTION_STRING=postgresql://<user>:<pass>@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apexcoachai_db?sslmode=require
+SHARED_PG_CONNECTION_STRING=postgresql://<user>:<pass>@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apex_db?sslmode=require
 ```
 
 ### Azure AI Search (Shared)
@@ -59,8 +59,8 @@ VITE_APP_NAME=ApexCoachAI
 
 ### Database
 
-- **Database name**: `apexcoachai_db`
-- **Schema**: App-specific tables within `apexcoachai_db`
+- **Database name**: `apex_db`
+- **Schema**: App-specific tables within `apex_db`
 
 ### Search Indexes
 

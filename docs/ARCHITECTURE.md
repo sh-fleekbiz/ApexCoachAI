@@ -54,7 +54,7 @@ All resources are deployed to shared resource groups in the MahumTech subscripti
 
 - **`rg-shared-data`**: Data services
   - PostgreSQL: `pg-shared-apps-eastus2`
-    - Database: `apexcoachai_db`
+    - Database: `apex_db`
     - Connection: `pg-shared-apps-eastus2.postgres.database.azure.com:5432`
     - Extensions: pgvector
   - Storage: `stmahumsharedapps`
@@ -107,4 +107,3 @@ Provides clients for shared data services:
 **No OpenAI.com**: Only Azure OpenAI endpoint (`shared-openai-eastus2`).
 
 See `docs/CONFIG.md` for detailed environment variable documentation.
-
