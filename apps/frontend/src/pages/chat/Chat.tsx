@@ -29,10 +29,10 @@ import styles from './Chat.module.css';
 
 // Starter prompts for coaching
 const STARTER_PROMPTS = [
-  'Work through a breakthrough challenge',
-  'Rebuild connection at home',
+  'Help me set and achieve a goal',
+  'Improve my communication skills',
   'Navigate a difficult conversation',
-  'Transform anger into leadership',
+  'Build better daily habits',
 ];
 
 const Chat = () => {
@@ -306,41 +306,40 @@ const Chat = () => {
     <div className={styles.container}>
       <div className={styles.chatHeader}>
         <div className={styles.headerContent}>
-          <h1 className={styles.chatTitle}>From Anger to Calm Leader</h1>
+          <h1 className={styles.chatTitle}>Your AI Coach</h1>
           <p className={styles.chatSubtitle}>
-            Your private space for honest growth and the Inside Out Method.
+            Ready to help you grow, learn, and achieve your goals.
           </p>
-          <div className={styles.personalityDropdown}>
-            <label
-              htmlFor="personality-select"
-              className={styles.personalityLabel}
-            >
-              Personality:
-            </label>
-            <select
-              id="personality-select"
-              className={styles.personalitySelect}
-              value={selectedPersonalityId || ''}
-              onChange={(event) =>
-                setSelectedPersonalityId(Number(event.target.value))
-              }
-              disabled={personalitiesLoading || personalities.length === 0}
-              aria-label="Select coaching personality"
-            >
-              {personalitiesLoading && (
-                <option value="">Loading personalities...</option>
-              )}
-              {!personalitiesLoading && personalities.length === 0 && (
-                <option value="">No personalities available</option>
-              )}
-              {!personalitiesLoading &&
-                personalities.map((personality) => (
-                  <option key={personality.id} value={personality.id}>
-                    {personality.name}
-                  </option>
-                ))}
-            </select>
-          </div>
+          {personalities.length > 0 && (
+            <div className={styles.personalityDropdown}>
+              <label
+                htmlFor="personality-select"
+                className={styles.personalityLabel}
+              >
+                Personality:
+              </label>
+              <select
+                id="personality-select"
+                className={styles.personalitySelect}
+                value={selectedPersonalityId || ''}
+                onChange={(event) =>
+                  setSelectedPersonalityId(Number(event.target.value))
+                }
+                disabled={personalitiesLoading}
+                aria-label="Select coaching personality"
+              >
+                {personalitiesLoading && (
+                  <option value="">Loading personalities...</option>
+                )}
+                {!personalitiesLoading &&
+                  personalities.map((personality) => (
+                    <option key={personality.id} value={personality.id}>
+                      {personality.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          )}
         </div>
         {isAdmin && (
           <div className={styles.headerActions}>

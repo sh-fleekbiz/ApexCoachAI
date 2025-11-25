@@ -116,7 +116,7 @@ const Layout = () => {
     <div className={styles.appShell}>
       <aside className={styles.sidebar}>
         <div className={styles.sidebarHeader}>
-          <div className={styles.logo}>BD</div>
+          <div className={styles.logo}>AC</div>
           <h2 className={styles.brandName}>Apex Coach AI</h2>
         </div>
         <button
@@ -150,12 +150,6 @@ const Layout = () => {
             )}
           </div>
           <div className={styles.navSection}>
-            <h3 className={styles.navSectionTitle}>Library</h3>
-            <button className={styles.navSectionButton} disabled>
-              Go to Library
-            </button>
-          </div>
-          <div className={styles.navSection}>
             <h3 className={styles.navSectionTitle}>Settings</h3>
             <button
               className={styles.navSectionButton}
@@ -183,12 +177,16 @@ const Layout = () => {
         <div className={styles.sidebarFooter}>
           <div className={styles.userInfo}>
             <span className={styles.userName}>{user?.name || user?.email}</span>
-            {user?.role === 'admin' && (
-              <a href="/#/admin" className={styles.adminLink}>
-                Admin
-              </a>
-            )}
           </div>
+          {user?.role === 'admin' && (
+            <button
+              className={styles.adminButton}
+              onClick={() => navigate('/admin')}
+              type="button"
+            >
+              ⚙️ Admin Panel
+            </button>
+          )}
           <button
             className={styles.logoutButton}
             onClick={handleLogout}

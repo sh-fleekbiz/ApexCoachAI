@@ -1,13 +1,22 @@
+import react from '@vitejs/plugin-react';
 import process from 'node:process';
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
 
-// Expose environment variables to the client
-process.env.VITE_SEARCH_API_URI = process.env.BACKEND_URI ?? '';
-console.log(`Using search API base URL: "${process.env.VITE_SEARCH_API_URI}"`);
+// Production API URL - hardcoded for Static Web App deployment
+const PROD_API_URL =
+  'https://apexcoachai-api.mangocoast-f4cc7159.eastus2.azurecontainerapps.io';
+
+// Use env var if provided, otherwise use production URL in production builds
+const apiUrl =
+  process.env.BACKEND_URI ||
+  (process.env.NODE_ENV === 'production' ? PROD_API_URL : '');
+console.log(`Using search API base URL: "${apiUrl}"`);
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  define: {
+    'import.meta.env.VITE_SEARCH_API_URI': JSON.stringify(apiUrl),
+  },
   plugins: [react()],
   build: {
     outDir: './dist',
@@ -25,6 +34,10 @@ export default defineConfig({
     chunkSizeWarningLimit: 1024,
   },
   server: {
-    proxy: { '/ask': 'http://127.0.0.1:3000', '/chat': 'http://127.0.0.1:3000', '/content': 'http://127.0.0.1:3000' },
+    proxy: {
+      '/ask': 'http://127.0.0.1:3000',
+      '/chat': 'http://127.0.0.1:3000',
+      '/content': 'http://127.0.0.1:3000',
+    },
   },
 });

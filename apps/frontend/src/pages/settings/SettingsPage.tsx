@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { usePersonality } from '../../contexts/PersonalityContext.js';
+import { useEffect, useState } from 'react';
 import { getUserSettings, updateUserSettings } from '../../api/index.js';
+import { usePersonality } from '../../contexts/PersonalityContext.js';
 import styles from './SettingsPage.module.css';
 
 interface UserSettings {
@@ -78,39 +78,51 @@ export default function SettingsPage() {
       <h1 className={styles.title}>Settings</h1>
 
       <form onSubmit={handleSave} className={styles.form}>
-        {/* Default Personality Section */}
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Default Coaching Personality</h2>
-          <p className={styles.helpText}>
-            This personality will be used for new chats by default. You can change it for any individual chat.
-          </p>
-          <div className={styles.formGroup}>
-            <label htmlFor="defaultPersonality" className={styles.label}>
-              Default Personality
-            </label>
-            <select
-              id="defaultPersonality"
-              className={styles.select}
-              value={settings.defaultPersonalityId || ''}
-              onChange={(event) => {
-                const value = Number(event.target.value);
-                setSettings({ ...settings, defaultPersonalityId: Number.isNaN(value) ? undefined : value });
-              }}
-            >
-              <option value="">None selected</option>
-              {personalities.map((personality) => (
-                <option key={personality.id} value={personality.id}>
-                  {personality.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </section>
+        {/* Default Personality Section - only show if personalities exist */}
+        {personalities.length > 0 && (
+          <section className={styles.section}>
+            <h2 className={styles.sectionTitle}>
+              Default Coaching Personality
+            </h2>
+            <p className={styles.helpText}>
+              This personality will be used for new chats by default. You can
+              change it for any individual chat.
+            </p>
+            <div className={styles.formGroup}>
+              <label htmlFor="defaultPersonality" className={styles.label}>
+                Default Personality
+              </label>
+              <select
+                id="defaultPersonality"
+                className={styles.select}
+                value={settings.defaultPersonalityId || ''}
+                onChange={(event) => {
+                  const value = Number(event.target.value);
+                  setSettings({
+                    ...settings,
+                    defaultPersonalityId: Number.isNaN(value)
+                      ? undefined
+                      : value,
+                  });
+                }}
+              >
+                <option value="">None selected</option>
+                {personalities.map((personality) => (
+                  <option key={personality.id} value={personality.id}>
+                    {personality.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </section>
+        )}
 
         {/* Profile Section */}
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Profile</h2>
-          <p className={styles.helpText}>Help your coach understand you better.</p>
+          <p className={styles.helpText}>
+            Help your coach understand you better.
+          </p>
 
           <div className={styles.formGroup}>
             <label htmlFor="nickname" className={styles.label}>
@@ -122,7 +134,9 @@ export default function SettingsPage() {
               className={styles.input}
               placeholder="How would you like to be called?"
               value={settings.nickname}
-              onChange={(event) => setSettings({ ...settings, nickname: event.target.value })}
+              onChange={(event) =>
+                setSettings({ ...settings, nickname: event.target.value })
+              }
               maxLength={100}
             />
           </div>
@@ -137,7 +151,9 @@ export default function SettingsPage() {
               className={styles.input}
               placeholder="What do you do?"
               value={settings.occupation}
-              onChange={(event) => setSettings({ ...settings, occupation: event.target.value })}
+              onChange={(event) =>
+                setSettings({ ...settings, occupation: event.target.value })
+              }
               maxLength={200}
             />
           </div>
@@ -145,11 +161,17 @@ export default function SettingsPage() {
 
         {/* Messages */}
         {error && <div className={styles.errorMessage}>{error}</div>}
-        {saveMessage && <div className={styles.successMessage}>{saveMessage}</div>}
+        {saveMessage && (
+          <div className={styles.successMessage}>{saveMessage}</div>
+        )}
 
         {/* Actions */}
         <div className={styles.actions}>
-          <button type="submit" className={styles.saveButton} disabled={isSaving}>
+          <button
+            type="submit"
+            className={styles.saveButton}
+            disabled={isSaving}
+          >
             {isSaving ? 'Saving...' : 'Save Settings'}
           </button>
         </div>

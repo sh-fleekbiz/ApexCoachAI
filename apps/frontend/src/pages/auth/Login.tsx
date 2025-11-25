@@ -1,219 +1,89 @@
-import {
-  MessageBar,
-  MessageBarType,
-  PrimaryButton,
-  Stack,
-  Text,
-  TextField,
-} from '@fluentui/react';
-import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import DemoLoginButtons from '../../components/auth/DemoLoginButtons.js';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext.js';
 import styles from './Auth.module.css';
 
+const demoRoles = [
+  {
+    role: 'coach',
+    label: 'Coach',
+    icon: '🎓',
+    description: 'Guide clients through coaching',
+  },
+  {
+    role: 'client',
+    label: 'Client',
+    icon: '💬',
+    description: 'Experience the coaching journey',
+  },
+  {
+    role: 'admin',
+    label: 'Admin',
+    icon: '⚙️',
+    description: 'Full platform access',
+  },
+];
+
 export function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [loggingIn, setLoggingIn] = useState<string | null>(null);
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [showLoginForm, setShowLoginForm] = useState(false);
-  const [autoLoginInProgress, setAutoLoginInProgress] = useState(false);
-  const { login, demoLoginWithRole, user, loading } = useAuth();
+  const { demoLoginWithRole } = useAuth();
   const navigate = useNavigate();
 
-  // Auto-login with demo coach account on first visit
-  useEffect(() => {
-    const hasVisited = localStorage.getItem('apexcoach_visited');
-    if (!hasVisited && !user && !loading && !autoLoginInProgress) {
-      setAutoLoginInProgress(true);
-      localStorage.setItem('apexcoach_visited', 'true');
-      handleAutoLogin();
-    }
-  }, [user, loading]);
-
-  const handleAutoLogin = async () => {
-    try {
-      await demoLoginWithRole('coach');
-      navigate('/');
-    } catch (error_: any) {
-      console.error('Auto-login failed:', error_);
-      setAutoLoginInProgress(false);
-    }
-  };
-
-  const handleQuickDemo = async () => {
-    setIsLoading(true);
+  const handleDemoLogin = async (role: string) => {
+    setLoggingIn(role);
     setError('');
     try {
-      await demoLoginWithRole('coach');
-      navigate('/');
-    } catch (error_: any) {
-      setError(error_.message || 'Demo login failed');
-      setIsLoading(false);
-    }
-  };
-
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setError('');
-    setIsLoading(true);
-
-    try {
-      await login(email, password);
+      await demoLoginWithRole(role);
       navigate('/');
     } catch (error_: any) {
       setError(error_.message || 'Login failed');
-    } finally {
-      setIsLoading(false);
+      setLoggingIn(null);
     }
   };
-
-  // Show loading state during auto-login
-  if (autoLoginInProgress) {
-    return (
-      <div className={styles.authContainer}>
-        <div className={styles.authCard}>
-          <Stack tokens={{ childrenGap: 20 }} horizontalAlign="center">
-            <Text variant="xxLarge" className={styles.authTitle}>
-              🚀 Welcome to Apex Coach AI
-            </Text>
-            <Text
-              variant="medium"
-              style={{ color: '#666', textAlign: 'center' }}
-            >
-              Setting up your demo experience...
-            </Text>
-            <div className={styles.loadingSpinner} />
-          </Stack>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className={styles.authContainer}>
       <div className={styles.authCard}>
-        <Stack tokens={{ childrenGap: 20 }}>
-          <div className={styles.authHeader}>
-            <Text variant="xxLarge" className={styles.authTitle}>
-              🎯 Apex Coach AI
-            </Text>
-            <Text variant="medium" className={styles.authSubtitle}>
-              Your AI-powered coaching companion
-            </Text>
-          </div>
+        <div className={styles.authHeader}>
+          <h1 className={styles.authTitle}>🎯 Apex Coach AI</h1>
+          <p className={styles.authSubtitle}>
+            Your AI-powered coaching companion
+          </p>
+        </div>
 
-          {error && (
-            <MessageBar messageBarType={MessageBarType.error}>
-              {error}
-            </MessageBar>
-          )}
+        {error && <div className={styles.errorMessage}>{error}</div>}
 
-          {/* Quick Demo Button - Primary CTA */}
-          <button
-            onClick={handleQuickDemo}
-            disabled={isLoading}
-            className={styles.quickDemoButton}
-          >
-            {isLoading ? (
-              <span className={styles.buttonLoading}>
-                <svg
-                  className={styles.spinner}
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className={styles.spinnerTrack}
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className={styles.spinnerHead}
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-                Starting Demo...
-              </span>
-            ) : (
-              <>
-                <span className={styles.buttonIcon}>▶️</span>
-                <span>
-                  <strong>Try Demo Now</strong>
-                  <span className={styles.buttonSubtext}>
-                    No account needed - instant access
-                  </span>
-                </span>
-              </>
-            )}
-          </button>
+        <p className={styles.selectRoleText}>
+          Select a demo role to get started:
+        </p>
 
-          <div className={styles.dividerContainer}>
-            <div className={styles.dividerLine} />
-            <Text variant="small" className={styles.dividerText}>
-              or choose a role
-            </Text>
-            <div className={styles.dividerLine} />
-          </div>
-
-          {/* Demo Role Selection */}
-          <DemoLoginButtons />
-
-          <div className={styles.dividerContainer}>
-            <div className={styles.dividerLine} />
-            <Text variant="small" className={styles.dividerText}>
-              have an account?
-            </Text>
-            <div className={styles.dividerLine} />
-          </div>
-
-          {/* Toggle to show login form */}
-          {!showLoginForm ? (
+        <div className={styles.roleGrid}>
+          {demoRoles.map((demo) => (
             <button
-              onClick={() => setShowLoginForm(true)}
-              className={styles.secondaryButton}
+              key={demo.role}
+              onClick={() => handleDemoLogin(demo.role)}
+              disabled={loggingIn !== null}
+              className={`${styles.roleButton} ${loggingIn === demo.role ? styles.roleButtonActive : ''}`}
             >
-              Sign in with email
+              {loggingIn === demo.role ? (
+                <div className={styles.loadingSpinner} />
+              ) : (
+                <>
+                  <span className={styles.roleIcon}>{demo.icon}</span>
+                  <span className={styles.roleLabel}>{demo.label}</span>
+                  <span className={styles.roleDescription}>
+                    {demo.description}
+                  </span>
+                </>
+              )}
             </button>
-          ) : (
-            <form onSubmit={handleSubmit}>
-              <Stack tokens={{ childrenGap: 15 }}>
-                <TextField
-                  label="Email"
-                  type="email"
-                  value={email}
-                  onChange={(_, newValue) => setEmail(newValue || '')}
-                  required
-                  autoComplete="email"
-                />
+          ))}
+        </div>
 
-                <TextField
-                  label="Password"
-                  type="password"
-                  value={password}
-                  onChange={(_, newValue) => setPassword(newValue || '')}
-                  required
-                  autoComplete="current-password"
-                />
-
-                <PrimaryButton
-                  text={isLoading ? 'Signing in...' : 'Sign In'}
-                  type="submit"
-                  disabled={isLoading}
-                />
-
-                <Text variant="small" className={styles.authLink}>
-                  Don&apos;t have an account? <Link to="/signup">Sign up</Link>
-                </Text>
-              </Stack>
-            </form>
-          )}
-        </Stack>
+        <p className={styles.footerText}>
+          No account needed • Instant access • Try all features
+        </p>
       </div>
     </div>
   );

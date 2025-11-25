@@ -2,7 +2,7 @@ const globalConfig = {
   BOT_TYPING_EFFECT_INTERVAL: 50, // in ms
 
   // Is default prompts enabled?
-  IS_DEFAULT_PROMPTS_ENABLED: true,
+  IS_DEFAULT_PROMPTS_ENABLED: false,
   // Default prompts to display in the chat
   DISPLAY_DEFAULT_PROMPTS_BUTTON: 'Not sure what to ask? Try our suggestions!',
   // This are the chat bubbles that will be displayed in the chat

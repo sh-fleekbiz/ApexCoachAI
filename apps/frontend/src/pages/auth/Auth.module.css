@@ -9,28 +9,123 @@
 
 .authCard {
   background: white;
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 40px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-  max-width: 450px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 400px;
   width: 100%;
+  text-align: center;
 }
 
 .authHeader {
-  text-align: center;
-  margin-bottom: 10px;
+  margin-bottom: 24px;
 }
 
 .authTitle {
-  color: #333;
-  font-weight: 600;
-  margin-bottom: 8px;
+  font-size: 28px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 8px 0;
 }
 
 .authSubtitle {
-  color: #666;
+  color: #6b7280;
+  font-size: 16px;
+  margin: 0;
 }
 
+.errorMessage {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.selectRoleText {
+  color: #4b5563;
+  font-size: 14px;
+  margin: 0 0 16px 0;
+}
+
+.roleGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.roleButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 100px;
+}
+
+.roleButton:hover:not(:disabled) {
+  border-color: #667eea;
+  background: #f8f7ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.roleButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.roleButtonActive {
+  border-color: #667eea;
+  background: #667eea;
+}
+
+.roleIcon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.roleLabel {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 4px;
+}
+
+.roleDescription {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.loadingSpinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.footerText {
+  margin: 24px 0 0 0;
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+/* Keep these for potential future use */
 .authLink {
   text-align: center;
   color: #666;
@@ -44,128 +139,4 @@
 
 .authLink a:hover {
   text-decoration: underline;
-}
-
-/* Quick Demo Button - Primary CTA */
-.quickDemoButton {
-  width: 100%;
-  padding: 16px 24px;
-  border: none;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
-}
-
-.quickDemoButton:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
-}
-
-.quickDemoButton:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.quickDemoButton:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.buttonIcon {
-  font-size: 24px;
-}
-
-.buttonSubtext {
-  display: block;
-  font-size: 12px;
-  opacity: 0.9;
-  font-weight: normal;
-  margin-top: 2px;
-}
-
-.buttonLoading {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* Spinner */
-.spinner {
-  width: 20px;
-  height: 20px;
-  animation: spin 1s linear infinite;
-}
-
-.spinnerTrack {
-  opacity: 0.25;
-}
-
-.spinnerHead {
-  opacity: 0.75;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Loading Spinner for auto-login */
-.loadingSpinner {
-  width: 48px;
-  height: 48px;
-  border: 4px solid #e5e7eb;
-  border-top-color: #667eea;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-/* Divider */
-.dividerContainer {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin: 8px 0;
-}
-
-.dividerLine {
-  flex: 1;
-  height: 1px;
-  background: #e5e7eb;
-}
-
-.dividerText {
-  color: #9ca3af;
-  text-transform: uppercase;
-  font-size: 11px;
-  letter-spacing: 0.5px;
-}
-
-/* Secondary Button */
-.secondaryButton {
-  width: 100%;
-  padding: 12px 24px;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  background: white;
-  color: #4b5563;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.secondaryButton:hover {
-  border-color: #667eea;
-  color: #667eea;
 }
