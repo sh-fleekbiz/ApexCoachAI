@@ -228,6 +228,12 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
             },
           },
         },
+        403: {
+          type: 'object',
+          properties: {
+            error: { type: 'string' },
+          },
+        },
         500: { $ref: 'httpError' },
       },
     },

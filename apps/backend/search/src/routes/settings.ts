@@ -2,7 +2,10 @@ import { type FastifyPluginAsync } from 'fastify';
 import { metaPromptRepository } from '../db/meta-prompt-repository.js';
 import { userSettingsRepository } from '../db/user-settings-repository.js';
 
-const settings: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
+const settings: FastifyPluginAsync = async (
+  fastify,
+  _options
+): Promise<void> => {
   // Get all meta prompts (personalities)
   fastify.get('/meta-prompts', {
     preHandler: [fastify.authenticate],
@@ -39,7 +42,7 @@ const settings: FastifyPluginAsync = async (fastify, _options): Promise<void> =>
           id: mp.id,
           name: mp.name,
           promptText: mp.prompt_text,
-          isDefault: mp.is_default === 1,
+          isDefault: mp.is_default === true,
           createdAt: mp.created_at,
         })),
       };
@@ -71,11 +74,15 @@ const settings: FastifyPluginAsync = async (fastify, _options): Promise<void> =>
       },
     },
     handler: async function (request, _reply) {
-      let settings = await userSettingsRepository.getUserSettings(request.user!.id);
+      let settings = await userSettingsRepository.getUserSettings(
+        request.user!.id
+      );
 
       // If no settings exist, create default ones
       if (!settings) {
-        settings = await userSettingsRepository.upsertUserSettings({ user_id: request.user!.id });
+        settings = await userSettingsRepository.upsertUserSettings({
+          user_id: request.user!.id,
+        });
       }
 
       return {

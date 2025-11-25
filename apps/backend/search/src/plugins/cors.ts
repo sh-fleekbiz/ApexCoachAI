@@ -1,9 +1,11 @@
-import fp from 'fastify-plugin';
 import cors from '@fastify/cors';
+import fp from 'fastify-plugin';
 
 export default fp(
   async (fastify) => {
-    const allowedOrigins = fastify.config.allowedOrigins.split(',').map((origin) => origin.trim());
+    const allowedOrigins = (fastify.config.allowedOrigins || '')
+      .split(',')
+      .map((origin) => origin.trim());
     fastify.log.info(`CORS allowed origins: ${allowedOrigins.join(', ')}`);
     fastify.register(cors, {
       origin: allowedOrigins,
@@ -12,5 +14,5 @@ export default fp(
   {
     name: 'cors',
     dependencies: ['config'],
-  },
+  }
 );
