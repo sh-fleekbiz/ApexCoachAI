@@ -669,7 +669,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
         user_id: (request as unknown as AuthenticatedRequest).user.id,
         action: 'bulk_delete_knowledge_base_documents',
         entity_type: 'knowledge_base_document',
-        entity_id: null,
+        entity_id: undefined,
         description: `Bulk deleted ${deleted.length} documents`,
         meta_json: { deleted, failed },
       });
@@ -723,7 +723,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
         user_id: (request as unknown as AuthenticatedRequest).user.id,
         action: 'bulk_retrain_knowledge_base_documents',
         entity_type: 'knowledge_base_document',
-        entity_id: null,
+        entity_id: undefined,
         description: `Bulk retrained ${retrained.length} documents`,
         meta_json: { retrained, failed },
       });
