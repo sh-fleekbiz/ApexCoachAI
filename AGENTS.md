@@ -96,30 +96,115 @@ DNS Notes: Ensure `api.apexcoachai.shtrial.com` is a CNAME to the Container App 
 
 ## Build & Test Commands
 
+All commands are executable and tested. Copy-paste ready:
+
 ```bash
+# Install dependencies (run from repo root)
 pnpm install
+
+# Development (starts all services: frontend, search API, indexer)
+pnpm dev
+# Frontend only: pnpm dev --filter=frontend
+# Search API only: pnpm dev --filter=search
+# Indexer only: pnpm dev --filter=indexer
+
+# Build (production build)
 pnpm build            # Build all packages
-pnpm test             # Run tests
+pnpm build --filter=frontend   # Frontend only
+pnpm build --filter=search     # Search API only
+pnpm build --filter=indexer    # Indexer only
+
+# Testing
+pnpm test             # Run all tests
 pnpm lint             # Lint all packages
+pnpm typecheck        # TypeScript type checking
 ```
+
+**Before committing**: Always run `pnpm lint && pnpm typecheck && pnpm test`
 
 ## Coding Conventions
 
-- Follow monorepo structure
-- Use shared Azure OpenAI resources
-- TypeScript strict mode
-- Meaningful package names
+**Good Examples** (refer to these files):
+- Frontend components: `apps/frontend/src/components/*.tsx`
+- Search API routes: `apps/backend/search/src/routes/*.ts`
+- Indexer services: `apps/backend/indexer/src/services/*.ts`
+
+**Patterns**:
+- Follow monorepo structure (apps/frontend, apps/backend/search, apps/backend/indexer)
+- Use shared Azure OpenAI resources (never create app-specific resources)
+- TypeScript strict mode (enforced in tsconfig.json)
+- Meaningful package names (use descriptive names, not abbreviations)
+- Fastify for backend APIs (not Express)
+- Use shared data utilities from backend packages
+
+**Bad Examples** (avoid):
+- ❌ Creating new Azure OpenAI resources per app
+- ❌ Mixing Express and Fastify patterns
+- ❌ Hardcoded API endpoints or credentials
 
 ## Environment Variables
 
-See `.env.example`. Use shared Azure OpenAI configuration.
+**No Key Vault**: All secrets/config via App Settings and environment variables.
+
+**No OpenAI.com**: Only Azure OpenAI endpoint (`shared-openai-eastus2`).
+
+See `apps/backend/search/.env.example` and `apps/backend/indexer/.env.example` for complete schemas. Key variables:
+
+```env
+# Azure OpenAI (shared across all services)
+AZURE_OPENAI_ENDPOINT=https://shared-openai-eastus2.openai.azure.com/openai/v1/
+AZURE_OPENAI_API_KEY=<your-key>
+AZURE_OPENAI_DEFAULT_CHAT_MODEL=gpt-4o
+AZURE_OPENAI_MODEL_HEAVY=gpt-5.1
+AZURE_OPENAI_MODEL_EMBED=text-embedding-3-small
+
+# PostgreSQL (shared)
+SHARED_PG_CONNECTION_STRING=postgresql://<user>:<pass>@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apexcoachai_db?sslmode=require
+
+# Azure AI Search (shared)
+AZURE_SEARCH_ENDPOINT=https://shared-search-standard-eastus2.search.windows.net
+AZURE_SEARCH_API_KEY=<your-key>
+AZURE_SEARCH_INDEX_PREFIX=apexcoachai
+
+# Azure Storage (shared)
+AZURE_STORAGE_CONNECTION_STRING=<connection-string>
+APP_STORAGE_PREFIX=apexcoachai
+```
+
+## Testing Requirements
+
+**Before every commit**:
+```bash
+pnpm lint && pnpm typecheck && pnpm test
+```
+
+**Test Coverage**:
+- Add unit tests for new services
+- Test RAG pipeline with sample coaching content
+- Verify content indexing accuracy
+- Test search API endpoints
 
 ## PR Guidelines
 
 - Title: `[Apex Coach AI] Description`
-- All tests passing
-- No TypeScript errors
+- All tests passing (`pnpm test`)
+- No TypeScript errors (`pnpm typecheck`)
+- Linting passes (`pnpm lint`)
+- Content indexing features tested
 
-## MCP Integration
+## Prohibited Patterns
 
-Use Context7 MCP for library documentation and best practices.
+❌ **Never**:
+
+- Use non-Azure AI providers as primary
+- Use OpenAI.com API (only Azure OpenAI)
+- Hardcode API keys or credentials
+- Bypass input validation
+- Skip content processing validation
+
+## Resources
+
+- `docs/ARCHITECTURE.md` - Detailed architecture documentation
+- `docs/CONFIG.md` - Environment variables and configuration guide
+- [Azure OpenAI Docs](https://learn.microsoft.com/en-us/azure/ai-services/openai/)
+- [Fastify Docs](https://www.fastify.io/)
