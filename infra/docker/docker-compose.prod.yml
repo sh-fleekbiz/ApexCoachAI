@@ -1,0 +1,113 @@
+version: '3.9'
+
+# Production Docker Compose Configuration
+# Use this for deployed environments (staging/production)
+# No volume mounts - uses built images only
+
+services:
+  search:
+    image: shacrapps.azurecr.io/apexcoachai-api:latest
+    ports:
+      - '3000:3000'
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      # Database
+      DATABASE_URL: ${DATABASE_URL}
+      DIRECT_URL: ${DIRECT_URL}
+      # Azure OpenAI
+      AZURE_OPENAI_ENDPOINT: ${AZURE_OPENAI_ENDPOINT}
+      AZURE_OPENAI_API_KEY: ${AZURE_OPENAI_API_KEY}
+      AZURE_OPENAI_CHAT_DEPLOYMENT: ${AZURE_OPENAI_CHAT_DEPLOYMENT:-gpt-4o}
+      AZURE_OPENAI_EMBEDDING_DEPLOYMENT: ${AZURE_OPENAI_EMBEDDING_DEPLOYMENT:-text-embedding-3-small}
+      AZURE_OPENAI_API_VERSION: ${AZURE_OPENAI_API_VERSION:-2025-01-01-preview}
+      # Azure AI Search
+      AZURE_SEARCH_ENDPOINT: ${AZURE_SEARCH_ENDPOINT}
+      AZURE_SEARCH_API_KEY: ${AZURE_SEARCH_API_KEY}
+      AZURE_SEARCH_INDEX_NAME: ${AZURE_SEARCH_INDEX_NAME}
+      # Azure Storage
+      AZURE_STORAGE_ACCOUNT_NAME: ${AZURE_STORAGE_ACCOUNT_NAME}
+      AZURE_STORAGE_CONNECTION_STRING: ${AZURE_STORAGE_CONNECTION_STRING}
+      AZURE_STORAGE_CONTAINER: ${AZURE_STORAGE_CONTAINER}
+      # Application
+      JWT_SECRET: ${JWT_SECRET}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    healthcheck:
+      test: [ 'CMD', 'wget', '--spider', '-q', 'http://localhost:3000/health' ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - apexcoach-network
+
+  indexer:
+    image: shacrapps.azurecr.io/apexcoachai-indexer:latest
+    ports:
+      - '3001:3001'
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      # Azure OpenAI
+      AZURE_OPENAI_ENDPOINT: ${AZURE_OPENAI_ENDPOINT}
+      AZURE_OPENAI_API_KEY: ${AZURE_OPENAI_API_KEY}
+      AZURE_OPENAI_EMBEDDING_DEPLOYMENT: ${AZURE_OPENAI_EMBEDDING_DEPLOYMENT:-text-embedding-3-small}
+      AZURE_OPENAI_API_VERSION: ${AZURE_OPENAI_API_VERSION:-2025-01-01-preview}
+      # Azure AI Search
+      AZURE_SEARCH_ENDPOINT: ${AZURE_SEARCH_ENDPOINT}
+      AZURE_SEARCH_API_KEY: ${AZURE_SEARCH_API_KEY}
+      AZURE_SEARCH_INDEX_NAME: ${AZURE_SEARCH_INDEX_NAME}
+      # Azure Storage
+      AZURE_STORAGE_ACCOUNT_NAME: ${AZURE_STORAGE_ACCOUNT_NAME}
+      AZURE_STORAGE_CONNECTION_STRING: ${AZURE_STORAGE_CONNECTION_STRING}
+      AZURE_STORAGE_CONTAINER: ${AZURE_STORAGE_CONTAINER}
+      # Application
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    healthcheck:
+      test: [ 'CMD', 'wget', '--spider', '-q', 'http://localhost:3001/health' ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    depends_on:
+      search:
+        condition: service_healthy
+    networks:
+      - apexcoach-network
+
+  frontend:
+    image: apexcoachai-frontend:latest
+    ports:
+      - '80:5173'
+    environment:
+      NODE_ENV: production
+      VITE_SEARCH_API_URI: ${VITE_SEARCH_API_URI:-http://search:3000}
+    restart: unless-stopped
+    depends_on:
+      search:
+        condition: service_healthy
+    networks:
+      - apexcoach-network
+
+networks:
+  apexcoach-network:
+    driver: bridge
+
+# Usage:
+# 1. Ensure images are built and available:
+#    - docker build -f apps/backend/search/Dockerfile -t shacrapps.azurecr.io/apexcoachai-api:latest .
+#    - docker build -f apps/backend/indexer/Dockerfile -t shacrapps.azurecr.io/apexcoachai-indexer:latest .
+#    - docker build -f apps/frontend/Dockerfile -t apexcoachai-frontend:latest .
+#
+# 2. Create .env file with required variables (see .env.example)
+#
+# 3. Start services:
+#    docker-compose -f infra/docker/docker-compose.prod.yml up -d
+#
+# 4. Check logs:
+#    docker-compose -f infra/docker/docker-compose.prod.yml logs -f
+#
+# 5. Stop services:
+#    docker-compose -f infra/docker/docker-compose.prod.yml down

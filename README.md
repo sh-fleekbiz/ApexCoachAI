@@ -67,27 +67,31 @@ The `pretest:e2e` hook automatically runs `pnpm exec playwright install` to ensu
 
 **No OpenAI.com**: Only Azure OpenAI endpoint (`shared-openai-eastus2`).
 
-See `docs/CONFIG.md` and `.env.example` for the complete schema. Key variables:
+See `docs/CONFIG.md` for the complete environment variable schema and detailed setup instructions. Key variables:
 
 ```env
 # Azure OpenAI
-AZURE_OPENAI_ENDPOINT=https://shared-openai-eastus2.openai.azure.com/openai/v1/
+AZURE_OPENAI_ENDPOINT=https://shared-openai-eastus2.openai.azure.com/
 AZURE_OPENAI_API_KEY=<your-key>
-AZURE_OPENAI_DEFAULT_CHAT_MODEL=gpt-5.1
-AZURE_OPENAI_MODEL_EMBED=text-embedding-3-small
-AZURE_OPENAI_MODEL_IMAGE=gpt-image-1-mini
+AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-4o
+AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small
 
 # PostgreSQL
-SHARED_PG_CONNECTION_STRING=postgresql://<user>:<pass>@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apexcoachai_db?sslmode=require
+DATABASE_URL=postgresql://<user>:<pass>@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apexcoachai?sslmode=require
+DIRECT_URL=postgresql://<user>:<pass>@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apexcoachai?sslmode=require
 
 # Azure AI Search
 AZURE_SEARCH_ENDPOINT=https://shared-search-standard-eastus2.search.windows.net
 AZURE_SEARCH_API_KEY=<your-key>
-AZURE_SEARCH_INDEX=apexcoachai-dev-index
+AZURE_SEARCH_INDEX_NAME=idx-apexcoachai-primary
 
 # Azure Storage
+AZURE_STORAGE_ACCOUNT_NAME=stmahumsharedapps
 AZURE_STORAGE_CONNECTION_STRING=<connection-string>
 AZURE_STORAGE_CONTAINER=apexcoachai
+
+# JWT Secret (generate with: openssl rand -base64 32)
+JWT_SECRET=<generate_strong_secret>
 ```
 
 ## Prerequisites
@@ -118,24 +122,35 @@ pnpm install
 
 ```bash
 # Copy example environment files
+cp .env.example .env
 cp apps/backend/search/.env.example apps/backend/search/.env
 cp apps/backend/indexer/.env.example apps/backend/indexer/.env
 cp apps/frontend/.env.example apps/frontend/.env
 
 # Edit the .env files with your Azure credentials
-# See docs/CONFIG.md for detailed instructions
+# See docs/CONFIG.md for detailed configuration guide
+# See docs/demo-guide.md for step-by-step local setup
 ```
 
 ### 4. Set Up Database
 
 ```bash
-# Run Prisma migrations
+# Navigate to search backend
 cd apps/backend/search
-pnpm prisma migrate dev
+
+# Generate Prisma client
+pnpm prisma generate
+
+# Run migrations (creates database schema)
+pnpm prisma migrate dev --name init
 
 # (Optional) Seed demo data
 pnpm seed:demo
+
+cd ../../..
 ```
+
+**Note**: See `docs/demo-guide.md` for detailed database setup instructions.
 
 ## Development
 
@@ -152,6 +167,8 @@ pnpm dev --filter=indexer     # Indexer service only
 ```
 
 **Important**: Use `pnpm dev` for development - it enables hot-reload via Turborepo. Don't run `pnpm build` during interactive development.
+
+**For detailed local development guide**, see `docs/demo-guide.md`.
 
 ### Available Commands
 
@@ -243,29 +260,61 @@ See [`.github/copilot-instructions.md`](./.github/copilot-instructions.md) for d
 ### Common Issues
 
 **Database Connection Errors**:
+
 - Verify `SHARED_PG_CONNECTION_STRING` in `.env` is correct
 - Check database exists: `apexcoachai_db` in `pg-shared-apps-eastus2`
 - Run migrations: `pnpm prisma migrate dev`
 
 **Azure OpenAI Errors**:
+
 - Verify `AZURE_OPENAI_ENDPOINT` and `AZURE_OPENAI_API_KEY` are set
 - Check deployment names match (`gpt-5.1`, `text-embedding-3-small`)
 - Ensure you're using Azure OpenAI, not OpenAI.com
 
 **Content Indexing Issues**:
+
 - Verify document format is supported (PDF, text, video transcripts)
 - Check Azure Storage connection string is correct
 - Verify Azure AI Search index exists and is configured
 
-**For more help**: See `docs/CONFIG.md` or check service logs in Azure Portal
+**For more help**:
+
+- See `docs/demo-guide.md` for local development troubleshooting
+- See `docs/CONFIG.md` for environment variable reference
+- See `docs/apexcoachai_issues.md` for known issues and fixes
+- Check service logs in Azure Portal
 
 ## Deployment
+
+### Manual Deployment
+
+For step-by-step manual deployment instructions, see **`docs/deployment-manual.md`**.
+
+Quick deployment using included scripts:
+
+```bash
+# Deploy backend services (builds images and updates Azure Container Apps)
+./scripts/deploy-backend.sh
+
+# Deploy frontend (builds and uploads to Static Web App)
+./scripts/deploy-frontend.sh
+
+# Or deploy everything at once
+./scripts/deploy-full.sh
+
+# Run smoke tests after deployment
+./scripts/smoke-test.sh
+```
+
+### Automated Deployment (CI/CD)
 
 Deployed via GitHub Actions workflow (`.github/workflows/deploy.yml`):
 
 - **Frontend**: Azure Static Web App `apexcoachai` in `rg-shared-web`
 - **Backend Services**: Azure Container Apps (`apexcoachai-api`, `apexcoachai-indexer`) in `cae-shared-apps`
 - **CI/CD**: Auto-deploys on push to `main` branch
+
+**Note**: Manual deployment is recommended for fine-grained control. See `docs/deployment-manual.md` for details.
 
 ## License
 
@@ -287,24 +336,24 @@ ApexCoachAI runs on the **MahumTech Shared Azure Platform**.
 
 ### Shared Resource Groups (no new RGs allowed)
 
-| Resource Group | Purpose |
-| :--- | :--- |
-| `rg-shared-ai` | Azure OpenAI `shared-openai-eastus2`, AI Search `shared-search-standard-eastus2` |
-| `rg-shared-data` | PostgreSQL `pg-shared-apps-eastus2`, Storage `stmahumsharedapps` |
-| `rg-shared-container-apps` | Container Apps environments, ACR `acrsharedapps` |
-| `rg-shared-web` | Static Web Apps |
-| `rg-shared-logs` | Log Analytics `law-shared-apps-eastus2`, App Insights `appi-shared-apps-eastus2` |
-| `rg-shared-dns` | DNS zones, certificates |
+| Resource Group             | Purpose                                                                          |
+| :------------------------- | :------------------------------------------------------------------------------- |
+| `rg-shared-ai`             | Azure OpenAI `shared-openai-eastus2`, AI Search `shared-search-standard-eastus2` |
+| `rg-shared-data`           | PostgreSQL `pg-shared-apps-eastus2`, Storage `stmahumsharedapps`                 |
+| `rg-shared-container-apps` | Container Apps environments, ACR `acrsharedapps`                                 |
+| `rg-shared-web`            | Static Web Apps                                                                  |
+| `rg-shared-logs`           | Log Analytics `law-shared-apps-eastus2`, App Insights `appi-shared-apps-eastus2` |
+| `rg-shared-dns`            | DNS zones, certificates                                                          |
 
 App-specific resources (all on shared services):
 
-| Resource | Name | Service |
-| :--- | :--- | :--- |
-| Database | `apexcoachai_db` | `pg-shared-apps-eastus2` |
-| Blob Container | `apexcoachai` | `stmahumsharedapps` |
-| Search Index | `idx-apexcoachai-primary` | `shared-search-standard-eastus2` |
-| Static Web App | `apexcoachai` | `rg-shared-web` |
-| Container App | `ca-apexcoachai-api` | `rg-shared-container-apps` |
+| Resource       | Name                      | Service                          |
+| :------------- | :------------------------ | :------------------------------- |
+| Database       | `apexcoachai_db`          | `pg-shared-apps-eastus2`         |
+| Blob Container | `apexcoachai`             | `stmahumsharedapps`              |
+| Search Index   | `idx-apexcoachai-primary` | `shared-search-standard-eastus2` |
+| Static Web App | `apexcoachai`             | `rg-shared-web`                  |
+| Container App  | `ca-apexcoachai-api`      | `rg-shared-container-apps`       |
 
 > **⚠️ Important:** Contributors and AI agents must **not** create new resource groups, PostgreSQL servers, storage accounts, or OpenAI/Search accounts. Extend the shared platform instead.
 

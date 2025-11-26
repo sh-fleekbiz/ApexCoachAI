@@ -1,7 +1,7 @@
 # ApexCoachAI - Manual Deployment Guide
 
-**Last Updated**: 2025-11-26  
-**Target**: Azure Container Apps & Static Web App  
+**Last Updated**: 2025-11-26
+**Target**: Azure Container Apps & Static Web App
 **Deployment Method**: Manual/Script-based (No CI/CD pipelines)
 
 ## Table of Contents
@@ -22,13 +22,14 @@
 
 ApexCoachAI consists of three deployable components:
 
-| Component | Technology | Deployment Target | Image/Build Output |
-|-----------|------------|-------------------|-------------------|
-| **Search API** | Fastify (Node.js) | Azure Container App `apexcoachai-api` | Docker image |
-| **Indexer Service** | Fastify (Node.js) | Azure Container App `apexcoachai-indexer` | Docker image |
-| **Frontend** | React (Vite) | Azure Static Web App `apexcoachai` | Static files |
+| Component           | Technology        | Deployment Target                         | Image/Build Output |
+| ------------------- | ----------------- | ----------------------------------------- | ------------------ |
+| **Search API**      | Fastify (Node.js) | Azure Container App `apexcoachai-api`     | Docker image       |
+| **Indexer Service** | Fastify (Node.js) | Azure Container App `apexcoachai-indexer` | Docker image       |
+| **Frontend**        | React (Vite)      | Azure Static Web App `apexcoachai`        | Static files       |
 
 **Architecture**:
+
 ```
 Internet → Static Web App (Frontend)
               ↓
@@ -71,6 +72,7 @@ pnpm --version   # Should be >= 9.0
 Ensure you have:
 
 1. **Azure CLI authenticated**:
+
    ```bash
    az login
    az account set --subscription 44e77ffe-2c39-4726-b6f0-2c733c7ffe78
@@ -422,6 +424,7 @@ az staticwebapp deploy \
    - Manual upload requires SWA CLI or direct deployment token
 
 3. **Using SWA CLI**:
+
    ```bash
    # Install SWA CLI
    npm install -g @azure/static-web-apps-cli
@@ -601,6 +604,7 @@ SELECT * FROM _prisma_migrations ORDER BY finished_at DESC LIMIT 5;
 ### Issue: Container App fails to start
 
 **Check logs**:
+
 ```bash
 az containerapp logs show \
   --name apexcoachai-api \
@@ -609,6 +613,7 @@ az containerapp logs show \
 ```
 
 **Common causes**:
+
 - Missing environment variables
 - Database connection failure
 - Port conflict
@@ -619,7 +624,9 @@ az containerapp logs show \
 **Symptoms**: `ImagePullBackOff` or `ErrImagePull`
 
 **Solutions**:
+
 1. Verify ACR access:
+
    ```bash
    az acr repository show \
      --name shacrapps \
@@ -632,6 +639,7 @@ az containerapp logs show \
 ### Issue: Frontend shows old version
 
 **Solutions**:
+
 1. Clear CDN cache (if using CDN)
 2. Hard refresh browser (Ctrl+Shift+R)
 3. Check deployment logs
@@ -645,6 +653,7 @@ az containerapp logs show \
 ### Issue: Database connection fails in production
 
 **Check**:
+
 1. Firewall rules allow Container Apps subnet
 2. Connection string is correct
 3. Database server is running
@@ -667,9 +676,9 @@ nc -zv pg-shared-apps-eastus2.postgres.database.azure.com 5432
 
 Keep a deployment log:
 
-| Date | Version/Tag | Deployer | Services Updated | Issues | Rollback Required |
-|------|-------------|----------|------------------|--------|-------------------|
-| 2025-11-26 | 20251126-143022 | username | api, indexer, frontend | None | No |
+| Date       | Version/Tag     | Deployer | Services Updated       | Issues | Rollback Required |
+| ---------- | --------------- | -------- | ---------------------- | ------ | ----------------- |
+| 2025-11-26 | 20251126-143022 | username | api, indexer, frontend | None   | No                |
 
 ---
 
@@ -699,6 +708,7 @@ After successful deployment:
 ---
 
 **Questions or Issues?**
+
 - Check Container Apps logs in Azure Portal
 - Review `docs/apexcoachai_issues.md` for known issues
 - Contact team lead or DevOps support

@@ -1,6 +1,6 @@
 # ApexCoachAI - Configuration Reference
 
-**Last Updated**: 2025-11-26  
+**Last Updated**: 2025-11-26
 **Version**: 1.0.0
 
 This document provides a comprehensive reference for all environment variables and configuration options used across the ApexCoachAI application.
@@ -66,23 +66,24 @@ cp apps/backend/indexer/.env.example apps/backend/indexer/.env
 
 ## Backend Search API Configuration
 
-**Service**: `apps/backend/search`  
-**Port**: 3000  
+**Service**: `apps/backend/search`
+**Port**: 3000
 **File**: `apps/backend/search/.env`
 
 ### Complete Variable List
 
 #### Azure OpenAI Configuration
 
-| Variable | Type | Required | Default | Description |
-|----------|------|----------|---------|-------------|
-| `AZURE_OPENAI_ENDPOINT` | URL | Yes | - | Azure OpenAI service endpoint |
-| `AZURE_OPENAI_API_KEY` | String | Yes | - | Azure OpenAI API key (from Azure Portal) |
-| `AZURE_OPENAI_CHAT_DEPLOYMENT` | String | Yes | `gpt-4o` | Chat completion deployment name |
-| `AZURE_OPENAI_EMBEDDING_DEPLOYMENT` | String | Yes | `text-embedding-3-small` | Embeddings deployment name |
-| `AZURE_OPENAI_API_VERSION` | String | Yes | `2025-01-01-preview` | API version for Azure OpenAI |
+| Variable                            | Type   | Required | Default                  | Description                              |
+| ----------------------------------- | ------ | -------- | ------------------------ | ---------------------------------------- |
+| `AZURE_OPENAI_ENDPOINT`             | URL    | Yes      | -                        | Azure OpenAI service endpoint            |
+| `AZURE_OPENAI_API_KEY`              | String | Yes      | -                        | Azure OpenAI API key (from Azure Portal) |
+| `AZURE_OPENAI_CHAT_DEPLOYMENT`      | String | Yes      | `gpt-4o`                 | Chat completion deployment name          |
+| `AZURE_OPENAI_EMBEDDING_DEPLOYMENT` | String | Yes      | `text-embedding-3-small` | Embeddings deployment name               |
+| `AZURE_OPENAI_API_VERSION`          | String | Yes      | `2025-01-01-preview`     | API version for Azure OpenAI             |
 
 **Example**:
+
 ```env
 AZURE_OPENAI_ENDPOINT=https://shared-openai-eastus2.openai.azure.com/
 AZURE_OPENAI_API_KEY=sk-abc123...xyz
@@ -92,6 +93,7 @@ AZURE_OPENAI_API_VERSION=2025-01-01-preview
 ```
 
 **Legacy Variables** (deprecated but still supported):
+
 - `AZURE_OPENAI_SERVICE` → use `AZURE_OPENAI_ENDPOINT` instead
 - `AZURE_OPENAI_CHATGPT_DEPLOYMENT` → use `AZURE_OPENAI_CHAT_DEPLOYMENT`
 - `AZURE_OPENAI_CHATGPT_MODEL` → use `AZURE_OPENAI_CHAT_DEPLOYMENT`
@@ -99,23 +101,26 @@ AZURE_OPENAI_API_VERSION=2025-01-01-preview
 
 #### Database Configuration
 
-| Variable | Type | Required | Default | Description |
-|----------|------|----------|---------|-------------|
-| `DATABASE_URL` | Connection String | Yes | - | PostgreSQL connection string (pooled) |
-| `DIRECT_URL` | Connection String | Yes | - | Direct PostgreSQL connection (for migrations) |
+| Variable       | Type              | Required | Default | Description                                   |
+| -------------- | ----------------- | -------- | ------- | --------------------------------------------- |
+| `DATABASE_URL` | Connection String | Yes      | -       | PostgreSQL connection string (pooled)         |
+| `DIRECT_URL`   | Connection String | Yes      | -       | Direct PostgreSQL connection (for migrations) |
 
 **Example**:
+
 ```env
 DATABASE_URL=postgresql://pgadmin:SecurePassword123@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apexcoachai?sslmode=require
 DIRECT_URL=postgresql://pgadmin:SecurePassword123@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apexcoachai?sslmode=require
 ```
 
 **Format**:
+
 ```
 postgresql://[user]:[password]@[host]:[port]/[database]?[options]
 ```
 
 **Important Notes**:
+
 - `DATABASE_URL` can point to a connection pooler (e.g., PgBouncer)
 - `DIRECT_URL` must bypass pooler for migrations (Prisma requirement)
 - In most cases, they can be the same value
@@ -123,13 +128,14 @@ postgresql://[user]:[password]@[host]:[port]/[database]?[options]
 
 #### Azure AI Search Configuration
 
-| Variable | Type | Required | Default | Description |
-|----------|------|----------|---------|-------------|
-| `AZURE_SEARCH_ENDPOINT` | URL | Yes | - | Azure AI Search service endpoint |
-| `AZURE_SEARCH_API_KEY` | String | Yes | - | Azure AI Search admin key |
-| `AZURE_SEARCH_INDEX_NAME` | String | Yes | `idx-apexcoachai-primary` | Search index name |
+| Variable                  | Type   | Required | Default                   | Description                      |
+| ------------------------- | ------ | -------- | ------------------------- | -------------------------------- |
+| `AZURE_SEARCH_ENDPOINT`   | URL    | Yes      | -                         | Azure AI Search service endpoint |
+| `AZURE_SEARCH_API_KEY`    | String | Yes      | -                         | Azure AI Search admin key        |
+| `AZURE_SEARCH_INDEX_NAME` | String | Yes      | `idx-apexcoachai-primary` | Search index name                |
 
 **Example**:
+
 ```env
 AZURE_SEARCH_ENDPOINT=https://shared-search-standard-eastus2.search.windows.net/
 AZURE_SEARCH_API_KEY=ABC123DEF456...
@@ -137,18 +143,20 @@ AZURE_SEARCH_INDEX_NAME=idx-apexcoachai-primary
 ```
 
 **Finding Values**:
+
 - Azure Portal → `shared-search-standard-eastus2` → Keys → Admin Key
 
 #### Azure Storage Configuration
 
-| Variable | Type | Required | Default | Description |
-|----------|------|----------|---------|-------------|
-| `AZURE_STORAGE_ACCOUNT_NAME` | String | Yes | `stmahumsharedapps` | Storage account name |
-| `AZURE_STORAGE_CONNECTION_STRING` | String | Yes | - | Full connection string with keys |
-| `AZURE_STORAGE_CONTAINER` | String | Yes | `apexcoachai` | Blob container name |
-| `AZURE_STORAGE_BLOB_ENDPOINT` | URL | No | Auto-generated | Blob service endpoint (optional) |
+| Variable                          | Type   | Required | Default             | Description                      |
+| --------------------------------- | ------ | -------- | ------------------- | -------------------------------- |
+| `AZURE_STORAGE_ACCOUNT_NAME`      | String | Yes      | `stmahumsharedapps` | Storage account name             |
+| `AZURE_STORAGE_CONNECTION_STRING` | String | Yes      | -                   | Full connection string with keys |
+| `AZURE_STORAGE_CONTAINER`         | String | Yes      | `apexcoachai`       | Blob container name              |
+| `AZURE_STORAGE_BLOB_ENDPOINT`     | URL    | No       | Auto-generated      | Blob service endpoint (optional) |
 
 **Example**:
+
 ```env
 AZURE_STORAGE_ACCOUNT_NAME=stmahumsharedapps
 AZURE_STORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=https;AccountName=stmahumsharedapps;AccountKey=abc123...;EndpointSuffix=core.windows.net
@@ -156,18 +164,20 @@ AZURE_STORAGE_CONTAINER=apexcoachai
 ```
 
 **Finding Values**:
+
 - Azure Portal → `stmahumsharedapps` → Access keys → Connection string
 
 #### Application Configuration
 
-| Variable | Type | Required | Default | Description |
-|----------|------|----------|---------|-------------|
-| `NODE_ENV` | String | No | `development` | Environment mode (`development`, `production`, `test`) |
-| `PORT` | Number | No | `3000` | Server port |
-| `JWT_SECRET` | String | Yes | - | Secret key for JWT token signing |
-| `LOG_LEVEL` | String | No | `info` | Logging level (`debug`, `info`, `warn`, `error`) |
+| Variable     | Type   | Required | Default       | Description                                            |
+| ------------ | ------ | -------- | ------------- | ------------------------------------------------------ |
+| `NODE_ENV`   | String | No       | `development` | Environment mode (`development`, `production`, `test`) |
+| `PORT`       | Number | No       | `3000`        | Server port                                            |
+| `JWT_SECRET` | String | Yes      | -             | Secret key for JWT token signing                       |
+| `LOG_LEVEL`  | String | No       | `info`        | Logging level (`debug`, `info`, `warn`, `error`)       |
 
 **Example**:
+
 ```env
 NODE_ENV=production
 PORT=3000
@@ -176,6 +186,7 @@ LOG_LEVEL=info
 ```
 
 **Generating JWT Secret**:
+
 ```bash
 # Using OpenSSL (recommended)
 openssl rand -base64 32
@@ -186,11 +197,12 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 
 #### Application Insights (Optional)
 
-| Variable | Type | Required | Default | Description |
-|----------|------|----------|---------|-------------|
-| `APPLICATIONINSIGHTS_CONNECTION_STRING` | String | No | - | Azure Application Insights connection string |
+| Variable                                | Type   | Required | Default | Description                                  |
+| --------------------------------------- | ------ | -------- | ------- | -------------------------------------------- |
+| `APPLICATIONINSIGHTS_CONNECTION_STRING` | String | No       | -       | Azure Application Insights connection string |
 
 **Example**:
+
 ```env
 APPLICATIONINSIGHTS_CONNECTION_STRING=InstrumentationKey=a78dfc6c-7ff6-44cf-af04-2b2f10e2ff8a;IngestionEndpoint=https://eastus2-3.in.applicationinsights.azure.com/
 ```
@@ -199,8 +211,8 @@ APPLICATIONINSIGHTS_CONNECTION_STRING=InstrumentationKey=a78dfc6c-7ff6-44cf-af04
 
 ## Backend Indexer Configuration
 
-**Service**: `apps/backend/indexer`  
-**Port**: 3001  
+**Service**: `apps/backend/indexer`
+**Port**: 3001
 **File**: `apps/backend/indexer/.env`
 
 The indexer service shares most configuration with the search API but does not need database access.
@@ -258,22 +270,24 @@ AZURE_STORAGE_ACCOUNT=stmahumsharedapps
 
 ## Frontend Configuration
 
-**Service**: `apps/frontend`  
-**Port**: 5173 (dev), 80/443 (production)  
+**Service**: `apps/frontend`
+**Port**: 5173 (dev), 80/443 (production)
 **File**: `apps/frontend/.env`
 
 ### Environment Variables
 
-| Variable | Type | Required | Default | Description |
-|----------|------|----------|---------|-------------|
-| `VITE_SEARCH_API_URI` | URL | Yes | `http://localhost:3000` | Backend API base URL |
+| Variable              | Type | Required | Default                 | Description          |
+| --------------------- | ---- | -------- | ----------------------- | -------------------- |
+| `VITE_SEARCH_API_URI` | URL  | Yes      | `http://localhost:3000` | Backend API base URL |
 
 **Development**:
+
 ```env
 VITE_SEARCH_API_URI=http://localhost:3000
 ```
 
 **Production**:
+
 ```env
 VITE_SEARCH_API_URI=https://api.apexcoachai.shtrial.com
 ```
@@ -291,6 +305,7 @@ const apiUrl =
 ```
 
 **Priority**:
+
 1. `BACKEND_URI` environment variable (highest)
 2. `VITE_SEARCH_API_URI` in `.env`
 3. Hardcoded `PROD_API_URL` if `NODE_ENV=production`
@@ -313,13 +328,13 @@ Region: East US 2
 
 ### Resource Groups
 
-| Resource Group | Purpose | Resources |
-|----------------|---------|-----------|
-| `rg-shared-ai` | AI Services | Azure OpenAI, AI Search |
-| `rg-shared-data` | Data Storage | PostgreSQL, Blob Storage |
-| `rg-shared-container-apps` | Backend Services | Container Apps, ACR |
-| `rg-shared-web` | Frontend | Static Web Apps |
-| `rg-shared-logs` | Monitoring | Log Analytics, App Insights |
+| Resource Group             | Purpose          | Resources                   |
+| -------------------------- | ---------------- | --------------------------- |
+| `rg-shared-ai`             | AI Services      | Azure OpenAI, AI Search     |
+| `rg-shared-data`           | Data Storage     | PostgreSQL, Blob Storage    |
+| `rg-shared-container-apps` | Backend Services | Container Apps, ACR         |
+| `rg-shared-web`            | Frontend         | Static Web Apps             |
+| `rg-shared-logs`           | Monitoring       | Log Analytics, App Insights |
 
 ### Shared Services Reference
 
@@ -332,6 +347,7 @@ Resource Group: rg-shared-ai
 ```
 
 **Deployments**:
+
 - `gpt-4o` - Chat completions
 - `text-embedding-3-small` - Embeddings
 - `gpt-image-1-mini` - Image generation (future use)
@@ -347,6 +363,7 @@ Resource Group: rg-shared-data
 ```
 
 **Access**:
+
 - Firewall rules required for external access
 - Contact DBA to add your IP
 
@@ -405,6 +422,7 @@ Resource Group: rg-shared-web
 ### Never Commit Secrets
 
 **❌ DO NOT**:
+
 ```env
 # .env (committed to git)
 AZURE_OPENAI_API_KEY=sk-real-key-12345
@@ -412,6 +430,7 @@ DATABASE_URL=postgresql://user:RealPassword@host/db
 ```
 
 **✅ DO**:
+
 ```env
 # .env.example (committed to git)
 AZURE_OPENAI_API_KEY=<your_azure_openai_key>
@@ -437,6 +456,7 @@ openssl rand -base64 32
 ### Azure Key Vault (Future Enhancement)
 
 Currently, secrets are stored in:
+
 - Local `.env` files (development)
 - Azure Container App Application Settings (production)
 
@@ -455,6 +475,7 @@ LOG_LEVEL=debug
 ```
 
 **Characteristics**:
+
 - Hot reload enabled
 - Verbose logging
 - Local services on localhost
@@ -469,6 +490,7 @@ LOG_LEVEL=info
 ```
 
 **Characteristics**:
+
 - Production-like environment
 - Limited logging
 - Separate database and resources
@@ -483,6 +505,7 @@ LOG_LEVEL=warn
 ```
 
 **Characteristics**:
+
 - Optimized builds
 - Minimal logging (warn/error only)
 - Production Azure resources
@@ -554,17 +577,20 @@ curl "$AZURE_SEARCH_ENDPOINT/indexes?api-version=2024-07-01" \
 ### Issue: Variable not loading
 
 **Check**:
+
 1. File is named exactly `.env` (not `.env.txt` or similar)
 2. No quotes around values (unless value contains spaces)
 3. No spaces around `=` sign
 4. File is in correct directory (per service)
 
 **Correct format**:
+
 ```env
 DATABASE_URL=postgresql://user:pass@host/db
 ```
 
 **Incorrect**:
+
 ```env
 DATABASE_URL = "postgresql://user:pass@host/db"
 ```
@@ -572,6 +598,7 @@ DATABASE_URL = "postgresql://user:pass@host/db"
 ### Issue: Database connection fails
 
 **Verify**:
+
 - Connection string format is correct
 - Password doesn't contain special chars that need escaping
 - `sslmode=require` is present
@@ -580,8 +607,9 @@ DATABASE_URL = "postgresql://user:pass@host/db"
 ### Issue: Azure OpenAI 401 Unauthorized
 
 **Check**:
+
 - API key is correct (no extra spaces)
-- Endpoint URL ends with `/` 
+- Endpoint URL ends with `/`
 - API version is supported
 - Deployment names match exactly (case-sensitive)
 
@@ -621,6 +649,6 @@ JWT_SECRET=<generate_with_openssl>
 
 ---
 
-**Document Version**: 1.0.0  
-**Last Updated**: 2025-11-26  
+**Document Version**: 1.0.0
+**Last Updated**: 2025-11-26
 **Maintained By**: ApexCoachAI Team
