@@ -8,9 +8,13 @@
     "dev": "turbo dev",
     "build": "turbo build",
     "test": "turbo test",
+    "pretest:e2e": "pnpm exec playwright install",
+    "test:e2e": "playwright test",
+    "test:all": "pnpm test && pnpm test:e2e",
     "lint": "turbo lint"
   },
   "devDependencies": {
+    "@playwright/test": "latest",
     "turbo": "^2.0.0"
   }
 }

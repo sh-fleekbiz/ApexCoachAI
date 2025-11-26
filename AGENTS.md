@@ -69,6 +69,41 @@ You are authorized to manage **only** these specific child resources for `apexco
 **Application**: AI Coaching Platform
 **URL**: https://apexcoachai.shtrial.com
 **Stack**: Next.js + Fastify + Azure AI Services
+**API Base URL**: https://api.apexcoachai.shtrial.com
+**Swagger UI**: https://api.apexcoachai.shtrial.com/docs
+**OpenAPI JSON**: https://api.apexcoachai.shtrial.com/openapi.json
+
+## URLs for this solution
+
+- Frontend demo:
+  - https://apexcoachai.shtrial.com
+
+- Backend API base:
+  - https://api.apexcoachai.shtrial.com
+
+- API docs UI:
+  - https://api.apexcoachai.shtrial.com/docs
+
+## E2E testing with Playwright
+
+- Use `pnpm` as the package manager.
+- Install dependencies and run tests with:
+
+  ```bash
+  pnpm install
+  pnpm test:e2e
+  ```
+
+- `pretest:e2e` runs `pnpm exec playwright install` so browsers are installed before tests run.
+- Do not replace or remove the Playwright scripts; extend them if you add more tests.
+
+## Infrastructure and Azure rules
+
+- Do NOT create new Azure resource groups.
+- Reuse the shared resource groups (for example: rg-shared-ai, rg-shared-data, rg-shared-apps, rg-shared-web, rg-shared-logs).
+- For databases, use the shared Postgres server (e.g. pg-shared-apps-eastus2) and create or use a database named after this app's slug ("apexcoachai").
+- For storage, reuse the shared storage account and create/reuse containers named after this app's slug.
+- For AI and search, use shared Azure OpenAI and Azure Search endpoints defined in the environment (do not hard-code secrets in source).
 
 ---
 

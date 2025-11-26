@@ -17,6 +17,8 @@ node_modules/
 .pnp.js
 .yarn/
 .pnpm-store/
+.npm/
+.cache/
 # pnpm lockfile should be committed, but ignore others
 package-lock.json
 yarn.lock
@@ -51,6 +53,7 @@ coverage/
 .nyc_output/
 test-results/
 playwright-report/
+blob-report/
 test-artifacts/
 .tap/
 packages/*/test-dist/
@@ -62,6 +65,7 @@ packages/*/test-dist/
 .env.local
 .env.*.local
 !*.env.example
+temp-env.json
 *_env
 *.pem
 
@@ -93,6 +97,8 @@ storage-credentials.json
 # ====================
 .DS_Store
 Thumbs.db
+ehthumbs.db
+Desktop.ini
 
 # ====================
 # Debug Logs
@@ -118,6 +124,8 @@ logs/
 # Misc
 # ====================
 TODO
+data/
+*.db
 
 # ====================
 # GitHub Copilot instructions - keep in sync

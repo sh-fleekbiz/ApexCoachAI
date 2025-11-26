@@ -36,6 +36,23 @@ Apex Coach AI transforms proprietary coaching content (videos, documents, traini
   - Backend API: `https://api.apexcoachai.shtrial.com`
   - Swagger UI: `https://api.apexcoachai.shtrial.com/swagger`
 
+## Demo URLs
+
+- **Frontend**: https://apexcoachai.shtrial.com
+- **API Base URL**: https://api.apexcoachai.shtrial.com
+- **API Docs**: https://api.apexcoachai.shtrial.com/docs
+
+## End-to-end Testing
+
+This project uses Playwright for E2E tests.
+
+```bash
+pnpm install
+pnpm test:e2e
+```
+
+The `pretest:e2e` hook automatically runs `pnpm exec playwright install` to ensure browsers are installed before tests run.
+
 ## Architecture
 
 - **Monorepo**: pnpm workspaces with Turborepo
