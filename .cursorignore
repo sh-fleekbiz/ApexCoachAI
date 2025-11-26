@@ -1,2 +1,5 @@
-!.env*
-!.github*
+# Unblock all env files
+
+!.env
+
+!.env.*

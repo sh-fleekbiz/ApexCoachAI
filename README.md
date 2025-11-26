@@ -34,13 +34,13 @@ Apex Coach AI transforms proprietary coaching content (videos, documents, traini
 - **Custom Domains**:
   - Frontend: `https://apexcoachai.shtrial.com`
   - Backend API: `https://api.apexcoachai.shtrial.com`
-  - Swagger UI: `https://api.apexcoachai.shtrial.com/swagger`
+  - Swagger UI: `https://api.apexcoachai.shtrial.com/docs`
 
 ## Demo URLs
 
 - **Frontend**: https://apexcoachai.shtrial.com
 - **API Base URL**: https://api.apexcoachai.shtrial.com
-- **API Docs**: https://api.apexcoachai.shtrial.com/docs
+- **API Documentation**: https://api.apexcoachai.shtrial.com/docs
 
 ## End-to-end Testing
 
@@ -205,9 +205,9 @@ ApexCoachAI/
 
 ## AI Roadmap
 
-- ✅ **Current**: RAG-powered Q&A, content indexing
-- 🔄 **Near-term**: Multi-agent coaching workflows, progress tracking
-- 📋 **Future**: Adaptive learning paths, automated assessment generation
+- **Current**: RAG-powered Q&A, content indexing
+- **Near-term**: Multi-agent coaching workflows, progress tracking
+- **Future**: Adaptive learning paths, automated assessment generation
 
 ## Contributing
 
@@ -274,7 +274,7 @@ Deployed via GitHub Actions workflow (`.github/workflows/deploy.yml`):
 ## Contact & Support
 
 - **Live Site**: https://apexcoachai.shtrial.com
-- **API Documentation**: https://api.apexcoachai.shtrial.com/swagger
+- **API Documentation**: https://api.apexcoachai.shtrial.com/docs
 - **Issues**: [GitHub Issues](https://github.com/your-org/apexcoachai/issues)
 
 ## ☁️ Infrastructure (MahumTech Shared Platform)
