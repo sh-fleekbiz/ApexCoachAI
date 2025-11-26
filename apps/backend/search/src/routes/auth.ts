@@ -46,7 +46,7 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
       try {
         // Check if user already exists
-        const existingUser = await await userRepository.getUserByEmail(email);
+        const existingUser = await userRepository.getUserByEmail(email);
         if (existingUser) {
           return reply
             .code(400)

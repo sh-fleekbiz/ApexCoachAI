@@ -3,8 +3,7 @@ import process from 'node:process';
 import { defineConfig } from 'vite';
 
 // Production API URL - hardcoded for Static Web App deployment
-const PROD_API_URL =
-  'https://apexcoachai-api.mangocoast-f4cc7159.eastus2.azurecontainerapps.io';
+const PROD_API_URL = 'https://api.apexcoachai.shtrial.com';
 
 // Use env var if provided, otherwise use production URL in production builds
 const apiUrl =
