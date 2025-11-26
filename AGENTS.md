@@ -1,210 +1,155 @@
-# ApexCoachAI Agents
+# Agent Profile – ApexCoachAI
 
-## Data Storage Naming
+**Contract:** MahumTech Shared Azure Platform (`#azure-mcp`)
+**App Slug:** `apexcoachai`
 
-Canonical identifiers:
+You are an AI coding agent working on the **ApexCoachAI** application - AI Coaching Platform.
+This project adheres to a strict **Shared Azure Platform Contract**.
 
-- PostgreSQL database: `apexcoachai_db` (server `pg-shared-apps-eastus2`)
-- Blob container: `apexcoachai` (storage account `stmahumsharedapps`)
+---
 
-Use these in secrets, IaC modules, and documentation.
+## 🛑 HARD RULES (Violations will be rejected)
 
-# AGENTS.md - Apex Coach AI
+1. **NO NEW RESOURCE GROUPS:** You are strictly **forbidden** from creating new Azure Resource Groups.
+2. **NO NEW SERVERS:** Do not create PostgreSQL Servers, Storage Accounts, OpenAI accounts, or AI Search Services.
+3. **SHARED ONLY:** You must deploy resources *into* the existing shared infrastructure listed below.
+4. **NO `az group create`:** If you generate Bicep/Terraform/CLI that calls `az group create`, **you are wrong**. Fix it.
 
-AI coding agent guide for Apex Coach AI, an AI-powered coaching and development platform that transforms proprietary content into interactive AI coaching experts.
+---
 
-## Project Overview
+## 🏗️ Infrastructure Architecture
 
-**Application**: AI-Powered Coaching & Development Platform
+### 1. The Shared Platform (Read-Only)
+
+You will use these existing resources for all deployments:
+
+| Service | Resource Group | Resource Name |
+| :--- | :--- | :--- |
+| **AI / LLM (OpenAI)** | `rg-shared-ai` | `shared-openai-eastus2` |
+| **AI Search** | `rg-shared-ai` | `shared-search-standard-eastus2` |
+| **PostgreSQL Host** | `rg-shared-data` | `pg-shared-apps-eastus2` |
+| **Blob Storage** | `rg-shared-data` | `stmahumsharedapps` |
+| **Container Registry** | `rg-shared-container-apps` | `acrsharedapps` |
+| **Container Apps Env (Dev)** | `rg-shared-container-apps` | `cae-shared-apps-dev` |
+| **Container Apps Env (Prod)** | `rg-shared-container-apps` | `cae-shared-apps-prod` |
+| **Log Analytics** | `rg-shared-logs` | `law-shared-apps-eastus2` |
+| **Application Insights** | `rg-shared-logs` | `appi-shared-apps-eastus2` |
+| **Static Web Apps** | `rg-shared-web` | (per-app SWAs) |
+| **DNS / Certificates** | `rg-shared-dns` | (shared DNS zones) |
+
+### 2. App-Specific Resources (Owned by this Repo)
+
+You are authorized to manage **only** these specific child resources for `apexcoachai`:
+
+| Resource Type | Name | Location |
+| :--- | :--- | :--- |
+| **Database** | `apexcoachai_db` | `pg-shared-apps-eastus2` |
+| **Blob Container** | `apexcoachai` | `stmahumsharedapps` |
+| **Search Index** | `idx-apexcoachai-primary` | `shared-search-standard-eastus2` |
+| **Static Web App** | `apexcoachai` | `rg-shared-web` |
+| **Container App (API)** | `ca-apexcoachai-api` | `rg-shared-container-apps` |
+| **Container Images** | `acrsharedapps.azurecr.io/apexcoachai-api:*` | `acrsharedapps` |
+
+### 3. Resource Groups Reference
+
+| Resource Group | Purpose | Create Resources Here? |
+| :--- | :--- | :--- |
+| `rg-shared-ai` | Azure OpenAI, AI Search | ❌ No - use existing |
+| `rg-shared-data` | PostgreSQL, Storage | ❌ No - use existing |
+| `rg-shared-container-apps` | ACR, Container Apps | ✅ Container Apps only |
+| `rg-shared-web` | Static Web Apps | ✅ SWAs only |
+| `rg-shared-logs` | Monitoring | ❌ No - use existing |
+| `rg-shared-dns` | DNS, Certs | ❌ No - use existing |
+| `rg-shared-backup` | Backups | ❌ No - use existing |
+
+---
+
+## 💻 Project Overview
+
+**Application**: AI Coaching Platform
 **URL**: https://apexcoachai.shtrial.com
-**Stack**: Monorepo with React frontend + Fastify search/indexer backends + Azure OpenAI/Azure AI Search
-**Target Market**: Content-focused SMBs, coaches, consultants, and training companies
-**Monorepo**: Yes (apps/frontend, apps/backend/search, apps/backend/indexer)
+**Stack**: Next.js + Fastify + Azure AI Services
 
-## Business Context
+---
 
-Apex Coach AI is a consumer-to-business (C2B) solution that enables:
-
-- **Coaches & Consultants**: Scale 1-on-1 coaching without sacrificing personalization
-- **Training Companies**: Turn course libraries into interactive learning assistants
-- **Startup Founders**: Provide consistent onboarding for growing teams
-- **Professional Services**: Deliver client support backed by proprietary methodologies
-
-**Key Value Proposition**: Turn proprietary videos and training materials into a 24/7 interactive AI expert that speaks with your authority.
-
-## Project Structure
-
-```
-ApexCoachAI/
-├── apps/
-│   ├── frontend/          # React coaching UI with integrated chat component
-│   └── backend/
-│       ├── search/        # Fastify RAG backend with integrated data utilities
-│       └── indexer/       # Content indexing service with integrated config
-```
-
-## Deployment Architecture
-
-**Current Deployment**: ✅ **Container Apps (Shared Environment)**
-
-- **Frontend**: Azure Static Web App `apexcoachai` in `rg-shared-web` (Free SKU)
-- **Backend API**: Azure Container App `apexcoachai-api` in shared environment:
-  - Environment: `cae-shared-apps` (in `rg-shared-apps`)
-  - Registry: `shacrapps.azurecr.io`
-  - Image: `shacrapps.azurecr.io/apexcoachai-search:latest`
-  - Compute: Consumption plan (scales to zero)
-- **Indexer**: Azure Container App `apexcoachai-indexer` in shared environment:
-  - Environment: `cae-shared-apps` (in `rg-shared-apps`)
-  - Registry: `shacrapps.azurecr.io`
-  - Image: `shacrapps.azurecr.io/apexcoachai-indexer:latest`
-  - Compute: Consumption plan (scales to zero)
-- **Custom Domain**: `apexcoachai.shtrial.com`
-
-## Custom Domains
-
-- Frontend: `https://apexcoachai.shtrial.com`
-- Backend API: `https://api.apexcoachai.shtrial.com`
-- Swagger: `https://api.apexcoachai.shtrial.com/swagger`
-
-DNS Notes: Ensure `api.apexcoachai.shtrial.com` is a CNAME to the Container App FQDN and bind TLS in the Azure portal.
-
-**Shared Resources** (all in shared resource groups):
-
-- Database: `pg-shared-apps-eastus2` (database: `apexcoachai_db`)
-- Azure OpenAI: `shared-openai-eastus2` (in `rg-shared-ai`)
-- Azure AI Search: `shared-search-standard-eastus2` (in `rg-shared-ai`)
-- Storage: `stmahumsharedapps` (in `rg-shared-data`)
-
-**Cost**: ~$5-10/month (frontend + Container Apps on consumption plan)
-
-## Tech Stack
-
-- **Monorepo**: pnpm workspaces with Turborepo
-- **Frontend**: React + TypeScript (apps/frontend)
-- **Backend**: Node.js + Fastify (apps/backend/search, apps/backend/indexer)
-- **Database**: Azure PostgreSQL (`pg-shared-apps-eastus2`, database: `apexcoachai_db`) with pgvector
-- **RAG**: Azure OpenAI exclusively
-  - Chat: `gpt-4o` (default), `gpt-5.1` (heavy tasks)
-  - Embeddings: `text-embedding-3-small`
-  - Image: `gpt-image-1-mini`
-- **Search**: Azure AI Search (`shared-search-standard-eastus2`, index prefix: `apexcoachai`)
-- **Storage**: Azure Blob Storage (`stmahumsharedapps`, prefix: `apexcoachai/`)
-- **Deployment**:
-  - Frontend: Azure Static Web App `apexcoachai` in `rg-shared-web` (Free SKU)
-  - Backend: Azure Container Apps `apexcoachai-api` and `apexcoachai-indexer` in `rg-shared-apps` (Consumption plan)
-- **Custom Domain**: `apexcoachai.shtrial.com`
-
-## Build & Test Commands
-
-All commands are executable and tested. Copy-paste ready:
+## 🔧 Build & Test Commands
 
 ```bash
-# Install dependencies (run from repo root)
+# Install dependencies
 pnpm install
 
-# Development (starts all services: frontend, search API, indexer)
+# Run development server
 pnpm dev
-# Frontend only: pnpm dev --filter=frontend
-# Search API only: pnpm dev --filter=search
-# Indexer only: pnpm dev --filter=indexer
 
-# Build (production build)
-pnpm build            # Build all packages
-pnpm build --filter=frontend   # Frontend only
-pnpm build --filter=search     # Search API only
-pnpm build --filter=indexer    # Indexer only
+# Build for production
+pnpm build
 
-# Testing
-pnpm test             # Run all tests
-pnpm lint             # Lint all packages
-pnpm typecheck        # TypeScript type checking
+# Run tests
+pnpm test
+
+# Lint and format
+pnpm lint
 ```
 
-**Before committing**: Always run `pnpm lint && pnpm typecheck && pnpm test`
+---
 
-## Coding Conventions
+## 🚀 Deployment Commands
 
-**Good Examples** (refer to these files):
-- Frontend components: `apps/frontend/src/components/*.tsx`
-- Search API routes: `apps/backend/search/src/routes/*.ts`
-- Indexer services: `apps/backend/indexer/src/services/*.ts`
-
-**Patterns**:
-- Follow monorepo structure (apps/frontend, apps/backend/search, apps/backend/indexer)
-- Use shared Azure OpenAI resources (never create app-specific resources)
-- TypeScript strict mode (enforced in tsconfig.json)
-- Meaningful package names (use descriptive names, not abbreviations)
-- Fastify for backend APIs (not Express)
-- Use shared data utilities from backend packages
-
-**Bad Examples** (avoid):
-- ❌ Creating new Azure OpenAI resources per app
-- ❌ Mixing Express and Fastify patterns
-- ❌ Hardcoded API endpoints or credentials
-
-## Environment Variables
-
-**No Key Vault**: All secrets/config via App Settings and environment variables.
-
-**No OpenAI.com**: Only Azure OpenAI endpoint (`shared-openai-eastus2`).
-
-See `apps/backend/search/.env.example` and `apps/backend/indexer/.env.example` for complete schemas. Key variables:
-
-```env
-# Azure OpenAI (shared across all services)
-AZURE_OPENAI_ENDPOINT=https://shared-openai-eastus2.openai.azure.com/openai/v1/
-AZURE_OPENAI_API_KEY=<your-key>
-AZURE_OPENAI_DEFAULT_CHAT_MODEL=gpt-4o
-AZURE_OPENAI_MODEL_HEAVY=gpt-5.1
-AZURE_OPENAI_MODEL_EMBED=text-embedding-3-small
-
-# PostgreSQL (shared)
-SHARED_PG_CONNECTION_STRING=postgresql://<user>:<pass>@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apexcoachai_db?sslmode=require
-
-# Azure AI Search (shared)
-AZURE_SEARCH_ENDPOINT=https://shared-search-standard-eastus2.search.windows.net
-AZURE_SEARCH_API_KEY=<your-key>
-AZURE_SEARCH_INDEX_PREFIX=apexcoachai
-
-# Azure Storage (shared)
-AZURE_STORAGE_CONNECTION_STRING=<connection-string>
-APP_STORAGE_PREFIX=apexcoachai
-```
-
-## Testing Requirements
-
-**Before every commit**:
 ```bash
-pnpm lint && pnpm typecheck && pnpm test
+# Build and push API image
+docker build -t acrsharedapps.azurecr.io/apexcoachai-api:latest -f apps/backend/Dockerfile .
+az acr login --name acrsharedapps
+docker push acrsharedapps.azurecr.io/apexcoachai-api:latest
+
+# Deploy to Container Apps
+az containerapp update \
+  --name ca-apexcoachai-api \
+  --resource-group rg-shared-container-apps \
+  --image acrsharedapps.azurecr.io/apexcoachai-api:latest
+
+# Deploy Static Web App (handled by GitHub Actions)
+# Push to main branch triggers deployment
 ```
 
-**Test Coverage**:
-- Add unit tests for new services
-- Test RAG pipeline with sample coaching content
-- Verify content indexing accuracy
-- Test search API endpoints
+---
 
-## PR Guidelines
+## 📋 Environment Variables
 
-- Title: `[Apex Coach AI] Description`
-- All tests passing (`pnpm test`)
-- No TypeScript errors (`pnpm typecheck`)
-- Linting passes (`pnpm lint`)
-- Content indexing features tested
+Required environment variables for local development (`.env.local`):
 
-## Prohibited Patterns
+```bash
+# Database (Shared PostgreSQL)
+DATABASE_URL=postgresql://pgadmin:***@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apexcoachai_db?sslmode=require
 
-❌ **Never**:
+# Azure OpenAI
+AZURE_OPENAI_ENDPOINT=https://shared-openai-eastus2.openai.azure.com/
+AZURE_OPENAI_API_KEY=***
+AZURE_OPENAI_API_VERSION=2025-01-01-preview
+AZURE_OPENAI_DEPLOYMENT_CHAT=gpt-4o
+AZURE_OPENAI_DEPLOYMENT_EMBEDDING=text-embedding-3-small
 
-- Use non-Azure AI providers as primary
-- Use OpenAI.com API (only Azure OpenAI)
-- Hardcode API keys or credentials
-- Bypass input validation
-- Skip content processing validation
+# Azure AI Search
+AZURE_SEARCH_ENDPOINT=https://shared-search-standard-eastus2.search.windows.net/
+AZURE_SEARCH_API_KEY=***
+AZURE_SEARCH_INDEX=idx-apexcoachai-primary
 
-## Resources
+# Azure Blob Storage
+AZURE_STORAGE_CONNECTION_STRING=***
+AZURE_STORAGE_CONTAINER=apexcoachai
 
-- `docs/ARCHITECTURE.md` - Detailed architecture documentation
-- `docs/CONFIG.md` - Environment variables and configuration guide
-- [Azure OpenAI Docs](https://learn.microsoft.com/en-us/azure/ai-services/openai/)
-- [Fastify Docs](https://www.fastify.io/)
+# Application Insights
+APPLICATIONINSIGHTS_CONNECTION_STRING=InstrumentationKey=***
+APP_NAME=apexcoachai
+```
+
+---
+
+## 🚫 Boundaries
+
+- **Do the hard work**: Search this repo for existing Bicep/ARM/Terraform and reuse patterns.
+- **Don't take shortcuts**: No isolated "demo" RGs, single-tenant servers, or one-off configs.
+- **Never touch** `.github/workflows` secrets layout without explicit permission.
+- **Focus on code**: Write clean, minimal code that fits the shared platform instead of reinventing infra.
+
+If you think a new resource is required, **FIRST** check if the shared platform already provides it.
+Extend existing shared resources (new DB, new container, new index), do NOT provision new servers or accounts.
