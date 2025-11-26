@@ -644,8 +644,8 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
     }
 
     try {
-      const deleted = [];
-      const failed = [];
+      const deleted: number[] = [];
+      const failed: { id: number; reason: string }[] = [];
 
       for (const id of ids) {
         try {
@@ -696,8 +696,8 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
     }
 
     try {
-      const retrained = [];
-      const failed = [];
+      const retrained: number[] = [];
+      const failed: { id: number; reason: string }[] = [];
 
       for (const id of ids) {
         try {

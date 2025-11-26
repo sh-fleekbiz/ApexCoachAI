@@ -1,4 +1,4 @@
-import * as helper from 'fastify-cli/helper.js';
+import Fastify, { type FastifyInstance } from 'fastify';
 import * as path from 'node:path';
 import process from 'node:process';
 import type * as test from 'node:test';
@@ -36,8 +36,7 @@ export function createTestConfig(
     azureOpenAiEmbeddingModel = 'text-embedding-3-small',
   } = options;
 
-  return {
-    config: async () => {
+  const applyEnvConfig = async () => {
       // Set test environment variables
       process.env.AZURE_OPENAI_SERVICE = azureOpenAiService;
       process.env.AZURE_SEARCH_SERVICE = azureSearchService;
@@ -56,18 +55,24 @@ export function createTestConfig(
       process.env.NODE_ENV = 'test';
 
       return {};
-    },
+  };
 
-    build: async (t: TestContext) => {
-      const argv = [appPath];
-      const app = await helper.build(
-        argv,
-        await createTestConfig(options).config()
-      );
+  return {
+    config: applyEnvConfig,
 
-      t.after(() => void app.close());
+    build: async (t: TestContext): Promise<FastifyInstance> => {
+      await applyEnvConfig();
 
-      return app;
+      const appModule = await import(appPath);
+      const fastify = Fastify();
+
+      if (typeof appModule.default === 'function') {
+        await fastify.register(appModule.default);
+      }
+
+      t.after(() => void fastify.close());
+
+      return fastify;
     },
   };
 }

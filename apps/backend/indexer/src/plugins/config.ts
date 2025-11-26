@@ -5,6 +5,11 @@ export interface AppConfig extends AzureConfig {}
 
 export default fp(
   async (fastify, _options) => {
+    // If tests or callers have already provided a config, reuse it
+    if (fastify.hasDecorator && fastify.hasDecorator('config')) {
+      return;
+    }
+
     const config = createIndexerAzureConfig();
     fastify.decorate('config', config);
   },

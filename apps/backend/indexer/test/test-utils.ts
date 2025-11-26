@@ -1,21 +1,21 @@
 import Fastify, { type FastifyInstance } from 'fastify';
+import type { AppConfig } from '../src/plugins/config.js';
 
 /**
  * Create test configuration for indexer
  */
-export function createTestConfig() {
+export function createTestConfig(): AppConfig {
   return {
-    NODE_ENV: 'test',
-    AZURE_STORAGE_ACCOUNT: 'test-storage',
-    AZURE_STORAGE_CONTAINER: 'test-container',
-    AZURE_SEARCH_SERVICE: 'test-search',
-    AZURE_SEARCH_INDEX: 'test-index',
-    AZURE_SEARCH_SEMANTIC_RANKER: 'disabled',
-    AZURE_OPENAI_SERVICE: 'test-openai',
-    AZURE_OPENAI_EMBEDDING_DEPLOYMENT: 'text-embedding-3-small',
-    AZURE_OPENAI_EMBEDDING_MODEL: 'text-embedding-3-small',
-    KB_FIELDS_CONTENT: 'content',
-    KB_FIELDS_SOURCEPAGE: 'sourcepage',
+    azureStorageAccount: 'test-storage',
+    azureStorageContainer: 'test-container',
+    azureSearchService: 'test-search',
+    azureSearchIndex: 'test-index',
+    azureSearchSemanticRanker: 'disabled',
+    azureOpenAiService: 'test-openai',
+    azureOpenAiEmbeddingDeployment: 'text-embedding-3-small',
+    azureOpenAiEmbeddingModel: 'text-embedding-3-small',
+    kbFieldsContent: 'content',
+    kbFieldsSourcePage: 'sourcepage',
   };
 }
 
@@ -25,7 +25,9 @@ export function createTestConfig() {
 export function createIndexerTestHelper(appPath: string) {
   const config = createTestConfig();
 
-  async function build(): Promise<FastifyInstance> {
+  async function build(
+    t?: { after: (fn: () => void | Promise<void>) => void }
+  ): Promise<FastifyInstance> {
     const app = await import(appPath);
     const fastify = Fastify();
 
@@ -35,6 +37,12 @@ export function createIndexerTestHelper(appPath: string) {
     // Register the app
     if (typeof app.default === 'function') {
       await fastify.register(app.default);
+    }
+
+    if (t) {
+      t.after(async () => {
+        await fastify.close();
+      });
     }
 
     return fastify;
