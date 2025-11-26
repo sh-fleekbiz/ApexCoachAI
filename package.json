@@ -8,8 +8,10 @@
     "dev": "turbo dev",
     "build": "turbo build",
     "test": "turbo test",
+    "start:webapp": "pnpm dev",
     "pretest:e2e": "pnpm exec playwright install",
     "test:e2e": "playwright test",
+    "test:e2e:smoke": "playwright test tests/e2e/smoke.spec.ts",
     "test:all": "pnpm test && pnpm test:e2e",
     "lint": "turbo lint"
   },
