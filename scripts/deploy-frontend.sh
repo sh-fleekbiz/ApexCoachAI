@@ -19,6 +19,25 @@ command -v node >/dev/null 2>&1 || { echo -e "${RED}Node.js is required but not 
 command -v pnpm >/dev/null 2>&1 || { echo -e "${RED}pnpm is required but not installed.${NC}" >&2; exit 1; }
 command -v az >/dev/null 2>&1 || { echo -e "${RED}Azure CLI is required but not installed.${NC}" >&2; exit 1; }
 
+# Resolve backend API URI from Azure Container App
+echo -e "${YELLOW}Resolving backend API URI from Azure Container App...${NC}"
+
+API_APP_NAME="${API_APP_NAME:-apexcoachai-api}"
+API_RESOURCE_GROUP="${API_RESOURCE_GROUP:-rg-shared-container-apps}"
+
+API_FQDN=$(az containerapp show \
+  --name "$API_APP_NAME" \
+  --resource-group "$API_RESOURCE_GROUP" \
+  --query "properties.configuration.ingress.fqdn" -o tsv 2>/dev/null || true)
+
+if [ -z "$API_FQDN" ]; then
+  echo -e "${RED}Failed to resolve Container App FQDN for $API_APP_NAME in $API_RESOURCE_GROUP.${NC}"
+  echo -e "${YELLOW}Continuing with existing production fallback API URL (may still cause 'Failed to fetch').${NC}"
+else
+  export BACKEND_URI="https://$API_FQDN"
+  echo -e "${GREEN}Using BACKEND_URI=$BACKEND_URI for frontend build.${NC}"
+fi
+
 # Navigate to frontend directory
 cd apps/frontend
 

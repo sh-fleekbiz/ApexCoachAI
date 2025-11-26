@@ -2,13 +2,16 @@ import react from '@vitejs/plugin-react';
 import process from 'node:process';
 import { defineConfig } from 'vite';
 
-// Production API URL - hardcoded for Static Web App deployment
+// Production API URL - legacy fallback for Static Web App deployment
 const PROD_API_URL = 'https://api.apexcoachai.shtrial.com';
 
-// Use env var if provided, otherwise use production URL in production builds
+// Prefer explicit backend env vars (set by azd or deploy scripts),
+// then fall back to the legacy hardcoded URL in production.
 const apiUrl =
   process.env.BACKEND_URI ||
+  process.env.SEARCH_API_URI ||
   (process.env.NODE_ENV === 'production' ? PROD_API_URL : '');
+
 console.log(`Using search API base URL: "${apiUrl}"`);
 
 // https://vitejs.dev/config/
