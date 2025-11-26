@@ -15,8 +15,8 @@ This repo deploys into a **shared Azure platform**. Do **not** create new resour
 ## App-Specific Resources for `apexcoachai`
 
 - When you need a **database**:
-  - Use DB `apexcoachai_db` on server `pg-shared-apps-eastus2` with `sslmode=require`.
-  - Connection: `postgresql://pgadmin:<password>@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apexcoachai_db?sslmode=require`
+  - Use DB `apexcoachai` on server `pg-shared-apps-eastus2` with `sslmode=require`.
+  - Connection: `postgresql://pgadmin:<password>@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apexcoachai?sslmode=require`
 
 - When you need **blob storage**:
   - Use container `apexcoachai` on storage account `stmahumsharedapps`.
@@ -45,7 +45,7 @@ When generating Bicep, Terraform, or Azure CLI:
 ## Configuration
 
 - Assume `.env` (local, gitignored) contains:
-  - `DATABASE_URL` pointing to `apexcoachai_db` on `pg-shared-apps-eastus2`
+  - `DATABASE_URL` pointing to `apexcoachai` on `pg-shared-apps-eastus2`
   - `AZURE_OPENAI_ENDPOINT=https://shared-openai-eastus2.openai.azure.com/`
   - `AZURE_SEARCH_ENDPOINT=https://shared-search-standard-eastus2.search.windows.net/`
   - `AZURE_STORAGE_CONTAINER=apexcoachai`
