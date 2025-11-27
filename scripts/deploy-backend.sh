@@ -5,7 +5,7 @@ set -e
 # Builds and deploys backend services to Azure Container Apps
 
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-ACR_NAME="shacrapps"
+ACR_NAME="acrsharedapps"
 RESOURCE_GROUP="rg-shared-container-apps"
 LOCATION="eastus2"
 
