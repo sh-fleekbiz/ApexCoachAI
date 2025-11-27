@@ -123,11 +123,6 @@ AZURE_OPENAI_API_VERSION=2025-01-01-preview
 # Database
 DATABASE_URL=postgresql://pgadmin:<password>@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apexcoachai?sslmode=require
 
-# Azure AI Search
-AZURE_SEARCH_ENDPOINT=https://shared-search-standard-eastus2.search.windows.net/
-AZURE_SEARCH_API_KEY=<from_portal>
-AZURE_SEARCH_INDEX_NAME=idx-apexcoachai-primary
-
 # Azure Storage
 AZURE_STORAGE_ACCOUNT_NAME=stmahumsharedapps
 AZURE_STORAGE_CONNECTION_STRING=<from_portal>
@@ -147,11 +142,6 @@ AZURE_OPENAI_ENDPOINT=https://shared-openai-eastus2.openai.azure.com/
 AZURE_OPENAI_API_KEY=<same_as_api>
 AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small
 AZURE_OPENAI_API_VERSION=2025-01-01-preview
-
-# Azure AI Search (same as API)
-AZURE_SEARCH_ENDPOINT=https://shared-search-standard-eastus2.search.windows.net/
-AZURE_SEARCH_API_KEY=<same_as_api>
-AZURE_SEARCH_INDEX_NAME=idx-apexcoachai-primary
 
 # Azure Storage (same as API)
 AZURE_STORAGE_ACCOUNT_NAME=stmahumsharedapps
@@ -220,7 +210,6 @@ docker images | grep apexcoachai-indexer
 docker run --rm -p 3000:3000 \
   -e DATABASE_URL="<your_db_url>" \
   -e AZURE_OPENAI_API_KEY="<your_key>" \
-  -e AZURE_SEARCH_API_KEY="<your_key>" \
   -e AZURE_STORAGE_CONNECTION_STRING="<your_conn_string>" \
   -e JWT_SECRET="test_secret" \
   shacrapps.azurecr.io/apexcoachai-api:latest

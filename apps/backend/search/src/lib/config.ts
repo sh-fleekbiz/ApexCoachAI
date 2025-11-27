@@ -8,9 +8,6 @@ import process from 'node:process';
 export interface AzureConfig {
   azureStorageAccount: string;
   azureStorageContainer: string;
-  azureSearchService: string;
-  azureSearchIndex: string;
-  azureSearchSemanticRanker: string;
   azureOpenAiService: string;
   azureOpenAiChatGptDeployment?: string;
   azureOpenAiChatGptModel?: string;
@@ -72,10 +69,6 @@ export function createSearchAzureConfig(): AzureConfig {
   const config: AzureConfig = {
     azureStorageAccount: process.env.AZURE_STORAGE_ACCOUNT || '',
     azureStorageContainer: process.env.AZURE_STORAGE_CONTAINER || '',
-    azureSearchService: process.env.AZURE_SEARCH_SERVICE || '',
-    azureSearchIndex: process.env.AZURE_SEARCH_INDEX || '',
-    azureSearchSemanticRanker:
-      process.env.AZURE_SEARCH_SEMANTIC_RANKER || 'disabled',
     azureOpenAiService: process.env.AZURE_OPENAI_SERVICE || '',
     azureOpenAiChatGptDeployment:
       process.env.AZURE_OPENAI_CHAT_DEPLOYMENT ||
@@ -84,7 +77,7 @@ export function createSearchAzureConfig(): AzureConfig {
     azureOpenAiChatGptModel:
       process.env.AZURE_OPENAI_CHAT_DEPLOYMENT ||
       process.env.AZURE_OPENAI_CHATGPT_MODEL ||
-      'gpt-4o',
+      'gpt-5-mini',
     azureOpenAiEmbeddingDeployment:
       process.env.AZURE_OPENAI_EMBEDDING_DEPLOYMENT || '',
     azureOpenAiEmbeddingModel:

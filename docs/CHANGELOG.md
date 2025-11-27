@@ -125,8 +125,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ```env
 AZURE_OPENAI_SERVICE=shared-openai-eastus2
 AZURE_OPENAI_CHATGPT_DEPLOYMENT=gpt-5.1-mini
-AZURE_SEARCH_INDEX=apexcoachai-dev-index
-AZURE_SEARCH_SERVICE=shared-search-standard-eastus2
 AZURE_STORAGE_ACCOUNT=stmahumsharedapps
 ```
 
@@ -135,8 +133,6 @@ AZURE_STORAGE_ACCOUNT=stmahumsharedapps
 ```env
 AZURE_OPENAI_ENDPOINT=https://shared-openai-eastus2.openai.azure.com/
 AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-4o
-AZURE_SEARCH_ENDPOINT=https://shared-search-standard-eastus2.search.windows.net/
-AZURE_SEARCH_INDEX_NAME=idx-apexcoachai-primary
 AZURE_STORAGE_ACCOUNT_NAME=stmahumsharedapps
 ```
 

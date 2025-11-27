@@ -128,9 +128,6 @@ AZURE_OPENAI_API_KEY=<your_azure_openai_key>
 DATABASE_URL=postgresql://<user>:<password>@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apexcoachai?sslmode=require
 DIRECT_URL=postgresql://<user>:<password>@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apexcoachai?sslmode=require
 
-# Azure AI Search
-AZURE_SEARCH_API_KEY=<your_search_api_key>
-
 # Azure Storage
 AZURE_STORAGE_CONNECTION_STRING=<your_storage_connection_string>
 
@@ -154,7 +151,6 @@ Both `apps/backend/search/.env` and `apps/backend/indexer/.env` need the same Az
 # You can copy from root .env or set them directly
 # They should match the root .env values for:
 # - AZURE_OPENAI_*
-# - AZURE_SEARCH_*
 # - AZURE_STORAGE_*
 # - DATABASE_URL (search backend only)
 ```
@@ -640,7 +636,6 @@ See `docs/CONFIG.md` (to be created) for comprehensive list.
 **Minimum required:**
 - `DATABASE_URL` + `DIRECT_URL`
 - `AZURE_OPENAI_API_KEY`
-- `AZURE_SEARCH_API_KEY`
 - `AZURE_STORAGE_CONNECTION_STRING`
 - `JWT_SECRET`
 

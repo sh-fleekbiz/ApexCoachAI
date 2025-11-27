@@ -22,14 +22,6 @@ param logAnalyticsName string = ''
 param applicationInsightsName string = ''
 param applicationInsightsDashboardName string = ''
 
-param searchServiceName string = ''
-param searchServiceResourceGroupName string = ''
-param searchServiceLocation string = ''
-// The free tier does not support managed identity (required) or semantic search (optional)
-@allowed(['basic', 'standard', 'standard2', 'standard3', 'storage_optimized_l1', 'storage_optimized_l2'])
-param searchServiceSkuName string
-param searchIndexName string
-
 param storageAccountName string = ''
 param storageResourceGroupName string = ''
 param storageResourceGroupLocation string = location
@@ -96,11 +88,6 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
 resource openAiResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' existing = if (!empty(openAiResourceGroupName)) {
   name: !empty(openAiResourceGroupName) ? openAiResourceGroupName : resourceGroup.name
 }
-
-resource searchServiceResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' existing = if (!empty(searchServiceResourceGroupName)) {
-  name: !empty(searchServiceResourceGroupName) ? searchServiceResourceGroupName : resourceGroup.name
-}
-
 resource storageResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' existing = if (!empty(storageResourceGroupName)) {
   name: !empty(storageResourceGroupName) ? storageResourceGroupName : resourceGroup.name
 }
@@ -197,14 +184,6 @@ module searchApi './core/host/container-app.bicep' = {
         value: openAi.outputs.name
       }
       {
-        name: 'AZURE_SEARCH_INDEX'
-        value: searchIndexName
-      }
-      {
-        name: 'AZURE_SEARCH_SERVICE'
-        value: searchService.outputs.name
-      }
-      {
         name: 'AZURE_STORAGE_ACCOUNT'
         value: 'stmahumsharedapps'
       }
@@ -277,14 +256,6 @@ module indexerApi './core/host/container-app.bicep' = {
         value: openAi.outputs.name
       }
       {
-        name: 'AZURE_SEARCH_INDEX'
-        value: searchIndexName
-      }
-      {
-        name: 'AZURE_SEARCH_SERVICE'
-        value: searchService.outputs.name
-      }
-      {
         name: 'AZURE_STORAGE_ACCOUNT'
         value: 'stmahumsharedapps'
       }
@@ -343,25 +314,6 @@ module openAi 'core/ai/cognitiveservices.bicep' = {
   }
 }
 
-module searchService 'core/search/search-services.bicep' = {
-  name: 'search-service'
-  scope: searchServiceResourceGroup
-  params: {
-    name: !empty(searchServiceName) ? searchServiceName : 'gptkb-${resourceToken}'
-    location: !empty(searchServiceLocation) ? searchServiceLocation : location
-    tags: tags
-    authOptions: {
-      aadOrApiKey: {
-        aadAuthFailureMode: 'http401WithBearerChallenge'
-      }
-    }
-    sku: {
-      name: searchServiceSkuName
-    }
-    semanticSearch: searchServiceSkuName == 'standard' ? 'free' : 'disabled'
-  }
-}
-
 // Reference existing shared storage account (stmahumsharedapps)
 // Container 'apexcoachai' should be created via: az storage container create --account-name stmahumsharedapps --name apexcoachai
 resource sharedStorage 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
@@ -392,28 +344,6 @@ module storageContribRoleUser 'core/security/role.bicep' = if (!isContinuousDepl
   }
 }
 
-module searchContribRoleUser 'core/security/role.bicep' = if (!isContinuousDeployment) {
-  scope: searchServiceResourceGroup
-  name: 'search-contrib-role-user'
-  params: {
-    principalId: principalId
-    // Search Index Data Contributor
-    roleDefinitionId: '8ebe5a00-799e-43f5-93ac-243d3dce84a7'
-    principalType: 'User'
-  }
-}
-
-module searchSvcContribRoleUser 'core/security/role.bicep' = if (!isContinuousDeployment) {
-  scope: searchServiceResourceGroup
-  name: 'search-svccontrib-role-user'
-  params: {
-    principalId: principalId
-    // Search Service Contributor
-    roleDefinitionId: '7ca78c08-252a-4471-8644-bb5ff32d4ba0'
-    principalType: 'User'
-  }
-}
-
 // SYSTEM IDENTITIES
 module openAiRoleSearchApi 'core/security/role.bicep' = {
   scope: openAiResourceGroup
@@ -433,17 +363,6 @@ module storageRoleSearchApi 'core/security/role.bicep' = {
     principalId: searchApi.outputs.identityPrincipalId
     // Storage Blob Data Reader
     roleDefinitionId: '2a2b9908-6ea1-4ae2-8e65-a410df84e7d1'
-    principalType: 'ServicePrincipal'
-  }
-}
-
-module searchRoleSearchApi 'core/security/role.bicep' = {
-  scope: searchServiceResourceGroup
-  name: 'search-role-searchapi'
-  params: {
-    principalId: searchApi.outputs.identityPrincipalId
-    // Search Index Data Reader
-    roleDefinitionId: '1407120a-92aa-4202-b7e9-c0e197c71c8f'
     principalType: 'ServicePrincipal'
   }
 }
@@ -470,28 +389,6 @@ module storageContribRoleIndexerApi 'core/security/role.bicep' = {
   }
 }
 
-module searchContribRoleIndexerApi 'core/security/role.bicep' = {
-  scope: searchServiceResourceGroup
-  name: 'search-contrib-role-indexer'
-  params: {
-    principalId: indexerApi.outputs.identityPrincipalId
-    // Search Index Data Contributor
-    roleDefinitionId: '8ebe5a00-799e-43f5-93ac-243d3dce84a7'
-    principalType: 'ServicePrincipal'
-  }
-}
-
-module searchSvcContribRoleIndexerApi 'core/security/role.bicep' = {
-  scope: searchServiceResourceGroup
-  name: 'search-svccontrib-role-indexer'
-  params: {
-    principalId: indexerApi.outputs.identityPrincipalId
-    // Search Service Contributor
-    roleDefinitionId: '7ca78c08-252a-4471-8644-bb5ff32d4ba0'
-    principalType: 'ServicePrincipal'
-  }
-}
-
 output AZURE_LOCATION string = location
 output AZURE_TENANT_ID string = tenant().tenantId
 output AZURE_RESOURCE_GROUP string = resourceGroup.name
@@ -506,18 +403,11 @@ output AZURE_OPENAI_CHATGPT_MODEL string = chatGptModelName
 output AZURE_OPENAI_EMBEDDING_DEPLOYMENT string = embeddingDeploymentName
 output AZURE_OPENAI_EMBEDDING_MODEL string = embeddingModelName
 
-output AZURE_SEARCH_INDEX string = searchIndexName
-output AZURE_SEARCH_SERVICE string = searchService.outputs.name
-output AZURE_SEARCH_SERVICE_RESOURCE_GROUP string = searchServiceResourceGroup.name
-output AZURE_SEARCH_SEMANTIC_RANKER string = searchServiceSkuName == 'standard' ? 'enabled' : 'disabled'
-
 output AZURE_STORAGE_ACCOUNT string = 'stmahumsharedapps'
 output AZURE_STORAGE_CONTAINER string = 'apexcoachai'
 output AZURE_STORAGE_RESOURCE_GROUP string = 'rg-shared-apps'
 
 output WEBAPP_URI string = webApp.outputs.uri
-output SEARCH_API_URI string = searchApi.outputs.uri
-output INDEXER_API_URI string = indexerApi.outputs.uri
 
 output ALLOWED_ORIGINS string = join(allowedOrigins, ',')
 output BACKEND_URI string = !empty(backendUri) ? backendUri : searchApi.outputs.uri

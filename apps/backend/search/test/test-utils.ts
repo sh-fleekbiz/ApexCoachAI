@@ -13,8 +13,6 @@ export function createTestConfig(
   options: {
     appPath: string;
     azureOpenAiService?: string;
-    azureSearchService?: string;
-    azureSearchIndex?: string;
     azureStorageAccount?: string;
     azureStorageContainer?: string;
     azureOpenAiChatGptDeployment?: string;
@@ -26,8 +24,6 @@ export function createTestConfig(
   const {
     appPath,
     azureOpenAiService = 'https://test-openai.openai.azure.com/',
-    azureSearchService = 'https://test-search.search.windows.net/',
-    azureSearchIndex = 'test-index',
     azureStorageAccount = 'teststorage',
     azureStorageContainer = 'test-container',
     azureOpenAiChatGptDeployment = 'gpt-4o-mini',
@@ -39,8 +35,6 @@ export function createTestConfig(
   const applyEnvConfig = async () => {
       // Set test environment variables
       process.env.AZURE_OPENAI_SERVICE = azureOpenAiService;
-      process.env.AZURE_SEARCH_SERVICE = azureSearchService;
-      process.env.AZURE_SEARCH_INDEX = azureSearchIndex;
       process.env.AZURE_STORAGE_ACCOUNT = azureStorageAccount;
       process.env.AZURE_STORAGE_CONTAINER = azureStorageContainer;
       process.env.AZURE_OPENAI_CHATGPT_DEPLOYMENT =

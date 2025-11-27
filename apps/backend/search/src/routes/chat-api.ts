@@ -173,10 +173,7 @@ const chatApi: FastifyPluginAsync = async (
           );
         }
 
-        let approachContext: ApproachContext = (context as any) ?? {};
-        if (this.config.azureSearchSemanticRanker !== 'enabled') {
-          approachContext = { ...approachContext, semantic_ranker: false };
-        }
+        const approachContext: ApproachContext = (context as any) ?? {};
 
         // Run RAG
         if (stream) {

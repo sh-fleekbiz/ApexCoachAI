@@ -1,4 +1,3 @@
-import { type SearchIndex } from '@azure/search-documents';
 import { encoding_for_model, type TiktokenModel } from '@dqbd/tiktoken';
 import { type BaseLogger } from 'pino';
 import { type AzureClients } from '../plugins/azure.js';
@@ -8,7 +7,7 @@ import { DocumentProcessor } from './document-processor.js';
 import { type Section } from './document.js';
 import { extractText, extractTextFromPdf } from './formats/index.js';
 import { MODELS_SUPPORTED_BATCH_SIZE } from './model-limits.js';
-import { wait } from './util/index.js';
+import { withClient } from './db.js';
 
 export interface IndexFileOptions {
   useVectors?: boolean;
@@ -24,14 +23,12 @@ export interface FileInfos {
   programId?: number;
 }
 
-const INDEXING_BATCH_SIZE = 1000;
-
 export class Indexer {
   private blobStorage: BlobStorage;
 
   constructor(
     private logger: BaseLogger,
-    private azure: AzureClients,
+    azure: AzureClients,
     private openai: OpenAiService,
     private embeddingModelName: string = 'text-embedding-3-small'
   ) {
@@ -39,117 +36,24 @@ export class Indexer {
   }
 
   async createSearchIndex(indexName: string, useSemanticRanker = false) {
-    this.logger.debug(`Ensuring search index "${indexName}" exists`);
-
-    const searchIndexClient = this.azure.searchIndex;
-
-    const names: string[] = [];
-    const indexNames = await searchIndexClient.listIndexes();
-    for await (const index of indexNames) {
-      names.push(index.name);
-    }
-    if (names.includes(indexName)) {
-      this.logger.debug(`Search index "${indexName}" already exists`);
-    } else {
-      const index: SearchIndex = {
-        name: indexName,
-        vectorSearch: {
-          algorithms: [
-            {
-              name: 'vector-search-algorithm',
-              kind: 'hnsw',
-              parameters: {
-                m: 4,
-                efSearch: 500,
-                metric: 'cosine',
-                efConstruction: 400,
-              },
-            },
-          ],
-          profiles: [
-            {
-              name: 'vector-search-profile',
-              algorithmConfigurationName: 'vector-search-algorithm',
-            },
-          ],
-        },
-        ...(useSemanticRanker
-          ? {
-              semanticSearch: {
-                defaultConfigurationName: 'semantic-search-config',
-                configurations: [
-                  {
-                    name: 'semantic-search-config',
-                    prioritizedFields: {
-                      contentFields: [
-                        {
-                          name: 'content',
-                        },
-                      ],
-                    },
-                  },
-                ],
-              },
-            }
-          : {}),
-        fields: [
-          {
-            name: 'id',
-            type: 'Edm.String',
-            key: true,
-          },
-          {
-            name: 'content',
-            type: 'Edm.String',
-            searchable: true,
-            analyzerName: 'en.microsoft',
-          },
-          {
-            name: 'embedding',
-            type: 'Collection(Edm.Single)',
-            hidden: false,
-            searchable: true,
-            filterable: false,
-            sortable: false,
-            facetable: false,
-            vectorSearchDimensions: 1536,
-            vectorSearchProfileName: 'vector-search-profile',
-          },
-          {
-            name: 'category',
-            type: 'Edm.String',
-            filterable: true,
-            facetable: true,
-          },
-          {
-            name: 'sourcepage',
-            type: 'Edm.String',
-            filterable: true,
-            facetable: true,
-          },
-          {
-            name: 'sourcefile',
-            type: 'Edm.String',
-            filterable: true,
-            facetable: true,
-          },
-          {
-            name: 'program_id',
-            type: 'Edm.Int32',
-            filterable: true,
-            facetable: true,
-          },
-        ],
-      };
-      this.logger.debug(`Creating "${indexName}" search index...`);
-      await searchIndexClient.createIndex(index);
-    }
+    this.logger.debug(
+      `Ensuring logical index "${indexName}" exists in Postgres (pgvector); no Azure Search is used.`,
+    );
   }
 
   async deleteSearchIndex(indexName: string) {
-    this.logger.debug(`Deleting search index "${indexName}"`);
-    const searchIndexClient = this.azure.searchIndex;
-    await searchIndexClient.deleteIndex(indexName);
+    this.logger.debug(
+      `Deleting logical index "${indexName}" from knowledge_base_sections table`,
+    );
+
+    await withClient(async (client) => {
+      await client.query(
+        'DELETE FROM knowledge_base_sections WHERE index_name = $1',
+        [indexName],
+      );
+    });
+
+    await this.blobStorage.deleteAll();
   }
 
   async indexFile(
@@ -183,28 +87,32 @@ export class Indexer {
         programId
       );
       const sections = document.sections;
-      if (options.useVectors) {
-        await this.updateEmbeddingsInBatch(sections);
-      }
+      await this.updateEmbeddingsInBatch(sections);
 
-      const searchClient = this.azure.searchIndex.getSearchClient(indexName);
+      await withClient(async (client) => {
+        for (const section of sections) {
+          if (!section.embedding) {
+            continue;
+          }
 
-      const batchSize = INDEXING_BATCH_SIZE;
-      let batch: Section[] = [];
+          const embeddingVector = `[${section.embedding.join(',')}]`;
 
-      for (let index = 0; index < sections.length; index++) {
-        batch.push(sections[index]);
-
-        if (batch.length === batchSize || index === sections.length - 1) {
-          const { results } = await searchClient.uploadDocuments(batch);
-          const succeeded = results.filter((r) => r.succeeded).length;
-          const indexed = batch.length;
-          this.logger.debug(
-            `Indexed ${indexed} sections, ${succeeded} succeeded`
+          await client.query(
+            `INSERT INTO knowledge_base_sections
+              (index_name, content, category, sourcepage, sourcefile, program_id, embedding)
+             VALUES ($1, $2, $3, $4, $5, $6, $7::vector)`,
+            [
+              indexName,
+              section.content,
+              section.category,
+              section.sourcepage,
+              section.sourcefile,
+              section.program_id ?? null,
+              embeddingVector,
+            ],
           );
-          batch = [];
         }
-      }
+      });
     } catch (_error: unknown) {
       const error = _error as Error;
       if (options.throwErrors) {
@@ -219,35 +127,26 @@ export class Indexer {
 
   async deleteFromIndex(indexName: string, filename?: string) {
     this.logger.debug(
-      `Removing sections from "${filename ?? '<all>'}" from search index "${indexName}"`
+      `Removing sections from "${filename ?? '<all>'}" for logical index "${indexName}"`
     );
-    const searchClient = this.azure.searchIndex.getSearchClient(indexName);
-
-    // eslint-disable-next-line no-constant-condition
-    while (true) {
-      const filter = filename ? `sourcefile eq '${filename}'` : undefined;
-      const r = await searchClient.search('', {
-        filter: filter,
-        top: 1000,
-        includeTotalCount: true,
-      });
-      if (r.count === 0) {
-        break;
+    await withClient(async (client) => {
+      if (filename) {
+        await client.query(
+          'DELETE FROM knowledge_base_sections WHERE index_name = $1 AND sourcefile = $2',
+          [indexName, filename],
+        );
+      } else {
+        await client.query(
+          'DELETE FROM knowledge_base_sections WHERE index_name = $1',
+          [indexName],
+        );
       }
-      const documents: any[] = [];
-      for await (const d of r.results) {
-        documents.push({ id: (d.document as any).id });
-      }
+    });
 
-      const { results } = await searchClient.deleteDocuments(documents);
-      this.logger.debug(`Removed ${results.length} sections from index`);
-
-      await (filename
-        ? this.blobStorage.delete(filename)
-        : this.blobStorage.deleteAll());
-
-      // It can take a few seconds for search results to reflect changes, so wait a bit
-      await wait(2000);
+    if (filename) {
+      await this.blobStorage.delete(filename);
+    } else {
+      await this.blobStorage.deleteAll();
     }
   }
 

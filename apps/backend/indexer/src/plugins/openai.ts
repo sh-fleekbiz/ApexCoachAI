@@ -12,7 +12,7 @@ export type OpenAiService = {
   };
 };
 
-const AZURE_OPENAI_API_VERSION = '2024-02-01';
+const AZURE_OPENAI_API_VERSION = '2025-04-01-preview';
 const AZURE_COGNITIVE_SERVICES_AD_SCOPE = 'https://cognitiveservices.azure.com/.default';
 
 export default fp(

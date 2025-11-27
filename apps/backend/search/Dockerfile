@@ -15,7 +15,12 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/backend/search/node_modules ./apps/backend/search/node_modules
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/backend/search ./apps/backend/search
+WORKDIR /app
+# Install devDependencies for build
+RUN pnpm install --frozen-lockfile --filter search...
 WORKDIR /app/apps/backend/search
+# Generate Prisma client before building
+RUN npx prisma generate
 RUN pnpm build
 WORKDIR /app
 

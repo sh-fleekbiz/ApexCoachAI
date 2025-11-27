@@ -22,7 +22,6 @@
   "dependencies": {
     "@azure/core-http": "^3.0.5",
     "@azure/identity": "^4.13.0",
-    "@azure/search-documents": "^12.2.0",
     "@azure/storage-blob": "^12.15.0",
     "@dqbd/tiktoken": "^1.0.7",
     "@fastify/autoload": "^6.1.0",

@@ -177,11 +177,6 @@ AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-4o
 AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small
 AZURE_OPENAI_API_VERSION=2025-01-01-preview
 
-# Azure AI Search
-AZURE_SEARCH_ENDPOINT=https://shared-search-standard-eastus2.search.windows.net/
-AZURE_SEARCH_API_KEY=<your_key>
-AZURE_SEARCH_INDEX_NAME=idx-apexcoachai-primary
-
 # Azure Storage
 AZURE_STORAGE_ACCOUNT_NAME=stmahumsharedapps
 AZURE_STORAGE_CONNECTION_STRING=<your_connection_string>
@@ -200,11 +195,6 @@ AZURE_OPENAI_ENDPOINT=https://shared-openai-eastus2.openai.azure.com/
 AZURE_OPENAI_API_KEY=<your_key>
 AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small
 AZURE_OPENAI_API_VERSION=2025-01-01-preview
-
-# Azure AI Search (same as search)
-AZURE_SEARCH_ENDPOINT=https://shared-search-standard-eastus2.search.windows.net/
-AZURE_SEARCH_API_KEY=<your_key>
-AZURE_SEARCH_INDEX_NAME=idx-apexcoachai-primary
 
 # Azure Storage (same as search)
 AZURE_STORAGE_ACCOUNT_NAME=stmahumsharedapps

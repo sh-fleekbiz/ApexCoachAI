@@ -8,9 +8,6 @@ import process from 'node:process';
 export interface AzureConfig {
   azureStorageAccount: string;
   azureStorageContainer: string;
-  azureSearchService: string;
-  azureSearchIndex: string;
-  azureSearchSemanticRanker: string;
   azureOpenAiService: string;
   azureOpenAiEmbeddingDeployment: string;
   azureOpenAiEmbeddingModel: string;
@@ -69,10 +66,6 @@ export function createIndexerAzureConfig(): AzureConfig {
   const config: AzureConfig = {
     azureStorageAccount: process.env.AZURE_STORAGE_ACCOUNT || '',
     azureStorageContainer: process.env.AZURE_STORAGE_CONTAINER || '',
-    azureSearchService: process.env.AZURE_SEARCH_SERVICE || '',
-    azureSearchIndex: process.env.AZURE_SEARCH_INDEX || '',
-    azureSearchSemanticRanker:
-      process.env.AZURE_SEARCH_SEMANTIC_RANKER || 'disabled',
     azureOpenAiService: process.env.AZURE_OPENAI_SERVICE || '',
     azureOpenAiEmbeddingDeployment:
       process.env.AZURE_OPENAI_EMBEDDING_DEPLOYMENT || '',

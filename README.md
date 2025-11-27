@@ -24,7 +24,7 @@ Apex Coach AI transforms proprietary coaching content (videos, documents, traini
   - Chat: `gpt-5.1`
   - Embeddings: `text-embedding-3-small`
   - Image: `gpt-image-1-mini`
-- **Search**: Azure AI Search (`shared-search-standard-eastus2`, index: `apexcoachai-dev-index`)
+- **Search/RAG**: Postgres + pgvector (table `knowledge_base_sections` in `apexcoachai_db`)
 - **Storage**: Azure Blob Storage (`stmahumsharedapps`, container: `apexcoachai`) in `rg-shared-data`
 - **Deployment**:
   - Frontend: Azure Static Web App `apexcoachai` in `rg-shared-web` (Free SKU)
@@ -79,11 +79,6 @@ AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small
 # PostgreSQL
 DATABASE_URL=postgresql://<user>:<pass>@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apexcoachai?sslmode=require
 DIRECT_URL=postgresql://<user>:<pass>@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apexcoachai?sslmode=require
-
-# Azure AI Search
-AZURE_SEARCH_ENDPOINT=https://shared-search-standard-eastus2.search.windows.net
-AZURE_SEARCH_API_KEY=<your-key>
-AZURE_SEARCH_INDEX_NAME=idx-apexcoachai-primary
 
 # Azure Storage
 AZURE_STORAGE_ACCOUNT_NAME=stmahumsharedapps
@@ -275,7 +270,7 @@ See [`.github/copilot-instructions.md`](./.github/copilot-instructions.md) for d
 
 - Verify document format is supported (PDF, text, video transcripts)
 - Check Azure Storage connection string is correct
-- Verify Azure AI Search index exists and is configured
+- Verify Azure PostgreSQL connection is correct
 
 **For more help**:
 
@@ -338,7 +333,7 @@ ApexCoachAI runs on the **MahumTech Shared Azure Platform**.
 
 | Resource Group             | Purpose                                                                          |
 | :------------------------- | :------------------------------------------------------------------------------- |
-| `rg-shared-ai`             | Azure OpenAI `shared-openai-eastus2`, AI Search `shared-search-standard-eastus2` |
+| `rg-shared-ai`             | Azure OpenAI `shared-openai-eastus2`                                            |
 | `rg-shared-data`           | PostgreSQL `pg-shared-apps-eastus2`, Storage `stmahumsharedapps`                 |
 | `rg-shared-container-apps` | Container Apps environments, ACR `acrsharedapps`                                 |
 | `rg-shared-web`            | Static Web Apps                                                                  |
@@ -351,7 +346,7 @@ App-specific resources (all on shared services):
 | :------------- | :------------------------ | :------------------------------- |
 | Database       | `apexcoachai_db`          | `pg-shared-apps-eastus2`         |
 | Blob Container | `apexcoachai`             | `stmahumsharedapps`              |
-| Search Index   | `idx-apexcoachai-primary` | `shared-search-standard-eastus2` |
+| RAG Vectors    | `knowledge_base_sections` | `pg-shared-apps-eastus2`         |
 | Static Web App | `apexcoachai`             | `rg-shared-web`                  |
 | Container App  | `ca-apexcoachai-api`      | `rg-shared-container-apps`       |
 

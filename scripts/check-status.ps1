@@ -101,7 +101,6 @@ if (Test-Path ".env") {
         "DATABASE_URL",
         "DIRECT_URL",
         "AZURE_OPENAI_API_KEY",
-        "AZURE_SEARCH_API_KEY",
         "AZURE_STORAGE_CONNECTION_STRING",
         "JWT_SECRET"
     )

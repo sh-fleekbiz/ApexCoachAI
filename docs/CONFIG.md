@@ -126,25 +126,14 @@ postgresql://[user]:[password]@[host]:[port]/[database]?[options]
 - In most cases, they can be the same value
 - Always use `sslmode=require` for Azure PostgreSQL
 
-#### Azure AI Search Configuration
+#### Search / RAG Storage
 
-| Variable                  | Type   | Required | Default                   | Description                      |
-| ------------------------- | ------ | -------- | ------------------------- | -------------------------------- |
-| `AZURE_SEARCH_ENDPOINT`   | URL    | Yes      | -                         | Azure AI Search service endpoint |
-| `AZURE_SEARCH_API_KEY`    | String | Yes      | -                         | Azure AI Search admin key        |
-| `AZURE_SEARCH_INDEX_NAME` | String | Yes      | `idx-apexcoachai-primary` | Search index name                |
+Search and retrieval use **Postgres + pgvector** in the shared database:
 
-**Example**:
+- Table: `knowledge_base_sections`
+- Database: `apexcoachai` on `pg-shared-apps-eastus2`
 
-```env
-AZURE_SEARCH_ENDPOINT=https://shared-search-standard-eastus2.search.windows.net/
-AZURE_SEARCH_API_KEY=ABC123DEF456...
-AZURE_SEARCH_INDEX_NAME=idx-apexcoachai-primary
-```
-
-**Finding Values**:
-
-- Azure Portal → `shared-search-standard-eastus2` → Keys → Admin Key
+No additional Azure Search env vars are required.
 
 #### Azure Storage Configuration
 
@@ -228,13 +217,7 @@ AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small
 AZURE_OPENAI_API_VERSION=2025-01-01-preview
 ```
 
-#### Azure AI Search (same as search API)
-
-```env
-AZURE_SEARCH_ENDPOINT=https://shared-search-standard-eastus2.search.windows.net/
-AZURE_SEARCH_API_KEY=<your_key>
-AZURE_SEARCH_INDEX_NAME=idx-apexcoachai-primary
-```
+Search data is stored in Postgres via the indexer service and queried by RAG approaches using pgvector.
 
 #### Azure Storage (same as search API)
 
@@ -253,18 +236,14 @@ PORT=3001
 
 ### Legacy Variables (Still Supported)
 
-The indexer may still reference these deprecated variables:
+The indexer may still reference these deprecated variables for Azure OpenAI and storage:
 
 ```env
 AZURE_OPENAI_SERVICE=shared-openai-eastus2
 AZURE_OPENAI_CHATGPT_DEPLOYMENT=gpt-4o
 AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-3-small
-AZURE_SEARCH_INDEX=idx-apexcoachai-primary
-AZURE_SEARCH_SERVICE=shared-search-standard-eastus2
 AZURE_STORAGE_ACCOUNT=stmahumsharedapps
 ```
-
-**Migration Plan**: These will be removed in a future version. Update code to use standardized variable names.
 
 ---
 
@@ -367,14 +346,13 @@ Resource Group: rg-shared-data
 - Firewall rules required for external access
 - Contact DBA to add your IP
 
-#### Azure AI Search
+#### Search / RAG (Postgres + pgvector)
 
 ```
-Service: shared-search-standard-eastus2
-Endpoint: https://shared-search-standard-eastus2.search.windows.net/
-Index: idx-apexcoachai-primary
-SKU: Standard
-Resource Group: rg-shared-ai
+Database: apexcoachai (Postgres)
+Table: knowledge_base_sections
+Server: pg-shared-apps-eastus2.postgres.database.azure.com
+Resource Group: rg-shared-data
 ```
 
 #### Azure Storage
@@ -533,7 +511,6 @@ REQUIRED_VARS=(
   "AZURE_OPENAI_API_KEY"
   "DATABASE_URL"
   "DIRECT_URL"
-  "AZURE_SEARCH_API_KEY"
   "AZURE_STORAGE_CONNECTION_STRING"
   "JWT_SECRET"
 )
@@ -565,9 +542,6 @@ psql "$DATABASE_URL" -c "SELECT version();"
 curl "$AZURE_OPENAI_ENDPOINT/openai/deployments?api-version=2025-01-01-preview" \
   -H "api-key: $AZURE_OPENAI_API_KEY"
 
-# Test Azure Search
-curl "$AZURE_SEARCH_ENDPOINT/indexes?api-version=2024-07-01" \
-  -H "api-key: $AZURE_SEARCH_API_KEY"
 ```
 
 ---
@@ -630,11 +604,6 @@ AZURE_OPENAI_API_VERSION=2025-01-01-preview
 # Database
 DATABASE_URL=postgresql://user:pass@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apexcoachai?sslmode=require
 DIRECT_URL=postgresql://user:pass@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apexcoachai?sslmode=require
-
-# Azure AI Search
-AZURE_SEARCH_ENDPOINT=https://shared-search-standard-eastus2.search.windows.net/
-AZURE_SEARCH_API_KEY=<your_key>
-AZURE_SEARCH_INDEX_NAME=idx-apexcoachai-primary
 
 # Azure Storage
 AZURE_STORAGE_ACCOUNT_NAME=stmahumsharedapps

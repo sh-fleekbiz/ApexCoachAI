@@ -29,21 +29,6 @@
     "webAppLocation": {
       "value": "${AZURE_WEBAPP_LOCATION=eastus2}"
     },
-    "searchIndexName": {
-      "value": "${AZURE_SEARCH_INDEX=gptkbindex}"
-    },
-    "searchServiceName": {
-      "value": "${AZURE_SEARCH_SERVICE}"
-    },
-    "searchServiceResourceGroupName": {
-      "value": "${AZURE_SEARCH_SERVICE_RESOURCE_GROUP}"
-    },
-    "searchServiceLocation": {
-      "value": "${AZURE_SEARCH_SERVICE_LOCATION}"
-    },
-    "searchServiceSkuName": {
-      "value": "${AZURE_SEARCH_SERVICE_SKU=standard}"
-    },
     "storageAccountName": {
       "value": "${AZURE_STORAGE_ACCOUNT}"
     },

@@ -12,9 +12,8 @@ RUN pnpm install --frozen-lockfile --filter indexer...
 FROM base AS build
 COPY . .
 COPY --from=deps /app/node_modules ./node_modules
-WORKDIR /app
-RUN pnpm run build --filter=indexer
-
+# Install all dependencies including devDependencies for build
+RUN pnpm install --frozen-lockfile --filter indexer...
 FROM base AS runtime
 ENV NODE_ENV=production
 WORKDIR /app

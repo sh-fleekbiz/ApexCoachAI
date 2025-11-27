@@ -63,16 +63,27 @@ if (-not (Test-Path "dist")) {
     throw "Build failed - 'dist' directory not found."
 }
 
-Pop-Location
-
-# Deploy to Azure Static Web App
-Write-Host "Deploying to Azure Static Web App '$StaticWebAppName' in '$StaticWebAppResourceGroup'..." -ForegroundColor Yellow
-
-az staticwebapp deploy `
+Write-Host "Fetching Static Web App deployment token..." -ForegroundColor Yellow
+$deploymentToken = az staticwebapp secrets list `
   --name $StaticWebAppName `
   --resource-group $StaticWebAppResourceGroup `
-  --source apps/frontend/dist `
-  --no-wait
+  --query "properties.apiKey" -o tsv
+
+if (-not $deploymentToken) {
+  throw "Failed to retrieve deployment token for Static Web App '$StaticWebAppName'."
+}
+
+if (-not (Get-Command "swa" -ErrorAction SilentlyContinue)) {
+  throw "Static Web Apps CLI 'swa' is not installed. Install it with: npm install -g @azure/static-web-apps-cli"
+}
+
+Write-Host "Deploying to Azure Static Web App '$StaticWebAppName' using SWA CLI..." -ForegroundColor Yellow
+swa deploy ./dist `
+  --deployment-token $deploymentToken `
+  --app-name $StaticWebAppName `
+  --env production
+
+Pop-Location
 
 Write-Host "=== Frontend deployment script completed ===" -ForegroundColor Green
 Write-Host "Frontend URL: https://apexcoachai.shtrial.com" -ForegroundColor Green

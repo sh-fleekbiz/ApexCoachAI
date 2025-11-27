@@ -51,9 +51,42 @@ Verifies:
 
 ---
 
-## Deployment Scripts (Bash - Linux/Mac/WSL)
+## Environment Configuration Scripts (PowerShell - Windows)
 
-### deploy-backend.sh
+### configure-env-variables.ps1
+
+**Configure environment variables for all services**
+
+Performs:
+
+- Prompts for Azure credentials (if not using local .env files)
+- Configures Container Apps environment variables (backend API and indexer)
+- Configures Static Web App settings (frontend)
+- Resolves backend API URL automatically
+- Verifies configuration after setup
+
+**Usage**:
+
+```powershell
+# Interactive mode (prompts for credentials)
+.\scripts\configure-env-variables.ps1
+
+# Using local .env files
+.\scripts\configure-env-variables.ps1 -UseLocalEnvFiles
+```
+
+**What it configures**:
+
+- **Backend Services**: DATABASE_URL, Azure OpenAI, Azure Search, Storage, JWT secret, etc.
+- **Frontend**: API URLs (VITE_SEARCH_API_URI, BACKEND_URI, etc.)
+
+**When to use**: Before deploying, when updating credentials, or when environment variables are missing
+
+---
+
+## Deployment Scripts
+
+### deploy-backend.ps1 (PowerShell - Windows)
 
 **Deploy backend services to Azure Container Apps**
 
@@ -66,9 +99,8 @@ Performs:
 
 **Usage**:
 
-```bash
-chmod +x scripts/deploy-backend.sh
-./scripts/deploy-backend.sh
+```powershell
+.\scripts\deploy-backend.ps1
 ```
 
 **Prerequisites**:
@@ -76,19 +108,59 @@ chmod +x scripts/deploy-backend.sh
 - Azure CLI authenticated
 - Docker installed
 - Access to Azure Container Registry
+- Environment variables configured (run `configure-env-variables.ps1` first)
 
 ---
 
-### deploy-frontend.sh
+### deploy-frontend.ps1 (PowerShell - Windows)
 
 **Deploy frontend to Azure Static Web App**
 
 Performs:
 
+- Resolves backend API URL from Container Apps
 - Installs dependencies
-- Builds production bundle
+- Builds production bundle with correct API URL
 - Deploys to Azure Static Web App
 - Verifies deployment
+
+**Usage**:
+
+```powershell
+.\scripts\deploy-frontend.ps1
+```
+
+**Prerequisites**:
+
+- Node.js and pnpm installed
+- Azure CLI authenticated
+- SWA CLI installed (`npm install -g @azure/static-web-apps-cli`)
+- Environment variables configured (run `configure-env-variables.ps1` first)
+
+---
+
+### deploy-backend.sh (Bash - Linux/Mac/WSL)
+
+**Deploy backend services to Azure Container Apps**
+
+Legacy bash version of deployment script.
+
+**Usage**:
+
+```bash
+chmod +x scripts/deploy-backend.sh
+./scripts/deploy-backend.sh
+```
+
+**Note**: PowerShell version is recommended for Windows.
+
+---
+
+### deploy-frontend.sh (Bash - Linux/Mac/WSL)
+
+**Deploy frontend to Azure Static Web App**
+
+Legacy bash version of deployment script.
 
 **Usage**:
 
@@ -97,15 +169,11 @@ chmod +x scripts/deploy-frontend.sh
 ./scripts/deploy-frontend.sh
 ```
 
-**Prerequisites**:
-
-- Node.js and pnpm installed
-- Azure CLI authenticated
-- SWA CLI or deployment token
+**Note**: PowerShell version is recommended for Windows.
 
 ---
 
-### deploy-full.sh
+### deploy-full.sh (Bash - Linux/Mac/WSL)
 
 **Full-stack deployment (backend + frontend)**
 
@@ -124,6 +192,14 @@ chmod +x scripts/deploy-full.sh
 ```
 
 **When to use**: Complete application deployment
+
+**Note**: For Windows, run scripts separately:
+
+```powershell
+.\scripts\configure-env-variables.ps1
+.\scripts\deploy-backend.ps1
+.\scripts\deploy-frontend.ps1
+```
 
 ---
 
@@ -205,8 +281,23 @@ chmod +x scripts/smoke-test.sh
 
 ### Deploy to Production
 
+```powershell
+# Windows (Recommended)
+# Step 1: Configure environment variables
+.\scripts\configure-env-variables.ps1
+
+# Step 2: Deploy backend services
+.\scripts\deploy-backend.ps1
+
+# Step 3: Deploy frontend
+.\scripts\deploy-frontend.ps1
+
+# Step 4: Verify deployment
+bash .\scripts\smoke-test.sh
+```
+
 ```bash
-# Linux/Mac/WSL
+# Linux/Mac/WSL (Alternative)
 ./scripts/deploy-full.sh
 
 # Then verify
@@ -264,8 +355,9 @@ When adding scripts to this directory:
 
 ## Documentation References
 
+- **Deployment Guide**: `docs/DEPLOYMENT_GUIDE.md` - **START HERE for deployment**
 - **Local Development**: `docs/demo-guide.md`
-- **Deployment**: `docs/deployment-manual.md`
+- **Manual Deployment**: `docs/deployment-manual.md`
 - **Configuration**: `docs/CONFIG.md`
 - **Issues**: `docs/apexcoachai_issues.md`
 

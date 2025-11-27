@@ -2,8 +2,7 @@ param(
     [string]$SubscriptionId = "44e77ffe-2c39-4726-b6f0-2c733c7ffe78",
     [string]$AcrName = "acrsharedapps",
     [string]$ResourceGroup = "rg-shared-container-apps",
-    [string]$ApiAppName = "apexcoachai-api",
-    [string]$IndexerAppName = "apexcoachai-indexer"
+    [string]$ApiAppName = "apexcoachai-api"
 )
 
 $ErrorActionPreference = "Stop"
@@ -21,7 +20,8 @@ foreach ($cmd in @("az", "docker")) {
 Write-Host "Checking Azure CLI login..." -ForegroundColor Yellow
 try {
     az account show | Out-Null
-} catch {
+}
+catch {
     az login | Out-Null
 }
 
@@ -40,31 +40,18 @@ az acr login --name $AcrName | Out-Null
 
 $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
 
-# Build and push search API image
-Write-Host "Building search API image..." -ForegroundColor Green
+# Build and push backend API image
+Write-Host "Building backend API image..." -ForegroundColor Green
 docker build `
-  --file apps/backend/search/Dockerfile `
-  --tag "$AcrName.azurecr.io/apexcoachai-api:latest" `
-  --tag "$AcrName.azurecr.io/apexcoachai-api:$timestamp" `
-  --platform linux/amd64 `
-  .
+    --file apps/backend/search/Dockerfile `
+    --tag "$AcrName.azurecr.io/apexcoachai-api:latest" `
+    --tag "$AcrName.azurecr.io/apexcoachai-api:$timestamp" `
+    --platform linux/amd64 `
+    .
 
-Write-Host "Pushing search API image..." -ForegroundColor Green
+Write-Host "Pushing backend API image..." -ForegroundColor Green
 docker push "$AcrName.azurecr.io/apexcoachai-api:latest"
 docker push "$AcrName.azurecr.io/apexcoachai-api:$timestamp"
-
-# Build and push indexer image
-Write-Host "Building indexer image..." -ForegroundColor Green
-docker build `
-  --file apps/backend/indexer/Dockerfile `
-  --tag "$AcrName.azurecr.io/apexcoachai-indexer:latest" `
-  --tag "$AcrName.azurecr.io/apexcoachai-indexer:$timestamp" `
-  --platform linux/amd64 `
-  .
-
-Write-Host "Pushing indexer image..." -ForegroundColor Green
-docker push "$AcrName.azurecr.io/apexcoachai-indexer:latest"
-docker push "$AcrName.azurecr.io/apexcoachai-indexer:$timestamp"
 
 # Helper to run az containerapp update and surface 'not found' clearly
 function Update-ContainerAppImage {
@@ -80,15 +67,14 @@ function Update-ContainerAppImage {
         --image $Image 2>&1
 
     if ($LASTEXITCODE -ne 0) {
-        Write-Warning "Failed to update Container App '$Name'. Raw output:" 
+        Write-Warning "Failed to update Container App '$Name'. Raw output:"
         Write-Host $updateResult
         Write-Warning "If the app does not exist yet, create it once in 'rg-shared-container-apps' using env 'cae-shared-apps-prod' and image $Image, then re-run this script."
     }
 }
 
-# Update Container Apps (if they exist)
+# Update Container App
 Update-ContainerAppImage -Name $ApiAppName -Image "$AcrName.azurecr.io/apexcoachai-api:latest"
-Update-ContainerAppImage -Name $IndexerAppName -Image "$AcrName.azurecr.io/apexcoachai-indexer:latest"
 
 Write-Host "=== Backend deployment script completed ===" -ForegroundColor Green
 Write-Host "Images tagged with: latest, $timestamp" -ForegroundColor Green

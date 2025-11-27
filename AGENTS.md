@@ -26,7 +26,7 @@ You will use these existing resources for all deployments:
 | Service | Resource Group | Resource Name |
 | :--- | :--- | :--- |
 | **AI / LLM (OpenAI)** | `rg-shared-ai` | `shared-openai-eastus2` |
-| **AI Search** | `rg-shared-ai` | `shared-search-standard-eastus2` |
+| **AI Search** | `rg-shared-ai` | `shared-search-standard-eastus2` (shared, not used by ApexCoachAI for RAG) |
 | **PostgreSQL Host** | `rg-shared-data` | `pg-shared-apps-eastus2` |
 | **Blob Storage** | `rg-shared-data` | `stmahumsharedapps` |
 | **Container Registry** | `rg-shared-container-apps` | `acrsharedapps` |
@@ -45,7 +45,7 @@ You are authorized to manage **only** these specific child resources for `apexco
 | :--- | :--- | :--- |
 | **Database** | `apexcoachai` | `pg-shared-apps-eastus2` |
 | **Blob Container** | `apexcoachai` | `stmahumsharedapps` |
-| **Search Index** | `idx-apexcoachai-primary` | `shared-search-standard-eastus2` |
+| **RAG Vectors Table** | `knowledge_base_sections` | `pg-shared-apps-eastus2` |
 | **Static Web App** | `apexcoachai` | `rg-shared-web` |
 | **Container App (API)** | `ca-apexcoachai-api` | `rg-shared-container-apps` |
 | **Container Images** | `acrsharedapps.azurecr.io/apexcoachai-api:*` | `acrsharedapps` |
@@ -103,7 +103,7 @@ You are authorized to manage **only** these specific child resources for `apexco
 - Reuse the shared resource groups (for example: rg-shared-ai, rg-shared-data, rg-shared-apps, rg-shared-web, rg-shared-logs).
 - For databases, use the shared Postgres server (e.g. pg-shared-apps-eastus2) and create or use a database named after this app's slug ("apexcoachai").
 - For storage, reuse the shared storage account and create/reuse containers named after this app's slug.
-- For AI and search, use shared Azure OpenAI and Azure Search endpoints defined in the environment (do not hard-code secrets in source).
+- For AI and RAG search, use shared Azure OpenAI for embeddings and Postgres + pgvector in `apexcoachai` (no Azure Search env vars are required).
 
 ---
 
@@ -162,11 +162,6 @@ AZURE_OPENAI_API_KEY=***
 AZURE_OPENAI_API_VERSION=2025-01-01-preview
 AZURE_OPENAI_DEPLOYMENT_CHAT=gpt-4o
 AZURE_OPENAI_DEPLOYMENT_EMBEDDING=text-embedding-3-small
-
-# Azure AI Search
-AZURE_SEARCH_ENDPOINT=https://shared-search-standard-eastus2.search.windows.net/
-AZURE_SEARCH_API_KEY=***
-AZURE_SEARCH_INDEX=idx-apexcoachai-primary
 
 # Azure Blob Storage
 AZURE_STORAGE_CONNECTION_STRING=***
