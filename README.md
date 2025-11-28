@@ -20,8 +20,8 @@ Apex Coach AI transforms proprietary coaching content (videos, documents, traini
 - **Frontend**: React, TypeScript, TailwindCSS, Vite
 - **Backend**: Fastify (Node.js, TypeScript)
 - **Database**: Azure PostgreSQL (`pg-shared-apps-eastus2`, database: `apexcoachai_db`) with pgvector
-- **AI**: Azure OpenAI exclusively
-  - Chat: `gpt-5.1`
+- **AI**: Azure OpenAI Responses API (v1 GA) exclusively
+  - Chat/Code: `gpt-5.1-codex-mini` (via Responses API)
   - Embeddings: `text-embedding-3-small`
   - Image: `gpt-image-1-mini`
 - **Search/RAG**: Postgres + pgvector (table `knowledge_base_sections` in `apexcoachai_db`)
@@ -70,11 +70,16 @@ The `pretest:e2e` hook automatically runs `pnpm exec playwright install` to ensu
 See `docs/DEPLOYMENT_GUIDE.md` for the complete environment variable schema and detailed setup instructions. Key variables:
 
 ```env
-# Azure OpenAI
-AZURE_OPENAI_ENDPOINT=https://shared-openai-eastus2.openai.azure.com/
+# Azure OpenAI Responses API (v1 GA)
+AZURE_OPENAI_ENDPOINT=https://shared-openai-eastus2.cognitiveservices.azure.com/
 AZURE_OPENAI_API_KEY=<your-key>
-AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-4o
-AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small
+AZURE_OPENAI_RESPONSES_URL=https://shared-openai-eastus2.cognitiveservices.azure.com/openai/v1/responses
+AZURE_OPENAI_EMBEDDING_ENDPOINT=https://shared-openai-eastus2.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2023-05-15
+
+# Model Configuration
+AI_MODEL_GENERAL=gpt-5.1-codex-mini
+AI_MODEL_EMBEDDING=text-embedding-3-small
+AI_MODEL_IMAGE=gpt-image-1-mini
 
 # PostgreSQL
 DATABASE_URL=postgresql://<user>:<pass>@pg-shared-apps-eastus2.postgres.database.azure.com:5432/apexcoachai?sslmode=require

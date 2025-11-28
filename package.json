@@ -31,7 +31,8 @@
     "docker:build": "pnpm docker:build:web && pnpm docker:build:indexer && pnpm docker:build:search",
     "docker:build:web": "cd apps/web && docker build -t apexcoachai-web -f Dockerfile ../..",
     "docker:build:indexer": "cd apps/services/indexer && docker build -t apexcoachai-indexer -f Dockerfile ../..",
-    "docker:build:search": "cd apps/services/search && docker build -t apexcoachai-search -f Dockerfile ../.."
+    "docker:build:search": "cd apps/services/search && docker build -t apexcoachai-search -f Dockerfile ../..",
+    "validate:responses-api": "tsx scripts/validate-responses-api.ts"
   },
   "devDependencies": {
     "@playwright/test": "latest",
