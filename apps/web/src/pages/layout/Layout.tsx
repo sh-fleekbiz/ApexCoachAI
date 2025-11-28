@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { apiBaseUrl } from '../../api/index.js';
+import { apiBaseUrl } from '../../services/index.js';
 import { OnboardingTour } from '../../components/Onboarding/OnboardingTour.tsx';
 import { useAuth } from '../../contexts/AuthContext.js';
 import Settings from '../settings/Settings.tsx';

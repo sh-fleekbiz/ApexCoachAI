@@ -19,7 +19,7 @@ import {
   RetrievalMode,
   apiBaseUrl,
   type RequestOverrides,
-} from '../../api/index.js';
+} from '../../services/index.js';
 import { SettingsButton } from '../../components/SettingsButton/SettingsButton.jsx';
 
 import { toolTipText, toolTipTextCalloutProps } from '../../i18n/tooltips.js';

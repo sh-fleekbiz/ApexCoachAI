@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getLibraryResources } from '../../api/index.js';
+import { getLibraryResources } from '../../services/index.js';
 import { ResourceCard } from '../../components/library/ResourceCard.js';
 import { ResourceDetail } from '../../components/library/ResourceDetail.js';
 import { UploadResource } from '../../components/library/UploadResource.js';

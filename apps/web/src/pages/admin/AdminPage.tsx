@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { apiBaseUrl } from '../../api/index.js';
+import { apiBaseUrl } from '../../services/index.js';
 import styles from './AdminPage.module.css';
 
 interface User {

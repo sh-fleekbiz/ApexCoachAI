@@ -5,7 +5,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { apiBaseUrl } from '../api/index.js';
+import { apiBaseUrl } from '../services/index.js';
 
 export interface User {
   id: number;

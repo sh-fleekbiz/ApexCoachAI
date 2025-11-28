@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getUserSettings, updateUserSettings } from '../../api/index.js';
+import { getUserSettings, updateUserSettings } from '../../services/index.js';
 import { useAuth } from '../../contexts/AuthContext.js';
 import { usePersonality } from '../../contexts/PersonalityContext.js';
 import styles from './SettingsPage.module.css';

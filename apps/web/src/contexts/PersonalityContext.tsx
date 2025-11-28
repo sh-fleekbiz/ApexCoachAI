@@ -5,7 +5,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { getMetaPrompts } from '../api/index.ts';
+import { getMetaPrompts } from '../services/index.ts';
 
 interface Personality {
   id: number;

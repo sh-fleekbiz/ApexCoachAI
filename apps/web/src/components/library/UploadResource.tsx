@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { createLibraryResource } from '../../api/index.js';
+import { createLibraryResource } from '../../services/index.js';
 import styles from './UploadResource.module.css';
 
 interface UploadResourceProps {

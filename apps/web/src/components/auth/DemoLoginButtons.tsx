@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { apiBaseUrl } from '../../api/index.js';
+import { apiBaseUrl } from '../../services/index.js';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface DemoRole {

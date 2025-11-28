@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { apiBaseUrl } from '../../api/index.js';
+import { apiBaseUrl } from '../../services/index.js';
 import styles from './UploadDocument.module.css';
 
 interface UploadDocumentProps {

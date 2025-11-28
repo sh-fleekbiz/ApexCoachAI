@@ -16,8 +16,8 @@ import {
   apiBaseUrl,
   getChatMessages,
   type RequestOverrides,
-} from '../../api/index.js';
-import type { Citation } from '../../api/models.js';
+} from '../../services/index.js';
+import type { Citation } from '../../services/models.js';
 import { SettingsButton } from '../../components/SettingsButton/index.js';
 import type { CustomStylesState } from '../../components/SettingsStyles/SettingsStyles.js';
 import { SettingsStyles } from '../../components/SettingsStyles/SettingsStyles.js';
