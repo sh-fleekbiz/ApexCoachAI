@@ -7,7 +7,17 @@
    - **Database:** PostgreSQL with `pgvector`.
    - **Infrastructure:** Shared Azure Resources (Read-Only).
 
-2. **Coding Standards:**
+2. **Repository Structure & Governance:**
+
+   - **Follow Canonical Structure:** Use `apps/web/` for frontend, `apps/services/` for backend
+   - **Forbidden Folders:** Never create `archive/`, `old/`, `backup/`, `temp/`, `misc/`, `legacy/`
+   - **No Nested READMEs:** Don't create README.md files that just describe folder purpose
+   - **No Dumping Grounds:** Avoid `utils/`, `common/`, `shared/` folders - use domain-specific structure
+   - **Naming Conventions:** PascalCase for components, kebab-case for files
+   - **Delete More Than You Add:** Always remove at least as much code as you add
+   - **No Archives:** Delete unused code, don't create archive folders
+
+3. **Coding Standards:**
 
    - **Do Not** suggest creating Azure Resources (Terraform/Bicep).
    - **Do Not** use Azure AI Search SDKs.
@@ -17,19 +27,50 @@
    - **Do** use `api-key` header for authentication (not Bearer token).
    - **Do** use `max_output_tokens` parameter (not `max_tokens` or `max_completion_tokens`).
 
-3. **Frontend:**
+4. **Frontend:**
 
    - Never expose `AZURE_OPENAI_API_KEY`.
-   - API calls must go through the Next.js/Express backend.
+   - API calls must go through the backend services.
+   - Place components in `apps/web/src/components/`
+   - Place pages in `apps/web/src/pages/`
+   - Place hooks in `apps/web/src/hooks/` (create if needed)
 
-4. **API Pattern:**
+5. **Backend:**
+
+   - Place routes in `apps/services/[service]/src/routes/`
+   - Place business logic in `apps/services/[service]/src/services/`
+   - Place utilities in `apps/services/[service]/src/lib/`
+   - Use approved dependencies only (see AGENTS.md)
+
+6. **API Pattern:**
 
    - Use stateful Responses API with `previous_response_id` for conversations.
    - Store response IDs on the client/backend to maintain conversation state.
    - Use `/openai/v1/responses` endpoint (v1 GA, no api-version param).
 
-5. **Vector Search:**
+7. **Vector Search:**
 
    - Use `pgvector` extension on shared Postgres database.
    - Generate embeddings with `text-embedding-3-small`.
    - Store and query vectors in the `apexcoachai` database.
+
+8. **Code Quality:**
+
+   - Never commit console.log statements in production code
+   - Never leave TODO comments (implement or remove)
+   - Never commit commented-out code blocks
+   - Keep files under 500KB unless explicitly approved
+
+9. **Documentation:**
+
+   - Update existing docs instead of creating new ones
+   - Document new environment variables in `.env.example`
+   - Never create documentation archives or legacy folders
+
+10. **Dependencies:**
+
+    - Use only approved dependencies from whitelist
+    - Audit new dependencies before adding
+    - Remove unused dependencies immediately
+
+**See AGENTS.md for complete governance rules and REPOSITORY_STRUCTURE.md for detailed structure guidelines.**
