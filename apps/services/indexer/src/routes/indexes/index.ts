@@ -1,4 +1,5 @@
 import { type FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts';
+import { indexingService } from '../../services/indexing-service.js';
 
 export interface IndexFileOptionsField {
   category?: string;
@@ -33,7 +34,7 @@ const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _options): Promis
     handler: async function (request, reply) {
       const { name } = request.body;
       try {
-        await fastify.indexer.createSearchIndex(name);
+        await indexingService.createIndex(fastify.indexer, name);
         reply.code(204);
       } catch (_error: unknown) {
         const error = _error as Error;
@@ -67,7 +68,7 @@ const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _options): Promis
     handler: async function (request, reply) {
       const { name } = request.params;
       try {
-        await fastify.indexer.deleteSearchIndex(name);
+        await indexingService.deleteIndex(fastify.indexer, name);
         reply.code(204);
       } catch (_error: unknown) {
         const error = _error as Error;
@@ -136,7 +137,7 @@ const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _options): Promis
         };
         if (wait) {
           fastify.log.info(`Indexing file "${filesInfos.filename}" synchronously`);
-          await fastify.indexer.indexFile(request.params.name, filesInfos, {
+          await indexingService.indexFile(fastify.indexer, request.params.name, filesInfos, {
             useVectors: fileOptions?.useVectors ?? true,
             uploadToStorage: fileOptions?.uploadToStorage ?? true,
             throwErrors: true,
@@ -144,7 +145,7 @@ const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _options): Promis
           reply.code(204);
         } else {
           // Do not await this, we want to return 202 immediately
-          fastify.indexer.indexFile(request.params.name, filesInfos);
+          indexingService.indexFile(fastify.indexer, request.params.name, filesInfos);
           reply.code(202);
         }
       } catch (_error: unknown) {
@@ -182,7 +183,7 @@ const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _options): Promis
     handler: async function (request, reply) {
       const { name, filename } = request.params;
       try {
-        await fastify.indexer.deleteFromIndex(name, filename);
+        await indexingService.deleteFromIndex(fastify.indexer, name, filename);
         reply.code(204);
       } catch (_error: unknown) {
         const error = _error as Error;

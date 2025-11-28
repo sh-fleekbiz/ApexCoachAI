@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "@playwright/test": "latest",
-    "concurrently": "^9.1.2"
+    "concurrently": "^9.1.2",
+    "tsx": "^4.19.2"
   }
 }
