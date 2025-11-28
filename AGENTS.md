@@ -16,6 +16,79 @@ This repo uses shared Azure infrastructure and the **Azure OpenAI Responses API*
    - **Do not** send full message history arrays.
 6. **NO FRONTEND KEYS:** Never expose `AZURE_OPENAI_API_KEY` to client-side code.
 
+## 🚫 REPOSITORY CLEANLINESS RULES (NEVER VIOLATE)
+
+### Forbidden Folders & Files
+- **NEVER** create: `archive/`, `old/`, `backup/`, `temp/`, `misc/`, `legacy/`
+- **NEVER** create nested `README.md` files that just describe folder purpose
+- **NEVER** create `.github/instructions/` - AI prompts belong in external wikis
+- **NEVER** create duplicate configuration files
+
+### Forbidden Code Patterns
+- **NEVER** commit commented-out code blocks
+- **NEVER** add `console.log` statements in production code
+- **NEVER** leave TODO comments older than 2 weeks
+- **NEVER** commit experimental/POC/spike code to main repo
+- **NEVER** commit files larger than 500KB without explicit approval
+
+### Documentation Rules
+- **NEVER** create new documentation files - update existing ones
+- **ALWAYS** update `DEPLOYMENT_GUIDE.md` for deployment changes
+- **ALWAYS** document new environment variables in `.env.example`
+
+## ✅ REQUIRED PATTERNS
+
+### Canonical Structure
+```
+apps/web/src/          # Frontend (React/Vite)
+├── components/        # Reusable UI components
+├── features/          # Feature-based organization
+├── pages/             # Route components
+├── hooks/             # Custom React hooks
+├── services/          # API clients
+├── contexts/          # React contexts/state
+└── types/             # TypeScript types
+
+apps/services/         # Backend services
+├── indexer/          # Document indexing service
+└── search/           # AI search service
+```
+
+### Naming Conventions
+- **Components**: PascalCase (`PersonalityCard.tsx`)
+- **Files**: kebab-case (`chat-service.ts`)
+- **Folders**: kebab-case for features, PascalCase for domains
+
+### Dependency Management
+- **Use approved whitelist only** - see REPOSITORY_STRUCTURE.md
+- **Audit dependencies** before adding new ones
+- **Remove unused dependencies** immediately
+
+## 📋 AI AGENT WORKFLOW
+
+### Before Generating Code
+1. Check if code belongs in canonical structure
+2. Verify dependencies are approved
+3. Identify which existing docs need updates
+
+### After Generating Code
+1. Delete at least as much code as you add
+2. Remove console.log, commented code, old TODOs
+3. Update existing single-source-of-truth docs
+4. Document new environment variables in `.env.example`
+
+## 🚨 ENFORCEMENT
+
+- **GitHub Actions** auto-reject forbidden patterns
+- **PR template** requires cleanup checklist
+- **Code review** validates compliance
+- **Automated scans** check for anti-patterns
+
+---
+
+**AI ASSISTANTS MUST FOLLOW THESE RULES EXACTLY**  
+**VIOLATIONS WILL CAUSE AUTOMATED REJECTION**
+
 ## 🏗️ Shared Architecture
 
 * **Database:** Shared Postgres (`apexcoachai` database on `pg-shared-apps-eastus2`)
