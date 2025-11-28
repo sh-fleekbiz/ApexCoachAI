@@ -40,7 +40,7 @@ az acr login --name $ACR_NAME
 # Build and push search API
 echo -e "${GREEN}Building search API image...${NC}"
 docker build \
-  --file apps/backend/search/Dockerfile \
+  --file apps/services/search/Dockerfile \
   --tag $ACR_NAME.azurecr.io/apexcoachai-api:latest \
   --tag $ACR_NAME.azurecr.io/apexcoachai-api:$TIMESTAMP \
   --platform linux/amd64 \
@@ -53,7 +53,7 @@ docker push $ACR_NAME.azurecr.io/apexcoachai-api:$TIMESTAMP
 # Build and push indexer
 echo -e "${GREEN}Building indexer image...${NC}"
 docker build \
-  --file apps/backend/indexer/Dockerfile \
+  --file apps/services/indexer/Dockerfile \
   --tag $ACR_NAME.azurecr.io/apexcoachai-indexer:latest \
   --tag $ACR_NAME.azurecr.io/apexcoachai-indexer:$TIMESTAMP \
   --platform linux/amd64 \

@@ -39,7 +39,7 @@ else
 fi
 
 # Navigate to frontend directory
-cd apps/frontend
+cd apps/web
 
 # Install dependencies
 echo -e "${YELLOW}Installing dependencies...${NC}"

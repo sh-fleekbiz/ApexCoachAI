@@ -6,19 +6,19 @@ WORKDIR /app
 
 FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY apps/backend/search/package.json apps/backend/search/
-COPY apps/backend/search/prisma ./apps/backend/search/prisma
+COPY apps/services/search/package.json apps/services/search/
+COPY apps/services/search/prisma ./apps/services/search/prisma
 RUN pnpm install --frozen-lockfile --filter search...
 
 FROM base AS build
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/backend/search/node_modules ./apps/backend/search/node_modules
+COPY --from=deps /app/apps/services/search/node_modules ./apps/services/search/node_modules
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY apps/backend/search ./apps/backend/search
+COPY apps/services/search ./apps/services/search
 WORKDIR /app
 # Install devDependencies for build
 RUN pnpm install --frozen-lockfile --filter search...
-WORKDIR /app/apps/backend/search
+WORKDIR /app/apps/services/search
 # Generate Prisma client before building
 RUN npx prisma generate
 RUN pnpm build
@@ -32,15 +32,15 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 # Copy search app package.json and built files
-COPY apps/backend/search/package.json apps/backend/search/
-COPY apps/backend/search/prisma ./apps/backend/search/prisma
-COPY --from=build /app/apps/backend/search/dist ./apps/backend/search/dist
+COPY apps/services/search/package.json apps/services/search/
+COPY apps/services/search/prisma ./apps/services/search/prisma
+COPY --from=build /app/apps/services/search/dist ./apps/services/search/dist
 
 # Install production dependencies only
 RUN pnpm install --prod --frozen-lockfile --filter search...
 
 # Generate Prisma client
-WORKDIR /app/apps/backend/search
+WORKDIR /app/apps/services/search
 RUN npx prisma generate
 
 EXPOSE 3000

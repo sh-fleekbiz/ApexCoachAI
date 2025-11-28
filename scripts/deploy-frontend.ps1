@@ -51,7 +51,7 @@ if ($fqdn) {
 }
 
 # Build frontend
-Push-Location apps/frontend
+Push-Location apps/web
 
 Write-Host "Installing frontend dependencies..." -ForegroundColor Yellow
 pnpm install

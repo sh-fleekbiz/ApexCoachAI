@@ -5,18 +5,36 @@
   "private": true,
   "packageManager": "pnpm@9.0.0",
   "scripts": {
-    "dev": "turbo dev",
-    "build": "turbo build",
-    "test": "turbo test",
-    "start:webapp": "pnpm dev",
+    "dev": "concurrently \"pnpm --filter web dev\" \"pnpm --filter indexer dev\" \"pnpm --filter search dev\"",
+    "dev:web": "pnpm --filter web dev",
+    "dev:indexer": "pnpm --filter indexer dev",
+    "dev:search": "pnpm --filter search dev",
+    "build": "pnpm --filter web build && pnpm --filter indexer build && pnpm --filter search build",
+    "build:web": "pnpm --filter web build",
+    "build:indexer": "pnpm --filter indexer build",
+    "build:search": "pnpm --filter search build",
+    "build:services": "pnpm --filter indexer build && pnpm --filter search build",
+    "test": "pnpm --filter web test && pnpm --filter indexer test && pnpm --filter search test",
+    "test:web": "pnpm --filter web test",
+    "test:indexer": "pnpm --filter indexer test",
+    "test:search": "pnpm --filter search test",
+    "start:webapp": "pnpm dev:web",
     "pretest:e2e": "pnpm exec playwright install",
     "test:e2e": "playwright test",
     "test:e2e:smoke": "playwright test tests/e2e/smoke.spec.ts",
     "test:all": "pnpm test && pnpm test:e2e",
-    "lint": "turbo lint"
+    "lint": "pnpm --filter web lint && pnpm --filter indexer lint && pnpm --filter search lint",
+    "lint:web": "pnpm --filter web lint",
+    "lint:indexer": "pnpm --filter indexer lint",
+    "lint:search": "pnpm --filter search lint",
+    "clean": "pnpm --filter web clean && pnpm --filter indexer clean && pnpm --filter search clean",
+    "docker:build": "pnpm docker:build:web && pnpm docker:build:indexer && pnpm docker:build:search",
+    "docker:build:web": "cd apps/web && docker build -t apexcoachai-web -f Dockerfile ../..",
+    "docker:build:indexer": "cd apps/services/indexer && docker build -t apexcoachai-indexer -f Dockerfile ../..",
+    "docker:build:search": "cd apps/services/search && docker build -t apexcoachai-search -f Dockerfile ../.."
   },
   "devDependencies": {
     "@playwright/test": "latest",
-    "turbo": "^2.0.0"
+    "concurrently": "^9.1.2"
   }
 }

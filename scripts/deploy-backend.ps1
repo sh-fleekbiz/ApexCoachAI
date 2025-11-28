@@ -43,7 +43,7 @@ $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
 # Build and push backend API image
 Write-Host "Building backend API image..." -ForegroundColor Green
 docker build `
-    --file apps/backend/search/Dockerfile `
+    --file apps/services/search/Dockerfile `
     --tag "$AcrName.azurecr.io/apexcoachai-api:latest" `
     --tag "$AcrName.azurecr.io/apexcoachai-api:$timestamp" `
     --platform linux/amd64 `

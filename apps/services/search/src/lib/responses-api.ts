@@ -108,7 +108,7 @@ export async function callResponsesApi(
     throw new Error(`Responses API failed: ${response.status} ${response.statusText} - ${errorText}`);
   }
 
-  const data: ResponsesApiResponse = await response.json();
+  const data: ResponsesApiResponse = await response.json() as ResponsesApiResponse;
 
   // Parse Responses API response format
   const outputItems = data.output || [];
