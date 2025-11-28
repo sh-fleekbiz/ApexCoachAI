@@ -4,7 +4,7 @@ import {
   deleteMetaPrompt,
   getMetaPrompts,
   updateMetaPrompt,
-} from '../../../api/index.js';
+} from '../../../services/index.js';
 import { PersonalityCard } from '../../../components/personality/PersonalityCard.js';
 import { PersonalityEditor } from '../../../components/personality/PersonalityEditor.js';
 import { usePersonality } from '../../../contexts/PersonalityContext.js';

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { apiBaseUrl } from '../../../api/index.js';
+import { apiBaseUrl } from '../../../services/index.js';
 
 interface Program {
   id: number;

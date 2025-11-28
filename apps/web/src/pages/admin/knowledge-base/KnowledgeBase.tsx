@@ -7,7 +7,7 @@ import {
   getKnowledgeBaseDocuments,
   retrainKnowledgeBaseDocument,
   updateKnowledgeBaseDocument,
-} from '../../../api/index.js';
+} from '../../../services/index.js';
 import { BulkActions } from '../../../components/knowledge-base/BulkActions.js';
 import { DocumentStatusBadge } from '../../../components/knowledge-base/DocumentStatusBadge.js';
 import { EmptyKnowledgeBase } from '../../../components/knowledge-base/EmptyKnowledgeBase.js';

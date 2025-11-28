@@ -7,7 +7,7 @@ import {
   TextField,
 } from '@fluentui/react';
 import React, { useEffect, useState } from 'react';
-import { apiBaseUrl } from '../../../api/index.js';
+import { apiBaseUrl } from '../../../services/index.js';
 
 interface WhiteLabelSettings {
   id: number;
