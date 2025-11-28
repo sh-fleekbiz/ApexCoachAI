@@ -571,7 +571,7 @@ az containerapp logs show `
      az containerapp show --name apexcoachai-api `
        --resource-group rg-shared-container-apps
      ```
-   - If doesn't exist, create it first (see `docs/deployment-manual.md`)
+   - If doesn't exist, create it first following the infrastructure constraints in `AGENTS.md`
 
 ### Issue: Environment Variables Not Persisting
 
@@ -737,11 +737,9 @@ az containerapp update --name apexcoachai-api `
 
 ## Additional Resources
 
-- **Infrastructure Details**: See `AGENTS.md`
-- **Manual Deployment Steps**: See `docs/deployment-manual.md`
-- **Configuration Reference**: See `docs/CONFIG.md`
-- **Local Development**: See `docs/demo-guide.md`
-- **Known Issues**: See `docs/apexcoachai_issues.md`
+- **Infrastructure & Shared Platform Details**: See `AGENTS.md`
+- **Repository Structure & Governance**: See `REPOSITORY_STRUCTURE.md`
+- **Configuration & Deployment Reference**: This guide (`docs/DEPLOYMENT_GUIDE.md`)
 
 ---
 

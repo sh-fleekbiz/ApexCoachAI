@@ -16,6 +16,8 @@
    - **Naming Conventions:** PascalCase for components, kebab-case for files
    - **Delete More Than You Add:** Always remove at least as much code as you add
    - **No Archives:** Delete unused code, don't create archive folders
+   - **No CI/CD Changes:** Do not create or modify GitHub Actions, `.github/workflows/*`, Azure Pipelines, or any other CI/CD configuration.
+   - **No Turborepo Orchestration:** Do not introduce or expand Turborepo (or similar orchestration). Prefer simple root-level `pnpm`/`npm` scripts for local dev and build.
 
 3. **Coding Standards:**
 
@@ -73,4 +75,13 @@
     - Audit new dependencies before adding
     - Remove unused dependencies immediately
 
-**See AGENTS.md for complete governance rules and REPOSITORY_STRUCTURE.md for detailed structure guidelines.**
+11. **Deep Cleanup & Restructuring Tasks:**
+
+    - When asked to perform repo cleanup, restructuring, or tooling simplification, follow the **"Deep Repository Cleanup, Restructuring, and Tooling Simplification (Strict Governance)"** section in `AGENTS.md`.
+    - Do not create archives or legacy folders. Delete junk instead of moving it (no `archive/`, `old/`, `backup/`, `temp/`, `misc/`, `legacy/`).
+    - Keep a clear separation of frontend (`apps/web/`), backend (`apps/services/`), and any data/ML/analytics areas.
+    - Do not add or modify CI/CD pipelines, GitHub Actions, `.github/workflows/*`, or Azure DevOps pipelines as part of cleanup.
+    - When simplifying tooling, remove Turborepo-style orchestration and use root-level `pnpm`/`npm` scripts instead.
+    - Classify cleanup recommendations with P1/P2/P3 risk and group them into Phases 1–3 as defined in `AGENTS.md`.
+
+**See AGENTS.md for complete governance rules (including deep-cleanup strict governance) and REPOSITORY_STRUCTURE.md for detailed structure guidelines.**

@@ -40,10 +40,7 @@ apexcoachai/
 │           ├── prisma/         # Database schema
 │           ├── package.json
 │           └── Dockerfile
-├── data/                       # Data and ML assets
-│   ├── migrations/             # Database migrations
-│   ├── seeds/                  # Seed data
-│   └── scripts/                # Data processing scripts
+├── data/                       # Local data/ML working area (gitignored; no large datasets in repo)
 ├── docs/                       # Essential documentation only
 │   └── DEPLOYMENT_GUIDE.md     # Single source of truth for deployment
 ├── infra/                      # Infrastructure as code

@@ -55,11 +55,11 @@ The `pretest:e2e` hook automatically runs `pnpm exec playwright install` to ensu
 
 ## Architecture
 
-- **Monorepo**: pnpm workspaces with Turborepo
+- **Monorepo**: pnpm workspaces
 - **Apps**:
-  - `apps/frontend`: React frontend with integrated chat component
-  - `apps/backend/search`: Fastify RAG backend with integrated data utilities
-  - `apps/backend/indexer`: Content indexing service with integrated config utilities
+  - `apps/web`: React frontend with integrated chat component
+  - `apps/services/search`: Fastify RAG backend with integrated data utilities
+  - `apps/services/indexer`: Content indexing service with integrated config utilities
 
 ## Environment Variables
 
@@ -67,7 +67,7 @@ The `pretest:e2e` hook automatically runs `pnpm exec playwright install` to ensu
 
 **No OpenAI.com**: Only Azure OpenAI endpoint (`shared-openai-eastus2`).
 
-See `docs/CONFIG.md` for the complete environment variable schema and detailed setup instructions. Key variables:
+See `docs/DEPLOYMENT_GUIDE.md` for the complete environment variable schema and detailed setup instructions. Key variables:
 
 ```env
 # Azure OpenAI
@@ -116,22 +116,18 @@ pnpm install
 ### 3. Configure Environment
 
 ```bash
-# Copy example environment files
+# Copy example environment file
 cp .env.example .env
-cp apps/backend/search/.env.example apps/backend/search/.env
-cp apps/backend/indexer/.env.example apps/backend/indexer/.env
-cp apps/frontend/.env.example apps/frontend/.env
 
-# Edit the .env files with your Azure credentials
-# See docs/CONFIG.md for detailed configuration guide
-# See docs/demo-guide.md for step-by-step local setup
+# Edit the .env file with your Azure credentials
+# See docs/DEPLOYMENT_GUIDE.md for detailed configuration and deployment guidance
 ```
 
 ### 4. Set Up Database
 
 ```bash
 # Navigate to search backend
-cd apps/backend/search
+cd apps/services/search
 
 # Generate Prisma client
 pnpm prisma generate
@@ -145,7 +141,7 @@ pnpm seed:demo
 cd ../../..
 ```
 
-**Note**: See `docs/demo-guide.md` for detailed database setup instructions.
+**Note**: See `docs/DEPLOYMENT_GUIDE.md` for detailed database and deployment setup instructions.
 
 ## Development
 
@@ -156,21 +152,21 @@ cd ../../..
 pnpm dev
 
 # Or run individually:
-pnpm dev --filter=frontend    # Frontend only
-pnpm dev --filter=search      # Search API only
-pnpm dev --filter=indexer     # Indexer service only
+pnpm dev:web       # Frontend only (apps/web)
+pnpm dev:search    # Search API only (apps/services/search)
+pnpm dev:indexer   # Indexer service only (apps/services/indexer)
 ```
 
-**Important**: Use `pnpm dev` for development - it enables hot-reload via Turborepo. Don't run `pnpm build` during interactive development.
+**Important**: Use `pnpm dev` (or the `dev:*` scripts) for interactive development. `pnpm build` is for production builds only.
 
-**For detailed local development guide**, see `docs/demo-guide.md`.
+**For detailed deployment and configuration guidance**, see `docs/DEPLOYMENT_GUIDE.md`.
 
 ### Available Commands
 
 ```bash
 # Development
 pnpm dev                    # Start all services with hot-reload
-pnpm dev --filter=search    # Start specific service
+pnpm dev:search             # Start specific service (search API)
 
 # Building
 pnpm build                  # Build all apps for production
@@ -183,7 +179,7 @@ pnpm lint                   # Lint all code
 pnpm typecheck             # TypeScript type checking
 
 # Database
-cd apps/backend/search
+cd apps/services/search
 pnpm prisma migrate dev    # Create and apply migrations
 pnpm prisma studio         # Open Prisma Studio
 ```
@@ -193,26 +189,29 @@ pnpm prisma studio         # Open Prisma Studio
 ```
 ApexCoachAI/
 ├── apps/
-│   ├── frontend/          # React frontend (Vite)
-│   │   ├── src/
-│   │   │   ├── components/  # React components (chat, knowledge-base, etc.)
-│   │   │   ├── pages/      # Page components
-│   │   │   ├── api/        # API client
-│   │   │   └── contexts/   # React contexts (Auth, Personality)
-│   ├── backend/
-│   │   ├── search/        # Fastify RAG API
-│   │   │   ├── src/
-│   │   │   │   ├── routes/  # API routes
-│   │   │   │   ├── rag/     # RAG client and logic
-│   │   │   │   └── db/      # Database repositories
-│   │   │   └── prisma/      # Prisma schema and migrations
-│   │   └── indexer/        # Content indexing service
-│   │       └── src/
-│   │           ├── lib/     # Document processors
-│   │           └── routes/  # Indexing API routes
-├── .github/
-│   └── workflows/        # CI/CD pipelines
-└── docs/                 # Additional documentation
+│   ├── web/               # React frontend (Vite)
+│   │   └── src/
+│   │       ├── components/  # React components (chat, knowledge-base, etc.)
+│   │       ├── features/    # Feature-based modules
+│   │       ├── pages/       # Page/route components
+│   │       ├── hooks/       # Custom React hooks
+│   │       ├── services/    # API clients
+│   │       ├── contexts/    # React contexts (Auth, Personality, etc.)
+│   │       └── types/       # Shared TypeScript types
+│   └── services/
+│       ├── search/          # Fastify RAG API
+│       │   ├── src/
+│       │   │   ├── routes/    # API routes
+│       │   │   ├── services/  # Business logic
+│       │   │   └── lib/       # Utilities
+│       │   └── prisma/        # Prisma schema and migrations
+│       └── indexer/          # Content indexing service
+│           └── src/
+│               ├── routes/    # Indexing API routes
+│               └── lib/       # Document processors
+├── .github/                  # Copilot instructions, PR templates (no CI/CD workflows)
+├── docs/                     # Core documentation (see DEPLOYMENT_GUIDE.md)
+└── scripts/                  # Deployment and maintenance scripts
 ```
 
 ## AI Roadmap
@@ -274,16 +273,15 @@ See [`.github/copilot-instructions.md`](./.github/copilot-instructions.md) for d
 
 **For more help**:
 
-- See `docs/demo-guide.md` for local development troubleshooting
-- See `docs/CONFIG.md` for environment variable reference
-- See `docs/apexcoachai_issues.md` for known issues and fixes
+- See `docs/DEPLOYMENT_GUIDE.md` for deployment, configuration, and troubleshooting details
+- See `AGENTS.md` for shared infrastructure and governance rules
 - Check service logs in Azure Portal
 
 ## Deployment
 
 ### Manual Deployment
 
-For step-by-step manual deployment instructions, see **`docs/deployment-manual.md`**.
+For step-by-step manual deployment instructions, see **`docs/DEPLOYMENT_GUIDE.md`**.
 
 Quick deployment using included scripts:
 
@@ -301,15 +299,10 @@ Quick deployment using included scripts:
 ./scripts/smoke-test.sh
 ```
 
-### Automated Deployment (CI/CD)
+### Automated Deployment (Scripts, No CI/CD Workflows)
 
-Deployed via GitHub Actions workflow (`.github/workflows/deploy.yml`):
-
-- **Frontend**: Azure Static Web App `apexcoachai` in `rg-shared-web`
-- **Backend Services**: Azure Container Apps (`apexcoachai-api`, `apexcoachai-indexer`) in `cae-shared-apps`
-- **CI/CD**: Auto-deploys on push to `main` branch
-
-**Note**: Manual deployment is recommended for fine-grained control. See `docs/deployment-manual.md` for details.
+Per `AGENTS.md`, this repo does **not** define or manage CI/CD pipelines (no `.github/workflows/*`, no Azure Pipelines).
+Deployment automation is handled via the PowerShell/Bash scripts in `scripts/` and the steps in `docs/DEPLOYMENT_GUIDE.md`.
 
 ## License
 
