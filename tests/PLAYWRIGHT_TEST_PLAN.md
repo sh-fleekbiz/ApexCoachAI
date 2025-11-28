@@ -18,7 +18,7 @@
 - **Framework**: Fastify (Node.js)
 - **Database**: PostgreSQL with Prisma ORM
 - **AI Services**: Azure OpenAI (GPT-4o, embeddings)
-- **Search**: Azure AI Search (hybrid + semantic ranking)
+- **Search**: Postgres + pgvector (vector search with optional text filters)
 - **Authentication**: JWT tokens via HTTP-only cookies
 - **API Base URL**: `http://localhost:3000` (via proxy)
 
@@ -40,7 +40,7 @@
 ### External Dependencies
 
 - Azure OpenAI (GPT-4o for chat, embeddings for RAG)
-- Azure AI Search (hybrid search with semantic ranking)
+- Postgres + pgvector (vector search and retrieval; no external search service)
 - Azure Blob Storage (content files)
 - PostgreSQL Database (users, chats, messages, resources)
 

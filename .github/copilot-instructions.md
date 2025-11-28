@@ -18,4 +18,4 @@
 - Reuse shared resource groups (rg-shared-ai, rg-shared-data, rg-shared-apps, rg-shared-web, rg-shared-logs)
 - Use shared Postgres server (pg-shared-apps-eastus2) with database named "apexcoachai"
 - Use shared storage account with container named "apexcoachai"
-- Use shared Azure OpenAI and Azure Search endpoints
+- Use shared Azure OpenAI. Semantic search / RAG must use Postgres + pgvector (Azure AI Search is not used).

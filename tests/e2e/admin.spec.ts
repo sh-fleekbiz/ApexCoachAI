@@ -117,7 +117,7 @@ test.describe('Admin Panel', () => {
 
       await test.step('Verify backend capabilities list', async () => {
         await expect(page.getByText(/Backend Capabilities/i)).toBeVisible();
-        await expect(page.getByText(/RAG with Azure AI Search/i)).toBeVisible();
+        await expect(page.getByText(/RAG with Postgres + pgvector/i)).toBeVisible();
         await expect(
           page.getByText(/Custom coaching personalities/i)
         ).toBeVisible();

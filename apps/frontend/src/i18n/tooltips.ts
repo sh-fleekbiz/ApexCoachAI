@@ -1,7 +1,7 @@
 // Keep values less than 20 words.
 // Don't add links to the tooltips.
 export const toolTipText = {
-  approaches: 'Retrieve first uses Azure Search. Read first uses LangChain.',
+  approaches: 'Retrieve-first uses Postgres + pgvector. Read-first uses LangChain.',
   promptTemplate: "Allows user to override the chatbot's prompt.",
   promptTemplatePrefix:
     "Allows user to provide a prefix to the chatbot's prompt. For example, `Answer the following question as if I were in high school.`",
