@@ -11,7 +11,7 @@ import { type SchemaTypes } from '../plugins/schemas.js';
 import type { Citation } from '../types/chat-types.js';
 
 // In-memory store for previous_response_id per chat (for stateful conversations)
-// TODO: Consider storing in database for persistence
+// Note: Database persistence could be considered for future scalability
 const chatResponseIds = new Map<number, string>();
 
 const chatApi: FastifyPluginAsync = async (

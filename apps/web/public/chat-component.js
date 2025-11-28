@@ -4573,7 +4573,7 @@ function kl(i, t) {
 class ii {
   constructor(t) {
     v(this, "options");
-    // TODO: Fix this rules type
+    // Rules type needs refinement
     v(this, "rules");
     v(this, "lexer");
     this.options = t || Se;
