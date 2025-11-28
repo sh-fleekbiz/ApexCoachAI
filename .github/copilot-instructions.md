@@ -1,21 +1,35 @@
-# Copilot Instructions - ApexCoachAI
+# Copilot Instructions for ApexCoachAI
 
-## Project Overview
-- **Application**: AI Coaching Platform
-- **URL**: https://apexcoachai.shtrial.com
-- **API Base URL**: https://api.apexcoachai.shtrial.com
-- **API Docs**: https://api.apexcoachai.shtrial.com/docs
+1. **Technology Stack:**
 
-## Development Guidelines
+   - **AI API:** Azure OpenAI Responses API (`/v1/responses`).
+   - **Primary Model:** `gpt-5.1-codex-mini`.
+   - **Database:** PostgreSQL with `pgvector`.
+   - **Infrastructure:** Shared Azure Resources (Read-Only).
 
-### Testing
-- Use `pnpm test:e2e` to run Playwright E2E tests
-- `pretest:e2e` automatically installs browsers
-- Always use pnpm, never npm or yarn
+2. **Coding Standards:**
 
-### Infrastructure Rules
-- Do NOT create new Azure resource groups
-- Reuse shared resource groups (rg-shared-ai, rg-shared-data, rg-shared-apps, rg-shared-web, rg-shared-logs)
-- Use shared Postgres server (pg-shared-apps-eastus2) with database named "apexcoachai"
-- Use shared storage account with container named "apexcoachai"
-- Use shared Azure OpenAI. Semantic search / RAG must use Postgres + pgvector (Azure AI Search is not used).
+   - **Do Not** suggest creating Azure Resources (Terraform/Bicep).
+   - **Do Not** use Azure AI Search SDKs.
+   - **Do** use `fetch` or `requests` to call the Responses API REST endpoint.
+   - **Do** use strict Environment Variable naming (e.g., `AI_MODEL_GENERAL`).
+   - **Do** use `input` field instead of `messages` array for API calls.
+   - **Do** use `api-key` header for authentication (not Bearer token).
+   - **Do** use `max_output_tokens` parameter (not `max_tokens` or `max_completion_tokens`).
+
+3. **Frontend:**
+
+   - Never expose `AZURE_OPENAI_API_KEY`.
+   - API calls must go through the Next.js/Express backend.
+
+4. **API Pattern:**
+
+   - Use stateful Responses API with `previous_response_id` for conversations.
+   - Store response IDs on the client/backend to maintain conversation state.
+   - Use `/openai/v1/responses` endpoint (v1 GA, no api-version param).
+
+5. **Vector Search:**
+
+   - Use `pgvector` extension on shared Postgres database.
+   - Generate embeddings with `text-embedding-3-small`.
+   - Store and query vectors in the `apexcoachai` database.

@@ -16,6 +16,9 @@ export interface AzureConfig {
   kbFieldsContent: string;
   kbFieldsSourcePage: string;
   allowedOrigins?: string;
+  // Responses API (v1 GA)
+  azureOpenAiResponsesUrl?: string;
+  aiModelGeneral?: string;
 }
 
 /**
@@ -69,7 +72,7 @@ export function createSearchAzureConfig(): AzureConfig {
   const config: AzureConfig = {
     azureStorageAccount: process.env.AZURE_STORAGE_ACCOUNT || '',
     azureStorageContainer: process.env.AZURE_STORAGE_CONTAINER || '',
-    azureOpenAiService: process.env.AZURE_OPENAI_SERVICE || '',
+    azureOpenAiService: process.env.AZURE_OPENAI_SERVICE || process.env.AZURE_OPENAI_RESOURCE || '',
     azureOpenAiChatGptDeployment:
       process.env.AZURE_OPENAI_CHAT_DEPLOYMENT ||
       process.env.AZURE_OPENAI_CHATGPT_DEPLOYMENT ||
@@ -77,16 +80,21 @@ export function createSearchAzureConfig(): AzureConfig {
     azureOpenAiChatGptModel:
       process.env.AZURE_OPENAI_CHAT_DEPLOYMENT ||
       process.env.AZURE_OPENAI_CHATGPT_MODEL ||
-      'gpt-5-mini',
+      process.env.AI_MODEL_GENERAL ||
+      'gpt-5.1-codex-mini',
     azureOpenAiEmbeddingDeployment:
       process.env.AZURE_OPENAI_EMBEDDING_DEPLOYMENT || '',
     azureOpenAiEmbeddingModel:
       process.env.AZURE_OPENAI_EMBEDDING_DEPLOYMENT ||
       process.env.AZURE_OPENAI_EMBEDDING_MODEL ||
+      process.env.AI_MODEL_EMBEDDING ||
       'text-embedding-3-small',
     kbFieldsContent: process.env.KB_FIELDS_CONTENT || 'content',
     kbFieldsSourcePage: process.env.KB_FIELDS_SOURCEPAGE || 'sourcepage',
     allowedOrigins: process.env.ALLOWED_ORIGINS || '*',
+    // Responses API (v1 GA)
+    azureOpenAiResponsesUrl: process.env.AZURE_OPENAI_RESPONSES_URL,
+    aiModelGeneral: process.env.AI_MODEL_GENERAL || 'gpt-5.1-codex-mini',
   };
 
   // Skip Azure service validation for local development

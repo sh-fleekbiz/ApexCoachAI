@@ -7,31 +7,74 @@ import type {
   ApproachResponseChunk,
 } from '../lib/approaches/approach.js';
 import type { Message } from '../lib/message.js';
+import { callResponsesApi } from '../lib/responses-api.js';
 
-// Stub implementation until full RAG approaches are integrated
+// Stub implementation using Responses API until full RAG approaches are integrated
 class StubChatApproach implements ChatApproach {
-  async run(messages: Message[], _context?: ApproachContext): Promise<ApproachResponse> {
-    // Return a minimal response that matches the expected shape
-    const lastUserMessage = messages.find((m) => m.role === 'user')?.content || 'Hello';
+  constructor(
+    private readonly apiKey: string,
+    private readonly responsesUrl: string,
+    private readonly model: string
+  ) {}
 
-    return {
-      choices: [
+  async run(messages: Message[], context?: ApproachContext): Promise<ApproachResponse> {
+    try {
+      const chatContext = context as any;
+      const previousResponseId = chatContext?.previousResponseId;
+
+      const result = await callResponsesApi(
+        messages,
         {
-          index: 0,
-          message: {
-            role: 'assistant',
-            content: `This is a stub response. Full RAG implementation pending. You said: "${lastUserMessage}"`,
-            context: {
-              data_points: {
-                text: [],
+          previousResponseId,
+          temperature: context?.temperature,
+          maxOutputTokens: 2000,
+        },
+        this.apiKey,
+        this.responsesUrl,
+        this.model
+      );
+
+      return {
+        choices: [
+          {
+            index: 0,
+            message: {
+              role: 'assistant',
+              content: result.content,
+              context: {
+                data_points: {
+                  text: [],
+                },
+                thoughts: 'Responses API implementation',
+                responseId: result.responseId, // Store for next turn
               },
-              thoughts: 'Stub implementation - RAG not yet configured',
             },
           },
-        },
-      ],
-      object: 'chat.completion',
-    };
+        ],
+        object: 'chat.completion',
+      };
+    } catch (error) {
+      // Fallback to stub response on error
+      const lastUserMessage = messages.find((m) => m.role === 'user')?.content || 'Hello';
+      return {
+        choices: [
+          {
+            index: 0,
+            message: {
+              role: 'assistant',
+              content: `Error: ${error instanceof Error ? error.message : 'Unknown error'}. You said: "${lastUserMessage}"`,
+              context: {
+                data_points: {
+                  text: [],
+                },
+                thoughts: 'Error in Responses API call',
+              },
+            },
+          },
+        ],
+        object: 'chat.completion',
+      };
+    }
   }
 
   async *runWithStreaming(
@@ -77,7 +120,16 @@ class StubChatApproach implements ChatApproach {
 // Plugin to register RAG approaches
 export default fp(
   async (fastify: FastifyInstance) => {
-    const stubApproach = new StubChatApproach();
+    const apiKey = process.env.AZURE_OPENAI_API_KEY || '';
+    const responsesUrl = process.env.AZURE_OPENAI_RESPONSES_URL || 
+      'https://shared-openai-eastus2.cognitiveservices.azure.com/openai/v1/responses';
+    const model = process.env.AI_MODEL_GENERAL || 'gpt-5.1-codex-mini';
+
+    if (!apiKey) {
+      fastify.log.warn('AZURE_OPENAI_API_KEY not set, Responses API will not work');
+    }
+
+    const stubApproach = new StubChatApproach(apiKey, responsesUrl, model);
 
     // Register approaches
     fastify.decorate('approaches', {
@@ -90,11 +142,11 @@ export default fp(
       },
     });
 
-    fastify.log.info('RAG approaches plugin loaded (stub implementation)');
+    fastify.log.info('RAG approaches plugin loaded (Responses API implementation)');
   },
   {
     name: 'approaches',
-    dependencies: [],
+    dependencies: ['config'],
   },
 );
 

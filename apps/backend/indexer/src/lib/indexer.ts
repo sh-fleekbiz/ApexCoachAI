@@ -152,22 +152,14 @@ export class Indexer {
 
   async createEmbedding(text: string): Promise<number[]> {
     // TODO: add retry
-    const embeddingsClient = await this.openai.getEmbeddings();
-    const result = await embeddingsClient.create({
-      input: text,
-      model: this.embeddingModelName,
-    });
-    return result.data[0].embedding;
+    const result = await this.openai.createEmbedding(text);
+    return result[0]?.embedding || [];
   }
 
   async createEmbeddingsInBatch(texts: string[]): Promise<Array<number[]>> {
     // TODO: add retry
-    const embeddingsClient = await this.openai.getEmbeddings();
-    const result = await embeddingsClient.create({
-      input: texts,
-      model: this.embeddingModelName,
-    });
-    return result.data.map((d) => d.embedding);
+    const result = await this.openai.createEmbedding(texts);
+    return result.map((d) => d.embedding);
   }
 
   async updateEmbeddingsInBatch(sections: Section[]): Promise<Section[]> {

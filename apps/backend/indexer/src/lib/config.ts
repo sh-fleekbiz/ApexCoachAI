@@ -66,11 +66,14 @@ export function createIndexerAzureConfig(): AzureConfig {
   const config: AzureConfig = {
     azureStorageAccount: process.env.AZURE_STORAGE_ACCOUNT || '',
     azureStorageContainer: process.env.AZURE_STORAGE_CONTAINER || '',
-    azureOpenAiService: process.env.AZURE_OPENAI_SERVICE || '',
+    azureOpenAiService: process.env.AZURE_OPENAI_SERVICE || process.env.AZURE_OPENAI_RESOURCE || '',
     azureOpenAiEmbeddingDeployment:
       process.env.AZURE_OPENAI_EMBEDDING_DEPLOYMENT || '',
     azureOpenAiEmbeddingModel:
-      process.env.AZURE_OPENAI_EMBEDDING_MODEL || 'text-embedding-3-small',
+      process.env.AZURE_OPENAI_EMBEDDING_DEPLOYMENT ||
+      process.env.AZURE_OPENAI_EMBEDDING_MODEL ||
+      process.env.AI_MODEL_EMBEDDING ||
+      'text-embedding-3-small',
     kbFieldsContent: process.env.KB_FIELDS_CONTENT || 'content',
     kbFieldsSourcePage: process.env.KB_FIELDS_SOURCEPAGE || 'sourcepage',
   };

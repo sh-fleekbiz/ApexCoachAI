@@ -10,6 +10,10 @@ import { type ApproachContext } from '../lib/index.js';
 import { type SchemaTypes } from '../plugins/schemas.js';
 import type { Citation } from '../types/chat-types.js';
 
+// In-memory store for previous_response_id per chat (for stateful conversations)
+// TODO: Consider storing in database for persistence
+const chatResponseIds = new Map<number, string>();
+
 const chatApi: FastifyPluginAsync = async (
   _fastify,
   _options
@@ -173,7 +177,13 @@ const chatApi: FastifyPluginAsync = async (
           );
         }
 
-        const approachContext: ApproachContext = (context as any) ?? {};
+        // Get previous_response_id for this chat (stateful conversation)
+        const previousResponseId = chatResponseIds.get(chat.id);
+        
+        const approachContext: ApproachContext = {
+          ...(context as any),
+          previousResponseId, // Pass to approach for stateful conversation
+        };
 
         // Run RAG
         if (stream) {
@@ -239,6 +249,11 @@ const chatApi: FastifyPluginAsync = async (
           // Extract assistant response
           const assistantMessage = response.choices?.[0]?.message;
           if (assistantMessage) {
+            // Store responseId for next turn (stateful conversation)
+            if (assistantMessage.context?.responseId) {
+              chatResponseIds.set(chat.id, assistantMessage.context.responseId as string);
+            }
+
             // Parse citations from context
             const citations: Citation[] = [];
             if (assistantMessage.context?.data_points?.text) {

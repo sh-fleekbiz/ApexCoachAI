@@ -1,10 +1,8 @@
 import fp from 'fastify-plugin';
 import { type AccessToken } from '@azure/core-http';
-import { OpenAI } from 'openai';
-import { type Embeddings } from 'openai/resources/index';
 
 export type OpenAiService = {
-  getEmbeddings(): Promise<Embeddings>;
+  createEmbedding(input: string | string[]): Promise<Array<{ embedding: number[] }>>;
   getApiToken(): Promise<string>;
   config: {
     apiVersion: string;
@@ -12,47 +10,55 @@ export type OpenAiService = {
   };
 };
 
-const AZURE_OPENAI_API_VERSION = '2025-04-01-preview';
 const AZURE_COGNITIVE_SERVICES_AD_SCOPE = 'https://cognitiveservices.azure.com/.default';
 
 export default fp(
   async (fastify, _options) => {
     const config = fastify.config;
-    const openAiUrl = `https://${config.azureOpenAiService}.openai.azure.com`;
+    const openAiUrl = `https://${config.azureOpenAiService}.cognitiveservices.azure.com`;
+    const embeddingEndpoint = process.env.AZURE_OPENAI_EMBEDDING_ENDPOINT || 
+      `${openAiUrl}/openai/deployments/${config.azureOpenAiEmbeddingDeployment}/embeddings?api-version=2023-05-15`;
 
-    fastify.log.info(`Using OpenAI at ${openAiUrl}`);
+    fastify.log.info(`Using OpenAI Embeddings at ${embeddingEndpoint}`);
 
     let openAiToken: AccessToken;
-    let embeddingsClient: OpenAI;
 
     const refreshOpenAiToken = async () => {
       if (!openAiToken || openAiToken.expiresOnTimestamp < Date.now() + 60 * 1000) {
         openAiToken = await fastify.azure.credential.getToken(AZURE_COGNITIVE_SERVICES_AD_SCOPE);
-
-        const commonOptions = {
-          apiKey: openAiToken.token,
-          defaultQuery: { 'api-version': AZURE_OPENAI_API_VERSION },
-          defaultHeaders: { 'api-key': openAiToken.token },
-        };
-
-        embeddingsClient = new OpenAI({
-          ...commonOptions,
-          baseURL: `${openAiUrl}/openai/deployments/${config.azureOpenAiEmbeddingDeployment}`,
-        });
       }
     };
 
     fastify.decorate('openai', {
-      async getEmbeddings() {
+      async createEmbedding(input: string | string[]) {
         await refreshOpenAiToken();
-        return embeddingsClient.embeddings;
+        
+        const response = await fetch(embeddingEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'api-key': openAiToken.token,
+          },
+          body: JSON.stringify({
+            input: Array.isArray(input) ? input : [input],
+          }),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          fastify.log.error(`Embedding API error: ${response.status} - ${errorText}`);
+          throw new Error(`Embedding generation failed: ${response.statusText}`);
+        }
+
+        const data = await response.json() as { data?: Array<{ embedding: number[] }> };
+        return data.data || [];
       },
       async getApiToken() {
         await refreshOpenAiToken();
         return openAiToken.token;
       },
       config: {
-        apiVersion: AZURE_OPENAI_API_VERSION,
+        apiVersion: '2023-05-15',
         apiUrl: openAiUrl,
       },
     });

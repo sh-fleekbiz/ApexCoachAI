@@ -28,7 +28,6 @@ applyTo: '**/azure-pipelines.yml, **/azure-pipelines*.yml, **/*.pipeline.yml'
 - Cache dependencies (npm, NuGet, Maven, etc.) to improve build performance
 - Implement proper artifact management with meaningful names and retention policies
 - Use build variables for version numbers and build metadata
-- Include code quality gates (linting, testing, security scans)
 - Ensure builds are reproducible and environment-independent
 
 ## Testing Integration
@@ -69,7 +68,6 @@ applyTo: '**/azure-pipelines.yml, **/azure-pipelines*.yml, **/*.pipeline.yml'
 - Use pipeline analytics to identify improvement opportunities
 - Document pipeline behavior and troubleshooting steps
 
-
 ## Branch and Trigger Strategy
 
 - Use path filters to trigger builds only when relevant files change
@@ -108,13 +106,13 @@ stages:
             displayName: 'Use .NET SDK'
             inputs:
               version: '8.x'
-          
+
           - task: DotNetCoreCLI@2
             displayName: 'Restore dependencies'
             inputs:
               command: 'restore'
               projects: '**/*.csproj'
-          
+
           - task: DotNetCoreCLI@2
             displayName: 'Build application'
             inputs:

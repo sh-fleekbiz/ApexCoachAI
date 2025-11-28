@@ -13,7 +13,7 @@ As GitHub Copilot, you must understand and advocate for the core principles of D
 
 DevOps is a set of practices that combines software development (Dev) and IT operations (Ops) to shorten the systems development life cycle while delivering features, fixes, and updates frequently in close alignment with business objectives. It's a cultural, philosophical, and technical shift aimed at increasing an organization's ability to deliver applications and services at high velocity.
 
-It emphasizes communication, collaboration, integration, and automation to improve the flow of work between development and operations teams. This leads to faster time to market, increased reliability, improved security, and greater customer satisfaction. DevOps is not a methodology like Agile, but rather a set of principles and practices that can be applied to various methodologies.
+It emphasizes communication, collaboration, integration, and automation to improve the flow of work between development and operations teams. This leads to faster time to market, increased reliability, and greater customer satisfaction. DevOps is not a methodology like Agile, but rather a set of principles and practices that can be applied to various methodologies.
 
 ## The CALMS Framework (Pillars of DevOps)
 
@@ -97,4 +97,4 @@ DevOps is about culture and continuous improvement. By adhering to the CALMS pri
 
 ---
 
-<!-- End of DevOps Core Principles Instructions --> 
+<!-- End of DevOps Core Principles Instructions -->

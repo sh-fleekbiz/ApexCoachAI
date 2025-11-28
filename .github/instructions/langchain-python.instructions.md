@@ -1,6 +1,6 @@
 ---
 description: 'Instructions for using LangChain with Python'
-applyTo: "**/*.py"
+applyTo: '**/*.py'
 ---
 
 # LangChain Python Instructions
@@ -34,7 +34,6 @@ LangChain's `Runnable` interface is the foundation for composing and executing c
 - For custom logic, wrap functions with `RunnableLambda` or `RunnableGenerator` instead of subclassing.
 - For advanced configuration, expose fields and alternatives via `configurable_fields` and `configurable_alternatives`.
 
-
 - Use LangChain's chat model integrations for conversational AI:
 
 - Import from `langchain.chat_models` or `langchain_openai` (e.g., `ChatOpenAI`).
@@ -43,6 +42,7 @@ LangChain's `Runnable` interface is the foundation for composing and executing c
 - For structured outputs, use `with_structured_output(schema)`.
 
 Example:
+
 ```python
 from langchain_openai import ChatOpenAI
 from langchain.schema import HumanMessage, SystemMessage
@@ -67,8 +67,6 @@ Best practices:
 - Always validate model outputs before using them in downstream tasks.
 - Prefer explicit message types for clarity and reliability.
 - For Copilot, provide clear, actionable prompts and document expected outputs.
-
-
 
 - LLM client factory: centralize provider configs (API keys), timeouts, retries, and telemetry. Provide a single place to switch providers or client settings.
 - Prompt templates: store templates under `prompts/` and load via a safe helper. Keep templates small and testable.
@@ -215,15 +213,7 @@ Models have a finite context window measured in tokens. When designing conversat
 
 - Use type hints and dataclasses for public APIs.
 - Validate inputs before calling LLMs or tools.
-- Load secrets from secret managers; never log secrets or unredacted model outputs.
 - Deterministic tests: mock LLMs and embedding calls.
 - Cache embeddings and frequent retrieval results.
 - Observability: log request_id, model name, latency, and sanitized token counts.
 - Implement exponential backoff and idempotency for external calls.
-
-## Security & privacy
-
-- Treat model outputs as untrusted. Sanitize before executing generated code or system commands.
-- Validate any user-supplied URLs and inputs to avoid SSRF and injection attacks.
-- Document data retention and add an API to erase user data on request.
-- Limit stored PII and encrypt sensitive fields at rest.

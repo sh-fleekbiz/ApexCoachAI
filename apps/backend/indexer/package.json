@@ -41,7 +41,6 @@
     "fastify-cli": "^7.3.0",
     "fastify-plugin": "^5.0.1",
     "mime": "^4.0.1",
-    "openai": "^4.4.0",
     "pdfjs-dist": "^4.0.189"
   },
   "devDependencies": {
