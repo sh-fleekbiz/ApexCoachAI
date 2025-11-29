@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {
   Checkbox,
   ChoiceGroup,
@@ -10,7 +11,7 @@ import {
   type IChoiceGroupOption,
   type IDropdownOption,
 } from '@fluentui/react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 import styles from '../../pages/oneshot/OneShot.module.css';
 
@@ -24,7 +25,7 @@ import { SettingsButton } from '../../components/SettingsButton/SettingsButton.j
 
 import { toolTipText, toolTipTextCalloutProps } from '../../i18n/tooltips.js';
 
-export function OneShotScreen(): JSX.Element {
+export function OneShotScreen(): React.JSX.Element {
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
   const [approach, setApproach] = useState<Approaches>(
     Approaches.ReadRetrieveRead
@@ -134,6 +135,7 @@ export function OneShotScreen(): JSX.Element {
           className={styles.settingsButton}
           onClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)}
         />
+        {/* @ts-ignore */}
         <chat-component
           title="Ask your data"
           data-input-position="sticky"

@@ -204,6 +204,7 @@ const WhiteLabel: React.FC = () => {
                 src={logoUrl}
                 alt="Logo preview"
                 className="max-h-12"
+                loading="lazy"
                 onError={() =>
                   setMessage({
                     type: MessageBarType.warning,

@@ -38,13 +38,23 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
 
-  /* Configure projects for major browsers - MOBILE FIRST (390x844px) */
+  /* Configure projects for major browsers - MOBILE FIRST */
   projects: [
-    /* Primary: Mobile viewports (390x844px - iPhone 12 standard) */
+    /* Primary: Mobile viewports */
+    {
+      name: 'mobile-small',
+      use: {
+        ...devices['iPhone SE'],
+        viewport: { width: 320, height: 568 },
+        hasTouch: true,
+        isMobile: true,
+      },
+    },
     {
       name: 'mobile-chrome',
       use: { 
-        ...devices['iPhone 12'], // 390x844px - Standard mobile viewport
+        ...devices['Pixel 5'],
+        viewport: { width: 393, height: 851 },
         hasTouch: true,
         isMobile: true,
       },
@@ -52,7 +62,17 @@ export default defineConfig({
     {
       name: 'mobile-safari',
       use: { 
-        ...devices['iPhone 12'], // 390x844px
+        ...devices['iPhone 12'],
+        viewport: { width: 390, height: 844 },
+        hasTouch: true,
+        isMobile: true,
+      },
+    },
+    {
+      name: 'mobile-large',
+      use: {
+        ...devices['iPhone 14 Pro Max'],
+        viewport: { width: 430, height: 932 },
         hasTouch: true,
         isMobile: true,
       },
@@ -72,12 +92,14 @@ export default defineConfig({
       use: { ...devices['Desktop Safari'] },
     },
 
-    /* Optional: Tablet viewports */
+    /* Tablet viewports */
     {
-      name: 'tablet-chrome',
+      name: 'tablet-ipad',
       use: { 
         ...devices['iPad Pro'],
+        viewport: { width: 1024, height: 1366 },
         hasTouch: true,
+        isMobile: false,
       },
     },
 

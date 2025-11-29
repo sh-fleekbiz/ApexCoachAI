@@ -24,7 +24,7 @@
    - **Do Not** suggest creating Azure Resources (Terraform/Bicep).
    - **Do Not** use Azure AI Search SDKs.
    - **Do** use `fetch` or `requests` to call the Responses API REST endpoint.
-   - **Do** use strict Environment Variable naming (e.g., `AI_MODEL_GENERAL`).
+   - **Do** use strict Environment Variable naming (e.g., `AI_MODEL_CORE` not `AI_MODEL_GENERAL`).
    - **Do** use `input` field instead of `messages` array for API calls.
    - **Do** use `api-key` header for authentication (not Bearer token).
    - **Do** use `max_output_tokens` parameter (not `max_tokens` or `max_completion_tokens`).
@@ -83,5 +83,12 @@
     - Do not add or modify CI/CD pipelines, GitHub Actions, `.github/workflows/*`, or Azure DevOps pipelines as part of cleanup.
     - When simplifying tooling, remove Turborepo-style orchestration and use root-level `pnpm`/`npm` scripts instead.
     - Classify cleanup recommendations with P1/P2/P3 risk and group them into Phases 1–3 as defined in `AGENTS.md`.
+
+12. **Cost Control (MANDATORY):**
+
+    - Container Apps must use: minReplicas=0, maxReplicas=3, CPU=0.25, Memory=0.5Gi
+    - Use `AI_MODEL_CORE` environment variable (not `AI_MODEL_GENERAL`)
+    - Never increase resource limits without explicit approval
+    - Scale-to-zero is required for all non-production workloads
 
 **See AGENTS.md for complete governance rules (including deep-cleanup strict governance) and REPOSITORY_STRUCTURE.md for detailed structure guidelines.**

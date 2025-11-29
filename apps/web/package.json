@@ -10,23 +10,23 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@fluentui/react": "^8.110.7",
-    "@fluentui/react-icons": "^2.0.206",
-    "@react-spring/web": "^9.7.3",
-    "dompurify": "^3.0.4",
-    "marked": "^9.1.5",
-    "react": "^18",
-    "react-dom": "^18",
-    "react-router-dom": "^6.29.0",
-    "rimraf": "^6.0.1"
+    "@fluentui/react": "^8.125.2",
+    "@fluentui/react-icons": "^2.0.315",
+    "@react-spring/web": "^10.0.3",
+    "dompurify": "^3.3.0",
+    "marked": "^17.0.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.9.6",
+    "rimraf": "^6.1.2"
   },
   "devDependencies": {
     "@types/dompurify": "^3.2.0",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "@vitejs/plugin-react": "^4.3.4",
-    "prettier": "^3.0.0",
-    "typescript": "^5.7.3",
-    "vite": "^6.1.0"
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "prettier": "^3.7.2",
+    "typescript": "^5.9.3",
+    "vite": "^7.2.4"
   }
 }

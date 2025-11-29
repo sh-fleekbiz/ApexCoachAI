@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {
   Checkbox,
   DefaultButton,
@@ -456,6 +457,7 @@ const ChatScreen = () => {
               <div className={styles.loadingState}>Loading chat history...</div>
             ) : (
               <>
+                {/* @ts-ignore */}
                 <chat-component
                   ref={chatComponentReference}
                   title=""

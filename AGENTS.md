@@ -165,6 +165,59 @@ apps/services/         # Backend services
 * **OpenAI:** `shared-openai-eastus2`
 * **DNS:** `apexcoachai.shtrial.com` (frontend), `api.apexcoachai.shtrial.com` (backend)
 * **Registry:** `acrsharedapps`
+* **Container App:** `ca-apexcoachai-api` (in `cae-shared-apps-dev`)
+* **Static Web App:** `mango-pond-00d000f0f`
+
+## 💰 Cost Control Rules (MANDATORY)
+
+All Container Apps MUST use these cost-optimized settings:
+
+| Setting | Required Value | Reason |
+|---------|----------------|--------|
+| minReplicas | **0** | Scale-to-zero when idle |
+| maxReplicas | **3** | Prevent runaway scaling |
+| CPU | **0.25** | Sufficient for API workloads |
+| Memory | **0.5Gi** | Sufficient for API workloads |
+
+**Environment Variable Naming:**
+- Use `AI_MODEL_CORE` (not `AI_MODEL_GENERAL`)
+- Use `DATABASE_URL` for connection strings
+
+**Cost Violations to Avoid:**
+- ❌ minReplicas > 0 (wastes money when idle)
+- ❌ maxReplicas > 3 (risk of runaway costs)
+- ❌ CPU > 0.25 or Memory > 0.5Gi without approval
+- ❌ Creating new Azure resources without approval
+
+## 🚀 Deployment Procedures
+
+### Container App Deployment
+```bash
+# Build and push image
+az acr build --registry acrsharedapps --image apexcoachai-api:latest ./apps/backend
+
+# Update Container App
+az containerapp update --name ca-apexcoachai-api --resource-group rg-shared-container-apps \
+  --image acrsharedapps.azurecr.io/apexcoachai-api:latest
+```
+
+### Static Web App Deployment
+```bash
+# Build frontend
+cd apps/web && pnpm build
+
+# Deploy using SWA CLI
+swa deploy ./dist --deployment-token $SWA_DEPLOYMENT_TOKEN
+```
+
+### Verify Deployment
+```bash
+# Check Container App status
+az containerapp show --name ca-apexcoachai-api --resource-group rg-shared-container-apps --query "properties.runningStatus"
+
+# Check logs
+az containerapp logs show --name ca-apexcoachai-api --resource-group rg-shared-container-apps --follow
+```
 
 ## 🧹 Deep Repository Cleanup, Restructuring, and Tooling Simplification (Strict Governance)
 

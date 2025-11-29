@@ -205,6 +205,16 @@ const Layout = () => {
       </aside>
       <main className={styles.mainContent}>
         <Outlet />
+        <footer className={styles.brandingFooter}>
+          <div className={styles.brandingContent}>
+            <span className={styles.appBrand}>Apex Coach AI</span>
+            <span className={styles.brandingSeparator}>•</span>
+            <span className={styles.appDescription}>AI-Powered Coaching Platform</span>
+          </div>
+          <div className={styles.brandingCopyright}>
+            © {new Date().getFullYear()} Sarosh Hussain, CTO Pendoah.ai • Demonstration Only • All Rights Reserved
+          </div>
+        </footer>
       </main>
       {isSettingsOpen && <Settings onClose={() => setIsSettingsOpen(false)} />}
       {showOnboarding && (
