@@ -39,7 +39,7 @@
   align-items: center;
   padding: 0.25rem 0.75rem;
   background-color: var(--accent-soft);
-  color: #1e40af;
+  color: hsl(var(--primary-strong));
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 600;
@@ -192,6 +192,7 @@
     min-height: 44px;
   }
 }
+
 
 
 
