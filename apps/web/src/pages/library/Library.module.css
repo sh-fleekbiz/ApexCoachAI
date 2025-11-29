@@ -10,14 +10,14 @@
   align-items: center;
   min-height: 400px;
   font-size: 1.125rem;
-  color: #666;
+  color: hsl(var(--muted-foreground));
 }
 
 .errorMessage {
   padding: 1rem;
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #dc2626;
+  background-color: var(--destructive-surface);
+  border: 1px solid var(--destructive-border);
+  color: hsl(var(--destructive));
   border-radius: 0.5rem;
   font-size: 0.875rem;
   margin-bottom: 1.5rem;
@@ -35,12 +35,12 @@
   font-size: 2rem;
   font-weight: bold;
   margin: 0 0 0.5rem 0;
-  color: #1f2937;
+  color: hsl(var(--foreground));
 }
 
 .subtitle {
   font-size: 1rem;
-  color: #6b7280;
+  color: hsl(var(--muted-foreground));
   margin: 0;
 }
 
@@ -49,8 +49,8 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background-color: #000;
-  color: #fff;
+  background-color: hsl(var(--foreground));
+  color: hsl(var(--surface));
   border: none;
   border-radius: 0.5rem;
   font-weight: 500;
@@ -61,7 +61,7 @@
 }
 
 .uploadButton:hover {
-  background-color: #1f2937;
+  background-color: hsl(var(--foreground));
 }
 
 .controls {
@@ -79,7 +79,7 @@
 .searchInput {
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid hsl(var(--border));
   border-radius: 0.5rem;
   font-size: 0.875rem;
   transition: border-color 0.15s ease-in-out;
@@ -87,7 +87,7 @@
 
 .searchInput:focus {
   outline: none;
-  border-color: #000;
+  border-color: hsl(var(--foreground));
 }
 
 .filters {
@@ -98,47 +98,47 @@
 
 .filterSelect {
   padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid hsl(var(--border));
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  background-color: #fff;
+  background-color: hsl(var(--surface));
   cursor: pointer;
   transition: border-color 0.15s ease-in-out;
 }
 
 .filterSelect:focus {
   outline: none;
-  border-color: #000;
+  border-color: hsl(var(--foreground));
 }
 
 .viewToggle {
   display: flex;
-  border: 1px solid #d1d5db;
+  border: 1px solid hsl(var(--border));
   border-radius: 0.5rem;
   overflow: hidden;
 }
 
 .viewButton {
   padding: 0.75rem 1rem;
-  background-color: #fff;
+  background-color: hsl(var(--surface));
   border: none;
   cursor: pointer;
   font-size: 1rem;
   transition: background-color 0.15s ease-in-out;
-  color: #6b7280;
+  color: hsl(var(--muted-foreground));
 }
 
 .viewButton:not(:last-child) {
-  border-right: 1px solid #d1d5db;
+  border-right: 1px solid hsl(var(--border));
 }
 
 .viewButton:hover {
-  background-color: #f9fafb;
+  background-color: hsl(var(--surface));
 }
 
 .viewButton.active {
-  background-color: #000;
-  color: #fff;
+  background-color: hsl(var(--foreground));
+  color: hsl(var(--surface));
 }
 
 .grid {
@@ -170,7 +170,7 @@
   width: 80px;
   height: 80px;
   margin-bottom: 1.5rem;
-  background-color: #f9fafb;
+  background-color: hsl(var(--surface));
   border-radius: 50%;
   font-size: 2.5rem;
 }
@@ -178,13 +178,13 @@
 .emptyTitle {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #1f2937;
+  color: hsl(var(--foreground));
   margin: 0 0 0.75rem 0;
 }
 
 .emptyText {
   font-size: 1rem;
-  color: #6b7280;
+  color: hsl(var(--muted-foreground));
   margin: 0 0 2rem 0;
   max-width: 500px;
   line-height: 1.6;
@@ -192,8 +192,8 @@
 
 .emptyButton {
   padding: 0.875rem 2rem;
-  background-color: #000;
-  color: #fff;
+  background-color: hsl(var(--foreground));
+  color: hsl(var(--surface));
   border: none;
   border-radius: 0.5rem;
   font-weight: 500;
@@ -203,7 +203,7 @@
 }
 
 .emptyButton:hover {
-  background-color: #1f2937;
+  background-color: hsl(var(--foreground));
 }
 
 /* Mobile responsiveness */
@@ -268,3 +268,6 @@
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   }
 }
+
+
+

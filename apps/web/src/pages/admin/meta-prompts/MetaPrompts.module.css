@@ -10,7 +10,7 @@
   align-items: center;
   min-height: 400px;
   font-size: 1.125rem;
-  color: #666;
+  color: hsl(var(--muted-foreground));
 }
 
 .header {
@@ -25,12 +25,12 @@
   font-size: 2rem;
   font-weight: bold;
   margin: 0 0 0.5rem 0;
-  color: #1f2937;
+  color: hsl(var(--foreground));
 }
 
 .subtitle {
   font-size: 1rem;
-  color: #6b7280;
+  color: hsl(var(--muted-foreground));
   margin: 0;
 }
 
@@ -39,8 +39,8 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background-color: #000;
-  color: #fff;
+  background-color: hsl(var(--foreground));
+  color: hsl(var(--surface));
   border: none;
   border-radius: 0.5rem;
   font-weight: 500;
@@ -51,14 +51,14 @@
 }
 
 .createButton:hover {
-  background-color: #1f2937;
+  background-color: hsl(var(--foreground));
 }
 
 .errorMessage {
   padding: 1rem;
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #dc2626;
+  background-color: var(--destructive-surface);
+  border: 1px solid var(--destructive-border);
+  color: hsl(var(--destructive));
   border-radius: 0.5rem;
   font-size: 0.875rem;
   margin-bottom: 1.5rem;
@@ -97,21 +97,21 @@
   width: 80px;
   height: 80px;
   margin-bottom: 1.5rem;
-  background-color: #f9fafb;
+  background-color: hsl(var(--surface));
   border-radius: 50%;
-  color: #9ca3af;
+  color: hsl(var(--muted-foreground));
 }
 
 .emptyTitle {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #1f2937;
+  color: hsl(var(--foreground));
   margin: 0 0 0.75rem 0;
 }
 
 .emptyText {
   font-size: 1rem;
-  color: #6b7280;
+  color: hsl(var(--muted-foreground));
   margin: 0 0 2rem 0;
   max-width: 500px;
   line-height: 1.6;
@@ -119,8 +119,8 @@
 
 .emptyButton {
   padding: 0.875rem 2rem;
-  background-color: #000;
-  color: #fff;
+  background-color: hsl(var(--foreground));
+  color: hsl(var(--surface));
   border: none;
   border-radius: 0.5rem;
   font-weight: 500;
@@ -130,7 +130,7 @@
 }
 
 .emptyButton:hover {
-  background-color: #1f2937;
+  background-color: hsl(var(--foreground));
 }
 
 /* Delete confirmation dialog */
@@ -149,7 +149,7 @@
 }
 
 .confirmDialog {
-  background: #ffffff;
+  background: hsl(var(--surface))fff;
   border-radius: 0.75rem;
   padding: 2rem;
   max-width: 400px;
@@ -161,13 +161,13 @@
 .confirmTitle {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1f2937;
+  color: hsl(var(--foreground));
   margin: 0 0 0.75rem 0;
 }
 
 .confirmText {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: hsl(var(--muted-foreground));
   margin: 0 0 1.5rem 0;
   line-height: 1.5;
 }
@@ -180,9 +180,9 @@
 
 .cancelButton {
   padding: 0.75rem 1.5rem;
-  background-color: #ffffff;
-  color: #374151;
-  border: 1px solid #d1d5db;
+  background-color: hsl(var(--surface))fff;
+  color: hsl(var(--foreground));
+  border: 1px solid hsl(var(--border));
   border-radius: 0.375rem;
   font-weight: 500;
   font-size: 0.875rem;
@@ -191,15 +191,15 @@
 }
 
 .cancelButton:hover {
-  background-color: #f9fafb;
-  border-color: #9ca3af;
+  background-color: hsl(var(--surface));
+  border-color: hsl(var(--muted-foreground));
 }
 
 .deleteButton {
   padding: 0.75rem 1.5rem;
-  background-color: #ef4444;
-  color: #ffffff;
-  border: 1px solid #ef4444;
+  background-color: hsl(var(--destructive-strong));
+  color: hsl(var(--surface))fff;
+  border: 1px solid hsl(var(--destructive-strong));
   border-radius: 0.375rem;
   font-weight: 500;
   font-size: 0.875rem;
@@ -208,8 +208,8 @@
 }
 
 .deleteButton:hover {
-  background-color: #dc2626;
-  border-color: #dc2626;
+  background-color: hsl(var(--destructive));
+  border-color: hsl(var(--destructive));
 }
 
 /* Mobile responsiveness */
@@ -268,3 +268,6 @@
     min-height: 44px;
   }
 }
+
+
+

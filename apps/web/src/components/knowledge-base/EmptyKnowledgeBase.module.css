@@ -16,20 +16,20 @@
 .title {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #1f2937;
+  color: hsl(var(--foreground));
   margin-bottom: 0.75rem;
 }
 
 .description {
   font-size: 1rem;
-  color: #6b7280;
+  color: hsl(var(--muted-foreground));
   max-width: 500px;
   line-height: 1.6;
   margin-bottom: 2rem;
 }
 
 .uploadButton {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-strong)) 100%);
   color: white;
   border: none;
   padding: 0.75rem 2rem;
@@ -53,7 +53,7 @@
 .examples {
   margin-top: 3rem;
   padding-top: 2rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid hsl(var(--border));
   width: 100%;
   max-width: 600px;
 }
@@ -61,7 +61,7 @@
 .examplesTitle {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #6b7280;
+  color: hsl(var(--muted-foreground));
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 1rem;
@@ -78,13 +78,13 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1rem;
-  background: #f9fafb;
+  background: hsl(var(--surface));
   border-radius: 8px;
   transition: all 0.2s ease;
 }
 
 .exampleItem:hover {
-  background: #f3f4f6;
+  background: hsl(var(--muted));
   transform: translateX(4px);
 }
 
@@ -94,7 +94,7 @@
 
 .exampleLabel {
   font-size: 0.875rem;
-  color: #4b5563;
+  color: hsl(var(--muted-foreground));
   font-weight: 500;
 }
 
@@ -116,3 +116,6 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+

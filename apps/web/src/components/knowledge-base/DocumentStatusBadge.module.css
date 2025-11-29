@@ -59,19 +59,19 @@
 
 /* Status-specific styles */
 .trained {
-  border: 1px solid #10b98140;
+  border: 1px solid color-mix(in srgb, hsl(var(--success)) 25%, transparent);
 }
 
 .training {
-  border: 1px solid #3b82f640;
+  border: 1px solid hsl(var(--primary))40;
 }
 
 .not_trained {
-  border: 1px solid #6b728040;
+  border: 1px solid hsl(var(--muted-foreground))40;
 }
 
 .failed {
-  border: 1px solid #ef444440;
+  border: 1px solid color-mix(in srgb, hsl(var(--destructive)) 25%, transparent);
 }
 
 /* Responsive */
@@ -84,3 +84,6 @@
     padding: 4px 8px;
   }
 }
+
+
+

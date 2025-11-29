@@ -2,35 +2,91 @@
   box-sizing: border-box;
 }
 
-html,
-body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
+@layer base {
+  :root {
+    color-scheme: light;
+    --background: 220 20% 96%;
+    --foreground: 220 18% 15%;
+    --surface: 0 0% 100%;
+    --surface-foreground: 220 18% 15%;
+    --primary: 213 86% 38%; /* hsl(var(--primary)) */
+    --primary-strong: 213 92% 32%; /* hover */
+    --primary-foreground: 0 0% 100%;
+    --accent: 210 57% 92%; /* soft blue surface */
+    --accent-foreground: 220 18% 18%;
+    --muted: 220 12% 90%;
+    --muted-foreground: 220 10% 45%;
+    --primary-soft: color-mix(in srgb, hsl(var(--primary)) 15%, hsl(var(--surface)) 85%);
+    --accent-soft: color-mix(in srgb, hsl(var(--accent)) 35%, hsl(var(--surface)) 65%);
+    --destructive-strong: color-mix(in srgb, hsl(var(--destructive)) 85%, hsl(var(--surface)) 15%);
+    --destructive-surface: color-mix(in srgb, hsl(var(--destructive)) 12%, hsl(var(--surface)) 88%);
+    --success: 142 71% 45%;
+    --warning: 43 95% 56%;
+    --info: 199 89% 48%;
+    --destructive: 0 75% 56%;
+    --overlay: 0 0% 100% / 0.85;
+    --backdrop: 220 20% 12% / 0.45;
+    --border: 220 15% 85%;
+  }
 
-body.dark {
-  background: #1e1e1e;
-  color: #fff;
-}
+  .dark {
+    color-scheme: dark;
+    --background: 0 0% 12%; /* hsl(var(--background)) */
+    --foreground: 0 0% 96%;
+    --surface: 0 0% 10%;
+    --surface-foreground: 0 0% 96%;
+    --primary: 213 80% 68%;
+    --primary-strong: 213 86% 58%;
+    --primary-foreground: 0 0% 8%;
+    --accent: 213 25% 18%;
+    --accent-foreground: 0 0% 96%;
+    --muted: 213 18% 18%;
+    --muted-foreground: 213 12% 70%;
+    --primary-soft: color-mix(in srgb, hsl(var(--primary)) 25%, hsl(var(--surface)) 75%);
+    --accent-soft: color-mix(in srgb, hsl(var(--accent)) 35%, hsl(var(--surface)) 65%);
+    --destructive-strong: color-mix(in srgb, hsl(var(--destructive)) 85%, hsl(var(--surface)) 15%);
+    --destructive-surface: color-mix(in srgb, hsl(var(--destructive)) 16%, hsl(var(--surface)) 84%);
+    --success: 142 71% 40%;
+    --warning: 43 95% 56%;
+    --info: 199 89% 58%;
+    --destructive: 0 68% 46%;
+    --overlay: 0 0% 0% / 0.6;
+    --backdrop: 0 0% 0% / 0.65;
+    --border: 213 18% 24%;
+  }
 
-html {
-  background: #f5f5f4;
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
 
-  font-family:
-    'Segoe UI',
-    -apple-system,
-    BlinkMacSystemFont,
-    'Roboto',
-    'Oxygen',
-    'Ubuntu',
-    'Cantarell',
-    'Fira Sans',
-    'Droid Sans',
-    'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  html,
+  body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family:
+      'Segoe UI',
+      -apple-system,
+      BlinkMacSystemFont,
+      'Roboto',
+      'Oxygen',
+      'Ubuntu',
+      'Cantarell',
+      'Fira Sans',
+      'Droid Sans',
+      'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+
+  #root {
+    height: 100%;
+  }
 }
 
 button {
@@ -44,3 +100,5 @@ button:focus {
 #root {
   height: 100%;
 }
+
+

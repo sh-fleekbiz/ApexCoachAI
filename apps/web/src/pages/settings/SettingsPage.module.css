@@ -10,14 +10,14 @@
   align-items: center;
   min-height: 400px;
   font-size: 1.125rem;
-  color: #666;
+  color: hsl(var(--muted-foreground));
 }
 
 .title {
   font-size: 2rem;
   font-weight: bold;
   margin-bottom: 2rem;
-  color: #333;
+  color: hsl(var(--foreground));
 }
 
 .form {
@@ -28,21 +28,21 @@
 
 .section {
   padding: 1.5rem;
-  background: #f9fafb;
+  background: hsl(var(--surface));
   border-radius: 0.5rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid hsl(var(--border));
 }
 
 .sectionTitle {
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  color: #1f2937;
+  color: hsl(var(--foreground));
 }
 
 .helpText {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: hsl(var(--muted-foreground));
   margin-bottom: 1rem;
 }
 
@@ -58,7 +58,7 @@
   display: block;
   font-weight: 500;
   margin-bottom: 0.5rem;
-  color: #374151;
+  color: hsl(var(--foreground));
   font-size: 0.875rem;
 }
 
@@ -66,7 +66,7 @@
 .select {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid hsl(var(--border));
   border-radius: 0.375rem;
   font-size: 1rem;
   transition:
@@ -77,12 +77,12 @@
 .input:focus,
 .select:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: hsl(var(--primary));
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .input::placeholder {
-  color: #9ca3af;
+  color: hsl(var(--muted-foreground));
 }
 
 .select {
@@ -96,9 +96,9 @@
 
 .errorMessage {
   padding: 1rem;
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #dc2626;
+  background-color: var(--destructive-surface);
+  border: 1px solid var(--destructive-border);
+  color: hsl(var(--destructive));
   border-radius: 0.375rem;
   font-size: 0.875rem;
 }
@@ -120,8 +120,8 @@
 
 .saveButton {
   padding: 0.75rem 2rem;
-  background-color: #000;
-  color: #fff;
+  background-color: hsl(var(--foreground));
+  color: hsl(var(--surface));
   border: none;
   border-radius: 0.375rem;
   font-weight: 500;
@@ -134,7 +134,7 @@
 }
 
 .saveButton:hover:not(:disabled) {
-  background-color: #1f2937;
+  background-color: hsl(var(--foreground));
 }
 
 .saveButton:disabled {
@@ -144,20 +144,20 @@
 
 .emptyPersonalityState {
   padding: 1rem;
-  background-color: #f9fafb;
+  background-color: hsl(var(--surface));
   border-radius: 0.375rem;
-  border: 1px dashed #d1d5db;
+  border: 1px dashed hsl(var(--border));
 }
 
 .link {
-  color: #3b82f6;
+  color: hsl(var(--primary));
   text-decoration: none;
   font-weight: 500;
   transition: color 0.15s ease-in-out;
 }
 
 .link:hover {
-  color: #2563eb;
+  color: hsl(var(--primary-strong));
   text-decoration: underline;
 }
 
@@ -193,3 +193,6 @@
     min-height: 44px; /* iOS minimum touch target */
   }
 }
+
+
+

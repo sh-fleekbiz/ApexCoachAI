@@ -44,30 +44,30 @@
   align-items: center;
   justify-content: space-between;
   padding: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid hsl(var(--border));
 }
 
 .title {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #1f2937;
+  color: hsl(var(--foreground));
 }
 
 .closeButton {
   width: 32px;
   height: 32px;
   border: none;
-  background: #f3f4f6;
+  background: hsl(var(--muted));
   border-radius: 6px;
   cursor: pointer;
   font-size: 1.25rem;
-  color: #6b7280;
+  color: hsl(var(--muted-foreground));
   transition: all 0.2s ease;
 }
 
 .closeButton:hover:not(:disabled) {
-  background: #e5e7eb;
-  color: #1f2937;
+  background: hsl(var(--border));
+  color: hsl(var(--foreground));
 }
 
 .closeButton:disabled {
@@ -77,7 +77,7 @@
 
 .tabs {
   display: flex;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid hsl(var(--border));
   padding: 0 1.5rem;
 }
 
@@ -85,7 +85,7 @@
   padding: 1rem 1.5rem;
   border: none;
   background: none;
-  color: #6b7280;
+  color: hsl(var(--muted-foreground));
   font-weight: 500;
   cursor: pointer;
   border-bottom: 2px solid transparent;
@@ -93,7 +93,7 @@
 }
 
 .tab:hover:not(:disabled) {
-  color: #1f2937;
+  color: hsl(var(--foreground));
 }
 
 .tab:disabled {
@@ -102,8 +102,8 @@
 }
 
 .activeTab {
-  color: #3b82f6;
-  border-bottom-color: #3b82f6;
+  color: hsl(var(--primary));
+  border-bottom-color: hsl(var(--primary));
 }
 
 .form {
@@ -115,7 +115,7 @@
 }
 
 .dropZone {
-  border: 2px dashed #d1d5db;
+  border: 2px dashed hsl(var(--border));
   border-radius: 8px;
   padding: 3rem 2rem;
   text-align: center;
@@ -124,13 +124,13 @@
 }
 
 .dropZone:hover {
-  border-color: #3b82f6;
-  background: #eff6ff;
+  border-color: hsl(var(--primary));
+  background: var(--accent-soft);
 }
 
 .dragging {
-  border-color: #3b82f6;
-  background: #eff6ff;
+  border-color: hsl(var(--primary));
+  background: var(--accent-soft);
 }
 
 .dropIcon {
@@ -140,13 +140,13 @@
 
 .dropText {
   font-size: 1rem;
-  color: #1f2937;
+  color: hsl(var(--foreground));
   margin-bottom: 0.5rem;
 }
 
 .dropHint {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: hsl(var(--muted-foreground));
 }
 
 .fileInput {
@@ -165,14 +165,14 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem;
-  background: #f9fafb;
+  background: hsl(var(--surface));
   border-radius: 6px;
 }
 
 .fileName {
   flex: 1;
   font-size: 0.875rem;
-  color: #1f2937;
+  color: hsl(var(--foreground));
   font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -181,23 +181,23 @@
 
 .fileSize {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: hsl(var(--muted-foreground));
 }
 
 .removeFile {
   width: 24px;
   height: 24px;
   border: none;
-  background: #e5e7eb;
+  background: hsl(var(--border));
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.875rem;
-  color: #6b7280;
+  color: hsl(var(--muted-foreground));
   transition: all 0.2s ease;
 }
 
 .removeFile:hover {
-  background: #dc2626;
+  background: hsl(var(--destructive));
   color: white;
 }
 
@@ -207,7 +207,7 @@
   gap: 0.5rem;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #374151;
+  color: hsl(var(--foreground));
   margin-bottom: 1rem;
 }
 
@@ -215,7 +215,7 @@
 .textarea,
 .select {
   padding: 0.75rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid hsl(var(--border));
   border-radius: 6px;
   font-size: 0.875rem;
   transition: all 0.2s ease;
@@ -225,14 +225,14 @@
 .textarea:focus,
 .select:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: hsl(var(--primary));
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .input:disabled,
 .textarea:disabled,
 .select:disabled {
-  background: #f9fafb;
+  background: hsl(var(--surface));
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -257,15 +257,15 @@
 
 .checkbox span {
   font-size: 0.875rem;
-  color: #374151;
+  color: hsl(var(--foreground));
 }
 
 .error {
   padding: 0.75rem;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
+  background: var(--destructive-surface);
+  border: 1px solid var(--destructive-border);
   border-radius: 6px;
-  color: #dc2626;
+  color: hsl(var(--destructive));
   font-size: 0.875rem;
   margin-bottom: 1rem;
 }
@@ -277,7 +277,7 @@
 .progressBar {
   width: 100%;
   height: 8px;
-  background: #e5e7eb;
+  background: hsl(var(--border));
   border-radius: 4px;
   overflow: hidden;
   margin-bottom: 0.5rem;
@@ -285,7 +285,7 @@
 
 .progressFill {
   height: 100%;
-  background: linear-gradient(90deg, #3b82f6, #2563eb);
+  background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--primary-strong)));
   transition: width 0.3s ease;
   border-radius: 4px;
 }
@@ -293,7 +293,7 @@
 .progressText {
   text-align: center;
   font-size: 0.875rem;
-  color: #6b7280;
+  color: hsl(var(--muted-foreground));
 }
 
 .actions {
@@ -314,16 +314,16 @@
 
 .cancelButton {
   background: white;
-  color: #374151;
-  border: 1px solid #d1d5db;
+  color: hsl(var(--foreground));
+  border: 1px solid hsl(var(--border));
 }
 
 .cancelButton:hover:not(:disabled) {
-  background: #f9fafb;
+  background: hsl(var(--surface));
 }
 
 .submitButton {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-strong)) 100%);
   color: white;
 }
 
@@ -362,3 +362,6 @@
     padding: 2rem 1rem;
   }
 }
+
+
+

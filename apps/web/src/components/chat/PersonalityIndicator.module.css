@@ -8,20 +8,20 @@
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background-color: #f3f4f6;
-  border: 1px solid #e5e7eb;
+  background-color: hsl(var(--muted));
+  border: 1px solid hsl(var(--border));
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
   width: 100%;
   text-align: left;
   font-size: 14px;
-  color: #374151;
+  color: hsl(var(--foreground));
 }
 
 .badge:hover {
-  background-color: #e5e7eb;
-  border-color: #d1d5db;
+  background-color: hsl(var(--border));
+  border-color: hsl(var(--border));
 }
 
 .badge:active {
@@ -36,28 +36,28 @@
 .text {
   flex: 1;
   font-size: 14px;
-  color: #374151;
+  color: hsl(var(--foreground));
 }
 
 .text strong {
-  color: #111827;
+  color: hsl(var(--foreground));
   font-weight: 600;
 }
 
 .expandIcon {
   font-size: 10px;
-  color: #9ca3af;
+  color: hsl(var(--muted-foreground));
   transition: transform 0.2s ease;
 }
 
 .description {
   margin-top: 8px;
   padding: 12px 16px;
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
+  background-color: hsl(var(--surface))fff;
+  border: 1px solid hsl(var(--border));
   border-radius: 6px;
   font-size: 13px;
-  color: #6b7280;
+  color: hsl(var(--muted-foreground));
   line-height: 1.6;
   animation: slideDown 0.2s ease-out;
 }
@@ -79,32 +79,32 @@
 
 /* Dark theme support */
 body.dark .badge {
-  background-color: #1f2937;
-  border-color: #374151;
-  color: #e5e7eb;
+  background-color: hsl(var(--foreground));
+  border-color: hsl(var(--foreground));
+  color: hsl(var(--border));
 }
 
 body.dark .badge:hover {
-  background-color: #374151;
-  border-color: #4b5563;
+  background-color: hsl(var(--foreground));
+  border-color: hsl(var(--muted-foreground));
 }
 
 body.dark .text {
-  color: #e5e7eb;
+  color: hsl(var(--border));
 }
 
 body.dark .text strong {
-  color: #f9fafb;
+  color: hsl(var(--surface));
 }
 
 body.dark .expandIcon {
-  color: #6b7280;
+  color: hsl(var(--muted-foreground));
 }
 
 body.dark .description {
-  background-color: #111827;
-  border-color: #374151;
-  color: #9ca3af;
+  background-color: hsl(var(--foreground));
+  border-color: hsl(var(--foreground));
+  color: hsl(var(--muted-foreground));
 }
 
 /* Responsive design */
@@ -119,3 +119,6 @@ body.dark .description {
     font-size: 12px;
   }
 }
+
+
+

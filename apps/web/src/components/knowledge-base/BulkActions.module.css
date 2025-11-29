@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.5rem;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-strong)) 100%);
   color: white;
   border-radius: 8px;
   margin-bottom: 1rem;
@@ -79,13 +79,13 @@
 }
 
 .danger {
-  background: #dc2626;
+  background: hsl(var(--destructive));
   color: white;
-  border: 1px solid #b91c1c;
+  border: 1px solid hsl(var(--destructive-strong));
 }
 
 .danger:hover {
-  background: #b91c1c;
+  background: hsl(var(--destructive-strong));
 }
 
 .ghost {
@@ -123,7 +123,7 @@
   padding: 0.75rem 1rem;
   border: none;
   background: none;
-  color: #1f2937;
+  color: hsl(var(--foreground));
   text-align: left;
   cursor: pointer;
   transition: background 0.2s ease;
@@ -131,7 +131,7 @@
 }
 
 .dropdownItem:hover {
-  background: #f3f4f6;
+  background: hsl(var(--muted));
 }
 
 /* Confirm Dialog */
@@ -182,12 +182,12 @@
 .confirmTitle {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1f2937;
+  color: hsl(var(--foreground));
   margin-bottom: 0.75rem;
 }
 
 .confirmText {
-  color: #6b7280;
+  color: hsl(var(--muted-foreground));
   line-height: 1.6;
   margin-bottom: 1.5rem;
 }
@@ -200,9 +200,9 @@
 
 .cancelButton {
   padding: 0.5rem 1rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid hsl(var(--border));
   background: white;
-  color: #374151;
+  color: hsl(var(--foreground));
   border-radius: 6px;
   font-weight: 500;
   cursor: pointer;
@@ -210,13 +210,13 @@
 }
 
 .cancelButton:hover {
-  background: #f9fafb;
+  background: hsl(var(--surface));
 }
 
 .deleteButton {
   padding: 0.5rem 1rem;
   border: none;
-  background: #dc2626;
+  background: hsl(var(--destructive));
   color: white;
   border-radius: 6px;
   font-weight: 500;
@@ -225,7 +225,7 @@
 }
 
 .deleteButton:hover {
-  background: #b91c1c;
+  background: hsl(var(--destructive-strong));
 }
 
 /* Responsive */
@@ -246,3 +246,6 @@
     min-width: 100px;
   }
 }
+
+
+

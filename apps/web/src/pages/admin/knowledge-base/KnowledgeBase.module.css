@@ -14,17 +14,17 @@
 .title {
   font-size: 2rem;
   font-weight: 700;
-  color: #1f2937;
+  color: hsl(var(--foreground));
   margin-bottom: 0.5rem;
 }
 
 .subtitle {
   font-size: 1rem;
-  color: #6b7280;
+  color: hsl(var(--muted-foreground));
 }
 
 .uploadButton {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-strong)) 100%);
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -44,7 +44,7 @@
 .loading {
   text-align: center;
   padding: 4rem 2rem;
-  color: #6b7280;
+  color: hsl(var(--muted-foreground));
   font-size: 1.125rem;
 }
 
@@ -65,7 +65,7 @@
 .errorMessage {
   background: #fee2e2;
   color: #991b1b;
-  border: 1px solid #fecaca;
+  border: 1px solid var(--destructive-border);
 }
 
 /* Stats Grid */
@@ -103,14 +103,14 @@
 .statValue {
   font-size: 2rem;
   font-weight: 700;
-  color: #1f2937;
+  color: hsl(var(--foreground));
   line-height: 1;
   margin-bottom: 0.25rem;
 }
 
 .statLabel {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: hsl(var(--muted-foreground));
 }
 
 /* Filters */
@@ -123,7 +123,7 @@
 .searchInput,
 .filterSelect {
   padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid hsl(var(--border));
   border-radius: 8px;
   font-size: 0.875rem;
   transition: all 0.2s ease;
@@ -137,7 +137,7 @@
 .searchInput:focus,
 .filterSelect:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: hsl(var(--primary));
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
@@ -159,7 +159,7 @@
 }
 
 .table thead {
-  background: #f9fafb;
+  background: hsl(var(--surface));
 }
 
 .table th {
@@ -167,28 +167,28 @@
   text-align: left;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: hsl(var(--foreground));
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .table tbody tr {
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid hsl(var(--border));
   transition: background 0.2s ease;
 }
 
 .table tbody tr:hover {
-  background: #f9fafb;
+  background: hsl(var(--surface));
 }
 
 .selectedRow {
-  background: #eff6ff !important;
+  background: var(--accent-soft) !important;
 }
 
 .table td {
   padding: 1rem;
   font-size: 0.875rem;
-  color: #1f2937;
+  color: hsl(var(--foreground));
 }
 
 .checkboxColumn {
@@ -213,14 +213,14 @@
 
 .docTitle {
   font-weight: 500;
-  color: #1f2937;
+  color: hsl(var(--foreground));
 }
 
 .typeBadge {
   display: inline-block;
   padding: 0.25rem 0.75rem;
-  background: #f3f4f6;
-  color: #6b7280;
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
   border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 600;
@@ -230,7 +230,7 @@
 .programBadge {
   display: inline-block;
   padding: 0.25rem 0.75rem;
-  background: #dbeafe;
+  background: var(--accent-soft);
   color: #1e40af;
   border-radius: 6px;
   font-size: 0.75rem;
@@ -238,11 +238,11 @@
 }
 
 .noProgram {
-  color: #9ca3af;
+  color: hsl(var(--muted-foreground));
 }
 
 .dateCell {
-  color: #6b7280;
+  color: hsl(var(--muted-foreground));
   font-size: 0.8125rem;
 }
 
@@ -254,7 +254,7 @@
 .actionButton {
   width: 32px;
   height: 32px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid hsl(var(--border));
   background: white;
   border-radius: 6px;
   cursor: pointer;
@@ -266,8 +266,8 @@
 }
 
 .actionButton:hover:not(:disabled) {
-  background: #f3f4f6;
-  border-color: #d1d5db;
+  background: hsl(var(--muted));
+  border-color: hsl(var(--border));
 }
 
 .actionButton:disabled {
@@ -277,14 +277,14 @@
 
 .deleteAction:hover {
   background: #fee2e2;
-  border-color: #fecaca;
+  border-color: var(--destructive-border);
 }
 
 /* No Results */
 .noResults {
   text-align: center;
   padding: 3rem 2rem;
-  color: #6b7280;
+  color: hsl(var(--muted-foreground));
 }
 
 .noResults p {
@@ -294,7 +294,7 @@
 
 .noResults button {
   padding: 0.5rem 1rem;
-  background: #3b82f6;
+  background: hsl(var(--primary));
   color: white;
   border: none;
   border-radius: 6px;
@@ -304,7 +304,7 @@
 }
 
 .noResults button:hover {
-  background: #2563eb;
+  background: hsl(var(--primary-strong));
 }
 
 /* Responsive */
@@ -365,3 +365,6 @@
     font-size: 0.8125rem;
   }
 }
+
+
+

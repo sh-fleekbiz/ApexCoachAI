@@ -5,6 +5,7 @@ import { knowledgeBaseRepository } from '../db/knowledge-base-repository.js';
 import { programRepository } from '../db/program-repository.js';
 import type { User } from '../db/user-repository.js';
 import { userRepository } from '../db/user-repository.js';
+import { RetrainingService } from '../lib/retraining-service.js';
 
 // Type declaration for authenticated request
 interface AuthenticatedRequest extends FastifyRequest {
@@ -619,8 +620,21 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
         meta_json: { documentId, title: document.title },
       });
 
-      // TODO: Trigger actual training job (queue, Azure Functions, etc.)
-      // For now, just set to training status
+      // Perform actual retraining asynchronously
+      const retrainingService = new RetrainingService(fastify.log);
+      
+      // Run retraining in background (don't await)
+      retrainingService.retrainDocument(documentId)
+        .then((result) => {
+          if (result.success) {
+            fastify.log.info({ documentId, sectionsCreated: result.sectionsCreated }, 'Document retraining completed');
+          } else {
+            fastify.log.error({ documentId, error: result.error }, 'Document retraining failed');
+          }
+        })
+        .catch((error) => {
+          fastify.log.error({ documentId, error }, 'Document retraining error');
+        });
 
       return { success: true, message: 'Retraining initiated' };
     } catch (error) {
@@ -728,7 +742,24 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
         meta_json: { retrained, failed },
       });
 
-      // TODO: Trigger actual training jobs for all documents
+      // Perform actual retraining asynchronously for all documents
+      if (retrained.length > 0) {
+        const retrainingService = new RetrainingService(fastify.log);
+        
+        // Run retraining in background (don't await)
+        retrainingService.retrainDocuments(retrained)
+          .then((results) => {
+            const successCount = results.filter(r => r.success).length;
+            const failCount = results.filter(r => !r.success).length;
+            fastify.log.info(
+              { successCount, failCount, total: retrained.length },
+              'Bulk document retraining completed'
+            );
+          })
+          .catch((error) => {
+            fastify.log.error({ error }, 'Bulk document retraining error');
+          });
+      }
 
       return { success: true, retrained, failed };
     } catch (error) {
