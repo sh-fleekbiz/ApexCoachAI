@@ -4,6 +4,35 @@
 
 This repo uses shared Azure infrastructure and the **Azure OpenAI Responses API**.
 
+## ⚡ Quick Reference (Read First)
+
+- **Infra & Azure**
+  - No new Azure infra (no new resource groups, storage, Postgres, search).
+  - Use **Responses API** (`/openai/v1/responses`) with `input` + `previous_response_id`.
+  - Never expose `AZURE_OPENAI_API_KEY` to client-side code.
+
+- **Repo Hygiene**
+  - No `archive/`, `old/`, `backup/`, `temp/`, `misc/`, `legacy/` folders.
+  - No commented-out code, debug `console.log` in production, or stale TODOs.
+  - No new docs files; always update existing single sources of truth.
+
+- **Structure & Naming**
+  - Frontend in `apps/web/src` using `components/`, `features/`, `pages/`, `services/`, etc.
+  - Backend in `apps/services/*` (e.g. `search`, `indexer`).
+  - Components = PascalCase, files = kebab-case, features = kebab-case folders.
+
+- **Dependencies & Tooling**
+  - Use only approved dependencies (see `REPOSITORY_STRUCTURE.md`).
+  - Remove unused deps; avoid tooling bloat.
+  - No Turborepo or new CI/CD workflows; prefer simple root `pnpm`/`npm` scripts.
+
+- **Cleanup & Refactors**
+  - Prefer deleting low-value code over archiving.
+  - Classify changes as P1/P2/P3 and follow phased cleanup (quick wins → structure → tooling).
+  - When updating `AGENTS.md` or Copilot instructions, extend and tighten guidance instead of replacing it.
+
+For full details and rationale, the sections below are **normative** and must be followed exactly.
+
 ## 🛑 HARD RULES (DO NOT BREAK)
 
 1. **NO NEW INFRA:** Do not create Resource Groups, Storage Accounts, or Postgres Servers.

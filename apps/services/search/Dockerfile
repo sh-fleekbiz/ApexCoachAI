@@ -44,4 +44,4 @@ WORKDIR /app/apps/services/search
 RUN npx prisma generate
 
 EXPOSE 3000
-CMD [ "node", "dist/app.js" ]
+CMD [ "node", "dist/server.js" ]
