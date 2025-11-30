@@ -32,4 +32,14 @@ export default fp(async (fastify) => {
     routePrefix: '/openapi',
     staticCSP: true,
   });
+
+  // Add /docs redirect to /openapi for consistency
+  fastify.get('/docs', async (_request, reply) => {
+    return reply.redirect('/openapi');
+  });
+
+  // Expose OpenAPI JSON at /openapi.json (dynamically generated)
+  fastify.get('/openapi.json', async (_request, reply) => {
+    return reply.send(fastify.swagger());
+  });
 });
