@@ -1,5 +1,4 @@
 import { type FastifyPluginAsync } from 'fastify';
-import { withClient } from '../lib/db.js';
 
 interface LibraryFilters {
   status?: string;
@@ -16,55 +15,49 @@ const library: FastifyPluginAsync = async (
     const { status, search, programId } = request.query as LibraryFilters;
 
     try {
-      const result = await withClient(async (client) => {
-        let query = 'SELECT * FROM library_resources WHERE 1=1';
-        const queryParams: (string | number)[] = [];
-        let paramIndex = 1;
+      const where: any = {};
+      
+      // Add status filter
+      if (status && status !== 'all') {
+        where.status = status;
+      }
 
-        // Add status filter
-        if (status && status !== 'all') {
-          query += ` AND status = $${paramIndex}`;
-          queryParams.push(status);
-          paramIndex++;
+      // Add search filter (search in title and source)
+      if (search && search.trim()) {
+        where.OR = [
+          { title: { contains: search.trim(), mode: 'insensitive' } },
+          { source: { contains: search.trim(), mode: 'insensitive' } },
+        ];
+      }
+
+      // Add program filter
+      if (programId) {
+        const programIdNum = Number.parseInt(programId, 10);
+        if (!Number.isNaN(programIdNum)) {
+          where.programId = programIdNum;
         }
+      }
 
-        // Add search filter (search in title and description)
-        if (search && search.trim()) {
-          query += ` AND (title ILIKE $${paramIndex} OR source ILIKE $${paramIndex})`;
-          queryParams.push(`%${search.trim()}%`);
-          paramIndex++;
-        }
-
-        // Add program filter
-        if (programId) {
-          const programIdNum = Number.parseInt(programId, 10);
-          if (!Number.isNaN(programIdNum)) {
-            query += ` AND program_id = $${paramIndex}`;
-            queryParams.push(programIdNum);
-            paramIndex++;
-          }
-        }
-
-        query += ' ORDER BY created_at DESC';
-
-        return await client.query(query, queryParams);
+      const result = await fastify.prisma.libraryResource.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
       });
 
       return {
-        resources: result.rows.map((row) => ({
+        resources: result.map((row) => ({
           id: row.id,
-          programId: row.program_id,
+          programId: row.programId,
           title: row.title,
           description: null, // Not in schema, but keeping for future
           type: row.type,
           source: row.source,
-          thumbnailUrl: row.thumbnail_url,
+          thumbnailUrl: row.thumbnailUrl,
           status: row.status,
-          transcriptJson: row.transcript_json,
-          durationSeconds: row.duration_seconds,
-          speakerMetaJson: row.speaker_meta_json,
-          createdAt: row.created_at,
-          updatedAt: row.updated_at,
+          transcriptJson: row.transcriptJson,
+          durationSeconds: row.durationSeconds,
+          speakerMetaJson: row.speakerMetaJson,
+          createdAt: row.createdAt,
+          updatedAt: row.updatedAt,
         })),
       };
     } catch (error) {
@@ -89,35 +82,31 @@ const library: FastifyPluginAsync = async (
     }
 
     try {
-      const result = await withClient(async (client) => {
-        return await client.query(
-          'SELECT * FROM library_resources WHERE id = $1',
-          [resourceId]
-        );
+      const row = await fastify.prisma.libraryResource.findUnique({
+        where: { id: resourceId },
       });
 
-      if (result.rows.length === 0) {
+      if (!row) {
         return reply.code(404).send({
           error: 'Resource not found',
           error_message: `Resource with ID ${resourceId} does not exist`,
         });
       }
 
-      const row = result.rows[0];
       return {
         id: row.id,
-        programId: row.program_id,
+        programId: row.programId,
         title: row.title,
         description: null,
         type: row.type,
         source: row.source,
-        thumbnailUrl: row.thumbnail_url,
+        thumbnailUrl: row.thumbnailUrl,
         status: row.status,
-        transcriptJson: row.transcript_json,
-        durationSeconds: row.duration_seconds,
-        speakerMetaJson: row.speaker_meta_json,
-        createdAt: row.created_at,
-        updatedAt: row.updated_at,
+        transcriptJson: row.transcriptJson,
+        durationSeconds: row.durationSeconds,
+        speakerMetaJson: row.speakerMetaJson,
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt,
       };
     } catch (error) {
       fastify.log.error(error);
@@ -179,37 +168,31 @@ const library: FastifyPluginAsync = async (
     }
 
     try {
-      const result = await withClient(async (client) => {
-        return await client.query(
-          `INSERT INTO library_resources
-           (title, type, source, thumbnail_url, program_id, status, created_at, updated_at)
-           VALUES ($1, $2, $3, $4, $5, 'pending', NOW(), NOW())
-           RETURNING *`,
-          [
-            title.trim(),
-            type,
-            source.trim(),
-            thumbnailUrl || null,
-            programId || null,
-          ]
-        );
+      const row = await fastify.prisma.libraryResource.create({
+        data: {
+          title: title.trim(),
+          type,
+          source: source.trim(),
+          thumbnailUrl: thumbnailUrl || null,
+          programId: programId || null,
+          status: 'pending',
+        },
       });
 
-      const row = result.rows[0];
       return {
         id: row.id,
-        programId: row.program_id,
+        programId: row.programId,
         title: row.title,
         description: null,
         type: row.type,
         source: row.source,
-        thumbnailUrl: row.thumbnail_url,
+        thumbnailUrl: row.thumbnailUrl,
         status: row.status,
-        transcriptJson: row.transcript_json,
-        durationSeconds: row.duration_seconds,
-        speakerMetaJson: row.speaker_meta_json,
-        createdAt: row.created_at,
-        updatedAt: row.updated_at,
+        transcriptJson: row.transcriptJson,
+        durationSeconds: row.durationSeconds,
+        speakerMetaJson: row.speakerMetaJson,
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt,
       };
     } catch (error) {
       fastify.log.error(error);

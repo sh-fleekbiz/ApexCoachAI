@@ -1,28 +1,19 @@
-import { withClient } from '../lib/db.js';
+import type { PrismaClient } from '@prisma/client';
 
-export interface UsageEvent {
-  id: number;
-  user_id: number;
-  type: string;
-  meta_json: string | null;
-  created_at: string;
-}
-
-export const usageEventRepository = {
+export const createUsageEventRepository = (prisma: PrismaClient) => ({
   async createUsageEvent(
-    event: Omit<UsageEvent, 'id' | 'created_at' | 'meta_json'> & {
+    event: {
+      user_id: number;
+      type: string;
       meta_json?: any;
     }
   ): Promise<void> {
-    return withClient(async (client) => {
-      await client.query(
-        'INSERT INTO usage_events (user_id, type, meta_json) VALUES ($1, $2, $3)',
-        [
-          event.user_id,
-          event.type,
-          event.meta_json ? JSON.stringify(event.meta_json) : null,
-        ]
-      );
+    await prisma.usageEvent.create({
+      data: {
+        userId: event.user_id,
+        type: event.type,
+        metaJson: event.meta_json ? JSON.stringify(event.meta_json) : null,
+      },
     });
   },
-};
+});

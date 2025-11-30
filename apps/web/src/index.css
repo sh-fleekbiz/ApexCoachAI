@@ -106,4 +106,63 @@ button:focus {
   height: 100%;
 }
 
+/* Responsive utility classes */
+.mobile-only {
+  display: none;
+}
+
+.desktop-only {
+  display: block;
+}
+
+@media (max-width: 767px) {
+  .mobile-only {
+    display: block;
+  }
+
+  .desktop-only {
+    display: none;
+  }
+}
+
+/* Touch target minimum sizes */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Responsive padding utilities */
+.responsive-padding {
+  padding: 16px 20px;
+}
+
+@media (min-width: 768px) {
+  .responsive-padding {
+    padding: 24px 32px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .responsive-padding {
+    padding: 32px 48px;
+  }
+}
+
+/* Responsive margin utilities */
+.responsive-margin {
+  margin: 16px;
+}
+
+@media (min-width: 768px) {
+  .responsive-margin {
+    margin: 24px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .responsive-margin {
+    margin: 32px;
+  }
+}
+
 

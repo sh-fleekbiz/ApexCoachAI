@@ -1,17 +1,4 @@
-import { withClient } from '../lib/db.js';
-
-interface KnowledgeBaseDocument {
-  id: number;
-  program_id: number | null;
-  title: string;
-  type: string;
-  source: string;
-  status: string;
-  training_status: string;
-  metadata: any;
-  created_at: Date;
-  updated_at: Date;
-}
+import type { PrismaClient, KnowledgeBaseDocument } from '@prisma/client';
 
 interface KnowledgeBaseFilters {
   status?: string;
@@ -20,62 +7,57 @@ interface KnowledgeBaseFilters {
   trainingStatus?: string;
 }
 
-export const knowledgeBaseRepository = {
+export const createKnowledgeBaseRepository = (prisma: PrismaClient) => ({
   async getAllDocuments(
     filters?: KnowledgeBaseFilters
-  ): Promise<KnowledgeBaseDocument[]> {
-    return withClient(async (client) => {
-      let query = `
-        SELECT kd.*, p.name as program_name
-        FROM knowledge_base_documents kd
-        LEFT JOIN programs p ON kd.program_id = p.id
-        WHERE 1=1
-      `;
-      const params: any[] = [];
-      let paramIndex = 1;
+  ): Promise<(KnowledgeBaseDocument & { program_name?: string })[]> {
+    const where: any = {};
+    
+    if (filters?.trainingStatus) {
+      where.trainingStatus = filters.trainingStatus;
+    }
+    if (filters?.status) {
+      where.status = filters.status;
+    }
+    if (filters?.programId) {
+      where.programId = filters.programId;
+    }
+    if (filters?.search) {
+      where.title = { contains: filters.search, mode: 'insensitive' };
+    }
 
-      if (filters?.trainingStatus) {
-        query += ` AND kd.training_status = $${paramIndex}`;
-        params.push(filters.trainingStatus);
-        paramIndex++;
-      }
-
-      if (filters?.status) {
-        query += ` AND kd.status = $${paramIndex}`;
-        params.push(filters.status);
-        paramIndex++;
-      }
-
-      if (filters?.programId) {
-        query += ` AND kd.program_id = $${paramIndex}`;
-        params.push(filters.programId);
-        paramIndex++;
-      }
-
-      if (filters?.search) {
-        query += ` AND kd.title ILIKE $${paramIndex}`;
-        params.push(`%${filters.search}%`);
-        paramIndex++;
-      }
-
-      query += ' ORDER BY kd.created_at DESC';
-
-      const result = await client.query(query, params);
-      return result.rows;
+    const documents = await prisma.knowledgeBaseDocument.findMany({
+      where,
+      include: {
+        program: {
+          select: { name: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
     });
+
+    return documents.map((doc) => ({
+      ...doc,
+      program_name: doc.program?.name,
+    })) as (KnowledgeBaseDocument & { program_name?: string })[];
   },
 
-  async getDocumentById(id: number): Promise<KnowledgeBaseDocument | null> {
-    return withClient(async (client) => {
-      const result = await client.query(
-        `SELECT kd.*, p.name as program_name
-         FROM knowledge_base_documents kd
-         LEFT JOIN programs p ON kd.program_id = p.id
-         WHERE kd.id = $1`,
-        [id]
-      );
-      return result.rows[0] || null;
+  async getDocumentById(id: number): Promise<(KnowledgeBaseDocument & { program_name?: string }) | null> {
+    const doc = await prisma.knowledgeBaseDocument.findUnique({
+      where: { id },
+      include: {
+        program: {
+          select: { name: true },
+        },
+      },
     });
+
+    if (!doc) return null;
+
+    return {
+      ...doc,
+      program_name: doc.program?.name,
+    } as KnowledgeBaseDocument & { program_name?: string };
   },
 
   async createDocument(data: {
@@ -85,20 +67,16 @@ export const knowledgeBaseRepository = {
     programId?: number | null;
     metadata?: any;
   }): Promise<KnowledgeBaseDocument> {
-    return withClient(async (client) => {
-      const result = await client.query(
-        `INSERT INTO knowledge_base_documents (title, type, source, program_id, metadata, status, training_status)
-         VALUES ($1, $2, $3, $4, $5, 'pending', 'not_trained')
-         RETURNING *`,
-        [
-          data.title,
-          data.type,
-          data.source,
-          data.programId || null,
-          data.metadata ? JSON.stringify(data.metadata) : null,
-        ]
-      );
-      return result.rows[0];
+    return prisma.knowledgeBaseDocument.create({
+      data: {
+        title: data.title,
+        type: data.type,
+        source: data.source,
+        programId: data.programId ?? null,
+        metadata: data.metadata ?? null,
+        status: 'pending',
+        trainingStatus: 'not_trained',
+      },
     });
   },
 
@@ -112,112 +90,50 @@ export const knowledgeBaseRepository = {
       programId: number | null;
     }>
   ): Promise<KnowledgeBaseDocument> {
-    return withClient(async (client) => {
-      const updates: string[] = [];
-      const params: any[] = [];
-      let paramIndex = 1;
+    const updateData: any = {};
+    
+    if (data.title !== undefined) updateData.title = data.title;
+    if (data.status !== undefined) updateData.status = data.status;
+    if (data.trainingStatus !== undefined) updateData.trainingStatus = data.trainingStatus;
+    if (data.metadata !== undefined) updateData.metadata = data.metadata;
+    if (data.programId !== undefined) updateData.programId = data.programId;
 
-      if (data.title !== undefined) {
-        updates.push(`title = $${paramIndex}`);
-        params.push(data.title);
-        paramIndex++;
-      }
-
-      if (data.status !== undefined) {
-        updates.push(`status = $${paramIndex}`);
-        params.push(data.status);
-        paramIndex++;
-      }
-
-      if (data.trainingStatus !== undefined) {
-        updates.push(`training_status = $${paramIndex}`);
-        params.push(data.trainingStatus);
-        paramIndex++;
-      }
-
-      if (data.metadata !== undefined) {
-        updates.push(`metadata = $${paramIndex}`);
-        params.push(JSON.stringify(data.metadata));
-        paramIndex++;
-      }
-
-      if (data.programId !== undefined) {
-        updates.push(`program_id = $${paramIndex}`);
-        params.push(data.programId);
-        paramIndex++;
-      }
-
-      params.push(id);
-      const result = await client.query(
-        `UPDATE knowledge_base_documents SET ${updates.join(', ')} WHERE id = $${paramIndex} RETURNING *`,
-        params
-      );
-      return result.rows[0];
+    return prisma.knowledgeBaseDocument.update({
+      where: { id },
+      data: updateData,
     });
   },
 
   async deleteDocument(id: number): Promise<void> {
-    return withClient(async (client) => {
-      await client.query('DELETE FROM knowledge_base_documents WHERE id = $1', [
-        id,
-      ]);
+    await prisma.knowledgeBaseDocument.delete({
+      where: { id },
     });
   },
 
   async getOverview() {
-    return withClient(async (client) => {
-      const totalResult = await client.query(
-        'SELECT COUNT(*) as count FROM knowledge_base_documents'
-      );
-      const totalDocuments = parseInt(totalResult.rows[0].count, 10);
+    const [
+      totalDocuments,
+      trainedDocuments,
+      trainingDocuments,
+      notTrainedDocuments,
+      failedDocuments,
+      totalResources,
+    ] = await Promise.all([
+      prisma.knowledgeBaseDocument.count(),
+      prisma.knowledgeBaseDocument.count({ where: { trainingStatus: 'trained' } }),
+      prisma.knowledgeBaseDocument.count({ where: { trainingStatus: 'training' } }),
+      prisma.knowledgeBaseDocument.count({ where: { trainingStatus: 'not_trained' } }),
+      prisma.knowledgeBaseDocument.count({ where: { trainingStatus: 'failed' } }),
+      prisma.libraryResource.count(),
+    ]);
 
-      const trainedResult = await client.query(
-        'SELECT COUNT(*) as count FROM knowledge_base_documents WHERE training_status = $1',
-        ['trained']
-      );
-      const trainedDocuments = parseInt(
-        trainedResult.rows[0]?.count || '0',
-        10
-      );
-
-      const trainingResult = await client.query(
-        'SELECT COUNT(*) as count FROM knowledge_base_documents WHERE training_status = $1',
-        ['training']
-      );
-      const trainingDocuments = parseInt(
-        trainingResult.rows[0]?.count || '0',
-        10
-      );
-
-      const notTrainedResult = await client.query(
-        'SELECT COUNT(*) as count FROM knowledge_base_documents WHERE training_status = $1',
-        ['not_trained']
-      );
-      const notTrainedDocuments = parseInt(
-        notTrainedResult.rows[0]?.count || '0',
-        10
-      );
-
-      const failedResult = await client.query(
-        'SELECT COUNT(*) as count FROM knowledge_base_documents WHERE training_status = $1',
-        ['failed']
-      );
-      const failedDocuments = parseInt(failedResult.rows[0]?.count || '0', 10);
-
-      // Also get library resources count for context
-      const libraryResult = await client.query(
-        'SELECT COUNT(*) as count FROM library_resources'
-      );
-      const totalResources = parseInt(libraryResult.rows[0].count, 10);
-
-      return {
-        totalDocuments,
-        trainedDocuments,
-        trainingDocuments,
-        notTrainedDocuments,
-        failedDocuments,
-        totalResources,
-      };
-    });
+    return {
+      totalDocuments,
+      trainedDocuments,
+      trainingDocuments,
+      notTrainedDocuments,
+      failedDocuments,
+      totalResources,
+    };
   },
-};
+});

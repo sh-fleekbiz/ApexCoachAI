@@ -4,6 +4,7 @@ import {
   DefaultButton,
   Dropdown,
   Panel,
+  PanelType,
   SpinButton,
   TextField,
   Toggle,
@@ -28,6 +29,7 @@ import { PersonalityIndicator } from '../../components/chat/PersonalityIndicator
 import { RAGVisualizer } from '../../components/chat/RAGVisualizer.js';
 import { useAuth } from '../../contexts/AuthContext.js';
 import { usePersonality } from '../../contexts/PersonalityContext.js';
+import { useMobile } from '../../hooks/useMobile.js';
 import { toolTipText, toolTipTextCalloutProps } from '../../i18n/tooltips.js';
 import styles from '../../pages/chat/Chat.module.css';
 
@@ -50,6 +52,7 @@ const ChatScreen = () => {
   const [ragSourcesCount, setRagSourcesCount] = useState(0);
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
+  const isMobile = useMobile();
   const {
     personalities,
     selectedPersonalityId,
@@ -506,6 +509,20 @@ const ChatScreen = () => {
           </DefaultButton>
         )}
         isFooterAtBottom={true}
+        type={isMobile ? PanelType.largeFixed : PanelType.smallFixedFar}
+        styles={
+          isMobile
+            ? {
+                main: {
+                  width: '100vw',
+                  maxWidth: '100vw',
+                },
+                overlay: {
+                  zIndex: 1002,
+                },
+              }
+            : undefined
+        }
       >
         <TooltipHost
           calloutProps={toolTipTextCalloutProps}

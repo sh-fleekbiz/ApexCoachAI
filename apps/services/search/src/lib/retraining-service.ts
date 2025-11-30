@@ -9,9 +9,10 @@
  * 5. Update document status
  */
 
+import type { PrismaClient } from '@prisma/client';
 import { EmbeddingService, chunkText, type Logger } from './embedding-service.js';
-import { knowledgeBaseSectionsRepository, type SectionInput } from '../db/knowledge-base-sections-repository.js';
-import { knowledgeBaseRepository } from '../db/knowledge-base-repository.js';
+import { createKnowledgeBaseSectionsRepository, type SectionInput } from '../db/knowledge-base-sections-repository.js';
+import { createKnowledgeBaseRepository } from '../db/knowledge-base-repository.js';
 
 export interface RetrainResult {
   success: boolean;
@@ -24,11 +25,15 @@ export class RetrainingService {
   private embeddingService: EmbeddingService;
   private logger: Logger;
   private indexName: string;
+  private knowledgeBaseRepository: ReturnType<typeof createKnowledgeBaseRepository>;
+  private knowledgeBaseSectionsRepository: ReturnType<typeof createKnowledgeBaseSectionsRepository>;
 
-  constructor(logger: Logger, indexName: string = 'apexcoach-kb') {
+  constructor(prisma: PrismaClient, logger: Logger, indexName: string = 'apexcoach-kb') {
     this.logger = logger;
     this.indexName = indexName;
     this.embeddingService = new EmbeddingService(logger);
+    this.knowledgeBaseRepository = createKnowledgeBaseRepository(prisma);
+    this.knowledgeBaseSectionsRepository = createKnowledgeBaseSectionsRepository(prisma);
   }
 
   /**
@@ -39,7 +44,7 @@ export class RetrainingService {
 
     try {
       // 1. Fetch document metadata
-      const document = await knowledgeBaseRepository.getDocumentById(documentId);
+      const document = await this.knowledgeBaseRepository.getDocumentById(documentId);
       if (!document) {
         return {
           success: false,
@@ -52,7 +57,7 @@ export class RetrainingService {
       // 2. Get content from source
       const content = await this.fetchDocumentContent(document);
       if (!content || content.trim().length === 0) {
-        await knowledgeBaseRepository.updateDocument(documentId, {
+        await this.knowledgeBaseRepository.updateDocument(documentId, {
           trainingStatus: 'failed',
         });
         return {
@@ -67,7 +72,7 @@ export class RetrainingService {
 
       // 3. Delete existing sections for this document
       const sourceIdentifier = `kb-doc-${documentId}`;
-      await knowledgeBaseSectionsRepository.deleteSectionsBySourcefile(sourceIdentifier);
+      await this.knowledgeBaseSectionsRepository.deleteSectionsBySourcefile(sourceIdentifier);
       this.logger.debug({ documentId }, 'Deleted old sections');
 
       // 4. Chunk the content
@@ -102,7 +107,7 @@ export class RetrainingService {
       }
 
       // 6. Insert new sections
-      const inserted = await knowledgeBaseSectionsRepository.insertSectionsBatch(
+      const inserted = await this.knowledgeBaseSectionsRepository.insertSectionsBatch(
         this.indexName,
         sections
       );
@@ -124,7 +129,7 @@ export class RetrainingService {
 
       // Mark as failed
       try {
-        await knowledgeBaseRepository.updateDocument(documentId, {
+        await this.knowledgeBaseRepository.updateDocument(documentId, {
           trainingStatus: 'failed',
         });
       } catch {

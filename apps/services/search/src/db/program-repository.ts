@@ -1,101 +1,72 @@
-import { withClient } from '../lib/db.js';
+import type { PrismaClient, Program, ProgramAssignment, AssignmentRole } from '@prisma/client';
 
-export interface Program {
-  id: number;
-  name: string;
-  description: string | null;
-  created_at: string;
-  created_by_user_id: number;
-}
-
-export interface ProgramAssignment {
-  id: number;
-  program_id: number;
-  user_id: number;
-  role: 'coach' | 'participant';
-  created_at: string;
-}
-
-export const programRepository = {
+export const createProgramRepository = (prisma: PrismaClient) => ({
   async createProgram(
-    program: Omit<Program, 'id' | 'created_at'>
+    program: {
+      name: string;
+      description: string | null;
+      created_by_user_id: number;
+    }
   ): Promise<Program> {
-    return withClient(async (client) => {
-      const result = await client.query(
-        'INSERT INTO programs (name, description, created_by_user_id) VALUES ($1, $2, $3) RETURNING *',
-        [program.name, program.description, program.created_by_user_id]
-      );
-      return result.rows[0] as Program;
+    return prisma.program.create({
+      data: {
+        name: program.name,
+        description: program.description,
+        createdByUserId: program.created_by_user_id,
+      },
     });
   },
 
-  async getProgramById(id: number): Promise<Program | undefined> {
-    return withClient(async (client) => {
-      const result = await client.query(
-        'SELECT * FROM programs WHERE id = $1',
-        [id]
-      );
-      return result.rows.length > 0 ? (result.rows[0] as Program) : undefined;
+  async getProgramById(id: number): Promise<Program | null> {
+    return prisma.program.findUnique({
+      where: { id },
     });
   },
 
   async getAllPrograms(): Promise<Program[]> {
-    return withClient(async (client) => {
-      const result = await client.query('SELECT * FROM programs');
-      return result.rows as Program[];
-    });
+    return prisma.program.findMany();
   },
 
   async createProgramAssignment(
-    assignment: Omit<ProgramAssignment, 'id' | 'created_at'>
+    assignment: {
+      program_id: number;
+      user_id: number;
+      role: AssignmentRole;
+    }
   ): Promise<ProgramAssignment> {
-    return withClient(async (client) => {
-      const result = await client.query(
-        'INSERT INTO program_assignments (program_id, user_id, role) VALUES ($1, $2, $3) RETURNING *',
-        [assignment.program_id, assignment.user_id, assignment.role]
-      );
-      return result.rows[0] as ProgramAssignment;
+    return prisma.programAssignment.create({
+      data: {
+        programId: assignment.program_id,
+        userId: assignment.user_id,
+        role: assignment.role,
+      },
     });
   },
 
   async getProgramAssignmentById(
     id: number
-  ): Promise<ProgramAssignment | undefined> {
-    return withClient(async (client) => {
-      const result = await client.query(
-        'SELECT * FROM program_assignments WHERE id = $1',
-        [id]
-      );
-      return result.rows.length > 0
-        ? (result.rows[0] as ProgramAssignment)
-        : undefined;
+  ): Promise<ProgramAssignment | null> {
+    return prisma.programAssignment.findUnique({
+      where: { id },
     });
   },
 
   async getProgramAssignments(programId: number): Promise<ProgramAssignment[]> {
-    return withClient(async (client) => {
-      const result = await client.query(
-        'SELECT * FROM program_assignments WHERE program_id = $1',
-        [programId]
-      );
-      return result.rows as ProgramAssignment[];
+    return prisma.programAssignment.findMany({
+      where: { programId },
     });
   },
 
   async getUserProgramAssignments(
     userId: number
   ): Promise<ProgramAssignment[]> {
-    return withClient(async (client) => {
-      const result = await client.query(
-        'SELECT * FROM program_assignments WHERE user_id = $1',
-        [userId]
-      );
-      return result.rows as ProgramAssignment[];
+    return prisma.programAssignment.findMany({
+      where: { userId },
     });
   },
 
   async getUserProgramIds(userId: number): Promise<number[]> {
     const assignments = await this.getUserProgramAssignments(userId);
-    return assignments.map((a) => a.program_id);
+    return assignments.map((a) => a.programId);
   },
-};
+});

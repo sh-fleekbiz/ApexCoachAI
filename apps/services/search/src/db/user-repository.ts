@@ -1,116 +1,83 @@
-import { withClient } from '../lib/db.js';
-
-export interface User {
-  id: number;
-  email: string;
-  password_hash: string;
-  name: string | null;
-  role: 'OWNER' | 'ADMIN' | 'COACH' | 'USER';
-  created_at: string;
-  is_demo: boolean;
-  demo_role: string | null;
-  demo_label: string | null;
-}
+import type { PrismaClient, User, Role } from '@prisma/client';
 
 export interface CreateUserParameters {
   email: string;
   password_hash: string;
   name?: string;
-  role?: User['role'];
+  role?: Role;
   is_demo?: boolean;
   demo_role?: string;
   demo_label?: string;
 }
 
-export const userRepository = {
+export const createUserRepository = (prisma: PrismaClient) => ({
   async getUserByEmail(email: string): Promise<User | null> {
-    return withClient(async (client) => {
-      const result = await client.query(
-        'SELECT * FROM users WHERE email = $1',
-        [email]
-      );
-      return result.rows.length > 0 ? (result.rows[0] as User) : null;
+    return prisma.user.findUnique({
+      where: { email },
     });
   },
 
   async getUserById(id: number): Promise<User | null> {
-    return withClient(async (client) => {
-      const result = await client.query('SELECT * FROM users WHERE id = $1', [
-        id,
-      ]);
-      return result.rows.length > 0 ? (result.rows[0] as User) : null;
+    return prisma.user.findUnique({
+      where: { id },
     });
   },
 
   async createUser(parameters: CreateUserParameters): Promise<User> {
-    return withClient(async (client) => {
-      const {
+    const {
+      email,
+      password_hash,
+      name,
+      role = 'USER',
+      is_demo = false,
+      demo_role,
+      demo_label,
+    } = parameters;
+    return prisma.user.create({
+      data: {
         email,
-        password_hash,
-        name,
-        role = 'USER',
-        is_demo = false,
-        demo_role,
-        demo_label,
-      } = parameters;
-      const result = await client.query(
-        `INSERT INTO users (email, password_hash, name, role, is_demo, demo_role, demo_label)
-         VALUES ($1, $2, $3, $4, $5, $6, $7)
-         RETURNING *`,
-        [
-          email,
-          password_hash,
-          name ?? null,
-          role,
-          is_demo,
-          demo_role ?? null,
-          demo_label ?? null,
-        ]
-      );
-      return result.rows[0] as User;
+        passwordHash: password_hash,
+        name: name ?? null,
+        role,
+        isDemo: is_demo,
+        demoRole: demo_role ?? null,
+        demoLabel: demo_label ?? null,
+      },
     });
   },
 
   async getAllUsers(): Promise<User[]> {
-    return withClient(async (client) => {
-      const result = await client.query(
-        'SELECT * FROM users ORDER BY created_at DESC'
-      );
-      return result.rows as User[];
+    return prisma.user.findMany({
+      orderBy: { createdAt: 'desc' },
     });
   },
 
-  async updateUserRole(id: number, role: User['role']): Promise<void> {
-    return withClient(async (client) => {
-      await client.query('UPDATE users SET role = $1 WHERE id = $2', [
-        role,
-        id,
-      ]);
+  async updateUserRole(id: number, role: Role): Promise<void> {
+    await prisma.user.update({
+      where: { id },
+      data: { role },
     });
   },
 
   async deleteUser(id: number): Promise<void> {
-    return withClient(async (client) => {
-      await client.query('DELETE FROM users WHERE id = $1', [id]);
+    await prisma.user.delete({
+      where: { id },
     });
   },
 
   async getDemoUsers(): Promise<User[]> {
-    return withClient(async (client) => {
-      const result = await client.query(
-        'SELECT * FROM users WHERE is_demo = TRUE ORDER BY demo_role'
-      );
-      return result.rows as User[];
+    return prisma.user.findMany({
+      where: { isDemo: true },
+      orderBy: { demoRole: 'asc' },
     });
   },
 
   async getDemoUserByRole(demoRole: string): Promise<User | null> {
-    return withClient(async (client) => {
-      const result = await client.query(
-        'SELECT * FROM users WHERE is_demo = TRUE AND demo_role = $1',
-        [demoRole]
-      );
-      return result.rows.length > 0 ? (result.rows[0] as User) : null;
+    return prisma.user.findFirst({
+      where: {
+        isDemo: true,
+        demoRole,
+      },
     });
   },
-};
+});

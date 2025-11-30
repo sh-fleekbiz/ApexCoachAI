@@ -15,6 +15,8 @@
     "watch": "tsc -w",
     "dev": "pnpm run build && concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"pnpm:watch\" \"pnpm:dev:start\"",
     "dev:start": "fastify start --pretty-logs --ignore-watch=.ts$ -w -l debug dist/app.js",
+    "seed": "tsx src/db/seed-comprehensive.ts",
+    "seed:default": "tsx src/db/seed.ts",
     "docker:build": "docker build --tag api --file ./Dockerfile ../..",
     "docker:run": "docker run --rm --publish 3000:3000 --env-file ../../.env api",
     "clean": "rimraf dist *.tgz"
@@ -32,8 +34,8 @@
     "@fastify/swagger": "^9.6.1",
     "@fastify/swagger-ui": "^5.2.3",
     "@fastify/type-provider-json-schema-to-ts": "^5.0.0",
-    "@prisma/adapter-pg": "^7.0.1",
-    "@prisma/client": "^7.0.1",
+    "@prisma/adapter-pg": "^7.0.0",
+    "@prisma/client": "^7.0.0",
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.2.3",
     "fastify": "^5.6.2",
@@ -41,14 +43,12 @@
     "fastify-plugin": "^5.1.0",
     "fastify-sse-v2": "^4.2.1",
     "jsonwebtoken": "^9.0.2",
-    "pg": "^8.16.3",
-    "prisma": "^7.0.1"
+    "prisma": "^7.0.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^3.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.10.1",
-    "@types/pg": "^8.15.6",
     "concurrently": "^9.2.1",
     "fastify-tsconfig": "^3.0.0",
     "rimraf": "^6.1.2",

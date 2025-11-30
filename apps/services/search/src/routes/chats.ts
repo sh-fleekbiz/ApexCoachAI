@@ -1,8 +1,8 @@
 import { type FastifyPluginAsync } from 'fastify';
-import { chatRepository } from '../db/chat-repository.js';
-import { messageRepository } from '../db/message-repository.js';
+import { createRepositories } from '../db/index.js';
 
 const chats: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
+  const repos = createRepositories(fastify.prisma);
   // Get all chats for the current user
   fastify.get('/chats', {
     preHandler: [fastify.authenticate],
@@ -31,14 +31,14 @@ const chats: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       },
     },
     handler: async function (request, _reply) {
-      const chats = await await chatRepository.getChatsByUserId(request.user!.id);
+      const chats = await repos.chat.getChatsByUserId(request.user!.id);
 
       return {
         chats: chats.map((chat) => ({
           id: chat.id,
           title: chat.title,
-          createdAt: chat.created_at,
-          updatedAt: chat.updated_at,
+          createdAt: chat.createdAt,
+          updatedAt: chat.updatedAt,
         })),
       };
     },
@@ -85,23 +85,23 @@ const chats: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       const chatId = (request.params as { id: number }).id;
 
       // Verify chat belongs to user
-      const chat = await await chatRepository.getChatById(chatId);
+      const chat = await repos.chat.getChatById(chatId);
       if (!chat) {
         return reply.code(404).send({ error: 'Chat not found' });
       }
-      if (chat.user_id !== request.user!.id) {
+      if (chat.userId !== request.user!.id) {
         return reply.code(403).send({ error: 'Forbidden' });
       }
 
-      const messages = await await messageRepository.getMessagesByChatId(chatId);
+      const messages = await repos.message.getMessagesByChatId(chatId);
 
       return {
         messages: messages.map((message) => ({
           id: message.id.toString(),
-          role: message.role,
+          role: message.role.toLowerCase(),
           content: message.content,
-          citations: message.citations_json ? JSON.parse(message.citations_json) : [],
-          createdAt: message.created_at,
+          citations: message.citationsJson ? JSON.parse(message.citationsJson) : [],
+          createdAt: message.createdAt,
         })),
       };
     },
@@ -136,15 +136,15 @@ const chats: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       const chatId = (request.params as { id: number }).id;
 
       // Verify chat belongs to user
-      const chat = await await chatRepository.getChatById(chatId);
+      const chat = await repos.chat.getChatById(chatId);
       if (!chat) {
         return reply.code(404).send({ error: 'Chat not found' });
       }
-      if (chat.user_id !== request.user!.id) {
+      if (chat.userId !== request.user!.id) {
         return reply.code(403).send({ error: 'Forbidden' });
       }
 
-      await chatRepository.deleteChat(chatId);
+      await repos.chat.deleteChat(chatId);
 
       return { message: 'Chat deleted successfully' };
     },

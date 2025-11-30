@@ -11,4 +11,3 @@ export {
   validateAzureConfig,
   type AzureConfig,
 } from './config.js';
-export { getPgPool, withClient } from './db.js';

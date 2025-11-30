@@ -1,9 +1,10 @@
 import { type FastifyPluginAsync } from 'fastify';
 import { type JsonSchemaToTsProvider } from '@fastify/type-provider-json-schema-to-ts';
 import { type SchemaTypes } from '../plugins/schemas.js';
-import { adminActionLogRepository } from '../db/admin-action-log-repository.js';
+import { createRepositories } from '../db/index.js';
 
 const adminActionLogRoutes: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
+  const repos = createRepositories(_fastify.prisma);
   const fastify = _fastify.withTypeProvider<
     JsonSchemaToTsProvider<{
       ValidatorSchemaOptions: { references: SchemaTypes };
@@ -66,14 +67,14 @@ const adminActionLogRoutes: FastifyPluginAsync = async (_fastify, _options): Pro
         let logs;
 
         if (userId) {
-          logs = await adminActionLogRepository.getLogsByUserId(userId, limit || 100);
+          logs = await repos.adminActionLog.getLogsByUserId(userId, limit || 100);
         } else if (action) {
-          logs = await adminActionLogRepository.getLogsByAction(action, limit || 100);
+          logs = await repos.adminActionLog.getLogsByAction(action, limit || 100);
         } else {
-          logs = await adminActionLogRepository.getAllLogs(limit || 100, offset || 0);
+          logs = await repos.adminActionLog.getAllLogs(limit || 100, offset || 0);
         }
 
-        const total = await await adminActionLogRepository.getLogsCount();
+        const total = await await repos.adminActionLog.getLogsCount();
 
         const formattedLogs = logs.map((log) => ({
           id: log.id,
@@ -147,7 +148,7 @@ const adminActionLogRoutes: FastifyPluginAsync = async (_fastify, _options): Pro
       const { limit } = request.query as { limit?: number };
 
       try {
-        const logs = await await adminActionLogRepository.getLogsByUserId(userId, limit || 100);
+        const logs = await await repos.adminActionLog.getLogsByUserId(userId, limit || 100);
 
         const formattedLogs = logs.map((log) => ({
           id: log.id,

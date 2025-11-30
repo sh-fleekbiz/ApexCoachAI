@@ -1,11 +1,11 @@
 import { type FastifyPluginAsync } from 'fastify';
-import { metaPromptRepository } from '../db/meta-prompt-repository.js';
-import { userSettingsRepository } from '../db/user-settings-repository.js';
+import { createRepositories } from '../db/index.js';
 
 const settings: FastifyPluginAsync = async (
   fastify,
   _options
 ): Promise<void> => {
+  const repos = createRepositories(fastify.prisma);
   // Get all meta prompts (personalities) - public endpoint for frontend initialization
   fastify.get('/meta-prompts', {
     schema: {
@@ -34,15 +34,15 @@ const settings: FastifyPluginAsync = async (
       },
     },
     handler: async function (_request, _reply) {
-      const metaPrompts = await await metaPromptRepository.getAllMetaPrompts();
+      const metaPrompts = await repos.metaPrompt.getAllMetaPrompts();
 
       return {
         metaPrompts: metaPrompts.map((mp) => ({
           id: mp.id,
           name: mp.name,
-          promptText: mp.prompt_text,
-          isDefault: mp.is_default === true,
-          createdAt: mp.created_at,
+          promptText: mp.promptText,
+          isDefault: mp.isDefault,
+          createdAt: mp.createdAt,
         })),
       };
     },
@@ -73,21 +73,21 @@ const settings: FastifyPluginAsync = async (
       },
     },
     handler: async function (request, _reply) {
-      let settings = await userSettingsRepository.getUserSettings(
+      let settings = await repos.userSettings.getUserSettings(
         request.user!.id
       );
 
       // If no settings exist, create default ones
       if (!settings) {
-        settings = await userSettingsRepository.upsertUserSettings({
+        settings = await repos.userSettings.upsertUserSettings({
           user_id: request.user!.id,
         });
       }
 
       return {
         settings: {
-          userId: settings.user_id,
-          defaultPersonalityId: settings.default_personality_id,
+          userId: settings.userId,
+          defaultPersonalityId: settings.defaultPersonalityId,
           nickname: settings.nickname,
           occupation: settings.occupation,
         },
@@ -134,7 +134,7 @@ const settings: FastifyPluginAsync = async (
         occupation?: string | null;
       };
 
-      const settings = await await userSettingsRepository.upsertUserSettings({
+      const settings = await repos.userSettings.upsertUserSettings({
         user_id: request.user!.id,
         default_personality_id: body.defaultPersonalityId,
         nickname: body.nickname,
@@ -143,8 +143,8 @@ const settings: FastifyPluginAsync = async (
 
       return {
         settings: {
-          userId: settings.user_id,
-          defaultPersonalityId: settings.default_personality_id,
+          userId: settings.userId,
+          defaultPersonalityId: settings.defaultPersonalityId,
           nickname: settings.nickname,
           occupation: settings.occupation,
         },

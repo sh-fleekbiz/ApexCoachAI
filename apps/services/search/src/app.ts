@@ -6,6 +6,11 @@ import settings from './routes/settings.js';
 import me from './routes/me.js';
 import chatApi from './routes/chat-api.js';
 import chats from './routes/chats.js';
+import goals from './routes/goals.js';
+import insights from './routes/insights.js';
+import progress from './routes/progress.js';
+import recommendations from './routes/recommendations.js';
+import exportRoute from './routes/export.js';
 import openapi from './plugins/openapi.js';
 import config from './plugins/config.js';
 import cors from './plugins/cors.js';
@@ -47,6 +52,11 @@ const app: FastifyPluginAsync<AppOptions> = async (fastify, options_): Promise<v
   await fastify.register(me);
   await fastify.register(chatApi);
   await fastify.register(chats);
+  await fastify.register(goals);
+  await fastify.register(insights);
+  await fastify.register(progress);
+  await fastify.register(recommendations);
+  await fastify.register(exportRoute);
 
   // Add /docs redirect to /openapi for consistency with other apps
   fastify.get('/docs', async (_request, reply) => {

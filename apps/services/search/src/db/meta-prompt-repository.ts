@@ -1,12 +1,4 @@
-import { withClient } from '../lib/db.js';
-
-export interface MetaPrompt {
-  id: number;
-  name: string;
-  prompt_text: string;
-  is_default: boolean;
-  created_at: string;
-}
+import type { PrismaClient, MetaPrompt } from '@prisma/client';
 
 export interface CreateMetaPromptParameters {
   name: string;
@@ -14,36 +6,22 @@ export interface CreateMetaPromptParameters {
   is_default?: boolean;
 }
 
-export const metaPromptRepository = {
+export const createMetaPromptRepository = (prisma: PrismaClient) => ({
   async getAllMetaPrompts(): Promise<MetaPrompt[]> {
-    return withClient(async (client) => {
-      const result = await client.query(
-        'SELECT * FROM meta_prompts ORDER BY created_at DESC'
-      );
-      return result.rows as MetaPrompt[];
+    return prisma.metaPrompt.findMany({
+      orderBy: { createdAt: 'desc' },
     });
   },
 
-  async getMetaPromptById(id: number): Promise<MetaPrompt | undefined> {
-    return withClient(async (client) => {
-      const result = await client.query(
-        'SELECT * FROM meta_prompts WHERE id = $1',
-        [id]
-      );
-      return result.rows.length > 0
-        ? (result.rows[0] as MetaPrompt)
-        : undefined;
+  async getMetaPromptById(id: number): Promise<MetaPrompt | null> {
+    return prisma.metaPrompt.findUnique({
+      where: { id },
     });
   },
 
-  async getDefaultMetaPrompt(): Promise<MetaPrompt | undefined> {
-    return withClient(async (client) => {
-      const result = await client.query(
-        'SELECT * FROM meta_prompts WHERE is_default = TRUE LIMIT 1'
-      );
-      return result.rows.length > 0
-        ? (result.rows[0] as MetaPrompt)
-        : undefined;
+  async getDefaultMetaPrompt(): Promise<MetaPrompt | null> {
+    return prisma.metaPrompt.findFirst({
+      where: { isDefault: true },
     });
   },
 
@@ -52,17 +30,20 @@ export const metaPromptRepository = {
   ): Promise<MetaPrompt> {
     const { name, prompt_text, is_default } = parameters;
 
-    return withClient(async (client) => {
-      // If setting as default, unset other defaults first
-      if (is_default) {
-        await client.query('UPDATE meta_prompts SET is_default = FALSE');
-      }
+    // If setting as default, unset other defaults first
+    if (is_default) {
+      await prisma.metaPrompt.updateMany({
+        where: { isDefault: true },
+        data: { isDefault: false },
+      });
+    }
 
-      const result = await client.query(
-        'INSERT INTO meta_prompts (name, prompt_text, is_default) VALUES ($1, $2, $3) RETURNING *',
-        [name, prompt_text, is_default ?? false]
-      );
-      return result.rows[0] as MetaPrompt;
+    return prisma.metaPrompt.create({
+      data: {
+        name,
+        promptText: prompt_text,
+        isDefault: is_default ?? false,
+      },
     });
   },
 
@@ -72,42 +53,35 @@ export const metaPromptRepository = {
   ): Promise<void> {
     const { name, prompt_text, is_default } = parameters;
 
-    return withClient(async (client) => {
-      // If setting as default, unset other defaults first
-      if (is_default) {
-        await client.query('UPDATE meta_prompts SET is_default = FALSE');
-      }
+    // If setting as default, unset other defaults first
+    if (is_default) {
+      await prisma.metaPrompt.updateMany({
+        where: { isDefault: true },
+        data: { isDefault: false },
+      });
+    }
 
-      const updates: string[] = [];
-      const values: any[] = [];
-      let paramIndex = 1;
+    const updateData: Partial<{
+      name: string;
+      promptText: string;
+      isDefault: boolean;
+    }> = {};
 
-      if (name !== undefined) {
-        updates.push(`name = $${paramIndex++}`);
-        values.push(name);
-      }
-      if (prompt_text !== undefined) {
-        updates.push(`prompt_text = $${paramIndex++}`);
-        values.push(prompt_text);
-      }
-      if (is_default !== undefined) {
-        updates.push(`is_default = $${paramIndex++}`);
-        values.push(is_default);
-      }
+    if (name !== undefined) updateData.name = name;
+    if (prompt_text !== undefined) updateData.promptText = prompt_text;
+    if (is_default !== undefined) updateData.isDefault = is_default;
 
-      if (updates.length > 0) {
-        values.push(id);
-        await client.query(
-          `UPDATE meta_prompts SET ${updates.join(', ')} WHERE id = $${paramIndex}`,
-          values
-        );
-      }
-    });
+    if (Object.keys(updateData).length > 0) {
+      await prisma.metaPrompt.update({
+        where: { id },
+        data: updateData,
+      });
+    }
   },
 
   async deleteMetaPrompt(id: number): Promise<void> {
-    return withClient(async (client) => {
-      await client.query('DELETE FROM meta_prompts WHERE id = $1', [id]);
+    await prisma.metaPrompt.delete({
+      where: { id },
     });
   },
-};
+});

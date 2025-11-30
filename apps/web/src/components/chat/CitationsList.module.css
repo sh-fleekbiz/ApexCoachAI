@@ -30,11 +30,13 @@
 }
 
 .citationCard {
-  background-color: hsl(var(--surface))fff;
+  background-color: hsl(var(--surface));
   border: 1px solid hsl(var(--border));
   border-radius: 6px;
   padding: 12px;
   transition: all 0.2s ease;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .citationCard:hover {

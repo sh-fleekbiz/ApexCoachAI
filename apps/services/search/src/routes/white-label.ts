@@ -1,10 +1,10 @@
 import { type FastifyPluginAsync } from 'fastify';
 import { type JsonSchemaToTsProvider } from '@fastify/type-provider-json-schema-to-ts';
 import { type SchemaTypes } from '../plugins/schemas.js';
-import { whiteLabelSettingsRepository } from '../db/white-label-settings-repository.js';
-import { adminActionLogRepository } from '../db/admin-action-log-repository.js';
+import { createRepositories } from '../db/index.js';
 
 const whiteLabelRoutes: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
+  const repos = createRepositories(_fastify.prisma);
   const fastify = _fastify.withTypeProvider<
     JsonSchemaToTsProvider<{
       ValidatorSchemaOptions: { references: SchemaTypes };
@@ -32,7 +32,7 @@ const whiteLabelRoutes: FastifyPluginAsync = async (_fastify, _options): Promise
     } as const,
     handler: async function (_request, reply) {
       try {
-        const settings = await await whiteLabelSettingsRepository.getSettings();
+        const settings = await await repos.whiteLabelSettings.getSettings();
 
         if (!settings) {
           return reply.send({
@@ -44,10 +44,10 @@ const whiteLabelRoutes: FastifyPluginAsync = async (_fastify, _options): Promise
         }
 
         return reply.send({
-          logoUrl: settings.logo_url,
-          brandColor: settings.brand_color,
-          appName: settings.app_name,
-          customCss: settings.custom_css,
+          logoUrl: settings.logoUrl,
+          brandColor: settings.brandColor,
+          appName: settings.appName,
+          customCss: settings.customCss,
         });
       } catch (error) {
         fastify.log.error(error);
@@ -101,7 +101,7 @@ const whiteLabelRoutes: FastifyPluginAsync = async (_fastify, _options): Promise
       };
 
       try {
-        const settings = await await whiteLabelSettingsRepository.updateSettings({
+        const settings = await await repos.whiteLabelSettings.updateSettings({
           logo_url: logoUrl,
           brand_color: brandColor,
           app_name: appName,
@@ -109,7 +109,7 @@ const whiteLabelRoutes: FastifyPluginAsync = async (_fastify, _options): Promise
         });
 
         // Log admin action
-        await adminActionLogRepository.createLog({
+        await repos.adminActionLog.createLog({
           user_id: request.user!.id,
           action: 'update_white_label_settings',
           entity_type: 'white_label_settings',
@@ -154,10 +154,10 @@ const whiteLabelRoutes: FastifyPluginAsync = async (_fastify, _options): Promise
     } as const,
     handler: async function (request, reply) {
       try {
-        await whiteLabelSettingsRepository.resetSettings();
+        await repos.whiteLabelSettings.resetSettings();
 
         // Log admin action
-        await adminActionLogRepository.createLog({
+        await repos.adminActionLog.createLog({
           user_id: request.user!.id,
           action: 'reset_white_label_settings',
           entity_type: 'white_label_settings',

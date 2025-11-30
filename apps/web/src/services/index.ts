@@ -372,3 +372,211 @@ export async function bulkRetrainKnowledgeBaseDocuments(ids: number[]) {
 
   return response.json();
 }
+
+// Goals API functions
+export async function getGoals() {
+  const response = await fetch(`${apiBaseUrl}/goals`, {
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to load goals');
+  }
+
+  return response.json();
+}
+
+export async function createGoal(data: {
+  title: string;
+  description?: string | null;
+  targetDate?: string | null;
+  milestones?: Array<{
+    title: string;
+    description?: string | null;
+    targetDate?: string | null;
+  }>;
+}) {
+  const response = await fetch(`${apiBaseUrl}/goals`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to create goal');
+  }
+
+  return response.json();
+}
+
+export async function updateGoal(
+  id: number,
+  data: {
+    title?: string;
+    description?: string | null;
+    status?: string;
+    targetDate?: string | null;
+  }
+) {
+  const response = await fetch(`${apiBaseUrl}/goals/${id}`, {
+    method: 'PUT',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to update goal');
+  }
+
+  return response.json();
+}
+
+export async function deleteGoal(id: number) {
+  const response = await fetch(`${apiBaseUrl}/goals/${id}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to delete goal');
+  }
+
+  return response.json();
+}
+
+export async function createMilestone(
+  goalId: number,
+  data: {
+    title: string;
+    description?: string | null;
+    targetDate?: string | null;
+  }
+) {
+  const response = await fetch(`${apiBaseUrl}/goals/${goalId}/milestones`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to create milestone');
+  }
+
+  return response.json();
+}
+
+export async function updateMilestone(
+  id: number,
+  data: {
+    title?: string;
+    description?: string | null;
+    status?: string;
+    targetDate?: string | null;
+  }
+) {
+  const response = await fetch(`${apiBaseUrl}/milestones/${id}`, {
+    method: 'PUT',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to update milestone');
+  }
+
+  return response.json();
+}
+
+// Insights API functions
+export async function getSessionSummary(chatId: number) {
+  const response = await fetch(`${apiBaseUrl}/chats/${chatId}/summary`, {
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to load session summary');
+  }
+
+  return response.json();
+}
+
+export async function generateSessionSummary(chatId: number) {
+  const response = await fetch(`${apiBaseUrl}/chats/${chatId}/summarize`, {
+    method: 'POST',
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to generate session summary');
+  }
+
+  return response.json();
+}
+
+export async function getInsightsDashboard() {
+  const response = await fetch(`${apiBaseUrl}/insights/dashboard`, {
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to load insights dashboard');
+  }
+
+  return response.json();
+}
+
+// Progress API functions
+export async function getProgress() {
+  const response = await fetch(`${apiBaseUrl}/progress`, {
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to load progress');
+  }
+
+  return response.json();
+}
+
+// Recommendations API functions
+export async function getContentRecommendations() {
+  const response = await fetch(`${apiBaseUrl}/recommendations/content`, {
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to load recommendations');
+  }
+
+  return response.json();
+}
+
+// Export API functions
+export async function exportChat(chatId: number, format: 'markdown' | 'json' = 'markdown') {
+  const response = await fetch(`${apiBaseUrl}/chats/${chatId}/export?format=${format}`, {
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to export chat');
+  }
+
+  return response.json();
+}
+
+export async function shareChat(chatId: number) {
+  const response = await fetch(`${apiBaseUrl}/chats/${chatId}/share`, {
+    method: 'POST',
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to create share link');
+  }
+
+  return response.json();
+}

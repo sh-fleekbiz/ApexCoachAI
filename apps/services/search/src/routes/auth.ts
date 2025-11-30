@@ -1,9 +1,9 @@
 import bcrypt from 'bcryptjs';
 import { type FastifyPluginAsync } from 'fastify';
-import { usageEventRepository } from '../db/usage-event-repository.js';
-import { userRepository } from '../db/user-repository.js';
+import { createRepositories } from '../db/index.js';
 
 const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
+  const repos = createRepositories(fastify.prisma);
   // Signup route
   fastify.post('/auth/signup', {
     schema: {
@@ -46,7 +46,7 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
       try {
         // Check if user already exists
-        const existingUser = await userRepository.getUserByEmail(email);
+        const existingUser = await repos.user.getUserByEmail(email);
         if (existingUser) {
           return reply
             .code(400)
@@ -57,7 +57,7 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
         const password_hash = await bcrypt.hash(password, 10);
 
         // Create user
-        const user = await await userRepository.createUser({
+        const user = await repos.user.createUser({
           email,
           password_hash,
           name,
@@ -71,7 +71,7 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
         });
 
         // Log usage event
-        await usageEventRepository.createUsageEvent({
+        await repos.usageEvent.createUsageEvent({
           user_id: user.id,
           type: 'login',
         });
@@ -139,7 +139,7 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
       try {
         // Find user
-        const user = await await userRepository.getUserByEmail(email);
+        const user = await repos.user.getUserByEmail(email);
         if (!user) {
           return reply.code(401).send({ error: 'Invalid email or password' });
         }
@@ -147,7 +147,7 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
         // Verify password
         const isValidPassword = await bcrypt.compare(
           password,
-          user.password_hash
+          user.passwordHash
         );
         if (!isValidPassword) {
           return reply.code(401).send({ error: 'Invalid email or password' });
@@ -245,12 +245,12 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       }
 
       try {
-        const demoUsers = await await userRepository.getDemoUsers();
+        const demoUsers = await repos.user.getDemoUsers();
 
         return {
           demoUsers: demoUsers.map((user) => ({
-            role: user.demo_role || 'unknown',
-            label: user.demo_label || user.name || 'Demo User',
+            role: user.demoRole || 'unknown',
+            label: user.demoLabel || user.name || 'Demo User',
             email: user.email,
             userRole: user.role,
           })),
@@ -310,7 +310,7 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
         // If role is specified, find demo user by role
         if (role) {
-          user = await await userRepository.getDemoUserByRole(role);
+          user = await repos.user.getDemoUserByRole(role);
           if (!user) {
             return reply
               .code(400)
@@ -318,7 +318,7 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
           }
         } else {
           // Fallback: get first demo user (for backward compatibility)
-          const demoUsers = await await userRepository.getDemoUsers();
+          const demoUsers = await repos.user.getDemoUsers();
           if (demoUsers.length === 0) {
             return reply.code(500).send({ error: 'No demo users available' });
           }
@@ -353,9 +353,9 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
             email: user.email,
             name: user.name,
             role: user.role,
-            isDemo: user.is_demo,
-            demoRole: user.demo_role,
-            demoLabel: user.demo_label,
+            isDemo: user.isDemo,
+            demoRole: user.demoRole,
+            demoLabel: user.demoLabel,
           },
         };
       } catch (error: any) {
@@ -397,12 +397,12 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
       try {
         // Check if demo user exists
-        let user = await await userRepository.getUserByEmail(demoEmail);
+        let user = await repos.user.getUserByEmail(demoEmail);
 
         // Create demo user if it doesn't exist
         if (!user) {
           const password_hash = await bcrypt.hash(demoPassword, 10);
-          user = await await userRepository.createUser({
+          user = await repos.user.createUser({
             email: demoEmail,
             password_hash,
             name: 'Demo User',
@@ -417,7 +417,7 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
         });
 
         // Log usage event
-        await await usageEventRepository.createUsageEvent({
+        await repos.usageEvent.createUsageEvent({
           user_id: user.id,
           type: 'login',
         });
@@ -472,7 +472,7 @@ const auth: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       },
     },
     handler: async function (request, _reply) {
-      const user = await await userRepository.getUserById(request.user!.id);
+      const user = await repos.user.getUserById(request.user!.id);
       return {
         user: {
           id: user!.id,

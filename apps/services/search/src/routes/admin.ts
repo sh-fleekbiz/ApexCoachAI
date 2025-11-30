@@ -1,10 +1,6 @@
 import { type FastifyPluginAsync, type FastifyRequest } from 'fastify';
-import { adminActionLogRepository } from '../db/admin-action-log-repository.js';
-import { invitationRepository } from '../db/invitation-repository.js';
-import { knowledgeBaseRepository } from '../db/knowledge-base-repository.js';
-import { programRepository } from '../db/program-repository.js';
-import type { User } from '../db/user-repository.js';
-import { userRepository } from '../db/user-repository.js';
+import { createRepositories } from '../db/index.js';
+import type { Role } from '@prisma/client';
 import { RetrainingService } from '../lib/retraining-service.js';
 
 // Type declaration for authenticated request
@@ -17,12 +13,13 @@ interface AuthenticatedRequest extends FastifyRequest {
 }
 
 const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
+  const repos = createRepositories(fastify.prisma);
   // All routes in this plugin are protected by the 'admin' role
   fastify.addHook('preHandler', fastify.requireRole('admin'));
 
   // Get all users
   fastify.get('/admin/users', async (_request, _reply) => {
-    return await await userRepository.getAllUsers();
+    return await repos.user.getAllUsers();
   });
 
   // Update user role
@@ -38,7 +35,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       });
     }
 
-    const { role } = request.body as { role: User['role'] };
+    const { role } = request.body as { role: Role };
 
     // Validate role
     const validRoles = ['owner', 'admin', 'coach', 'user'];
@@ -51,7 +48,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
     try {
       // Get user before update for logging
-      const user = await await userRepository.getUserById(userId);
+      const user = await repos.user.getUserById(userId);
       if (!user) {
         return reply.code(404).send({
           error: 'User not found',
@@ -60,11 +57,11 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       }
 
       const oldRole = user.role;
-      await userRepository.updateUserRole(userId, role);
+      await repos.user.updateUserRole(userId, role);
 
       // Log admin action
       try {
-        await adminActionLogRepository.createLog({
+        await repos.adminActionLog.createLog({
           user_id: (request as unknown as AuthenticatedRequest).user.id,
           action: 'update_user_role',
           entity_type: 'user',
@@ -92,7 +89,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
   // Get all invitations
   fastify.get('/admin/invitations', async (_request, _reply) => {
-    return await await invitationRepository.getAllInvitations();
+    return await repos.invitation.getAllInvitations();
   });
 
   // Create invitation
@@ -114,14 +111,14 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
     }
 
     try {
-      const invitation = await await invitationRepository.createInvitation({
+      const invitation = await repos.invitation.createInvitation({
         email,
         role,
         invited_by_user_id,
       });
 
       // Log admin action
-      await adminActionLogRepository.createLog({
+      await repos.adminActionLog.createLog({
         user_id: invited_by_user_id,
         action: 'create_invitation',
         entity_type: 'invitation',
@@ -153,7 +150,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
     try {
       // Get invitation before update for logging
       const invitation =
-        await await invitationRepository.getInvitationById(invitationId);
+        await repos.invitation.getInvitationById(invitationId);
       if (!invitation) {
         return reply.code(404).send({
           error: 'Invitation not found',
@@ -167,7 +164,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       );
 
       // Log admin action
-      await adminActionLogRepository.createLog({
+      await repos.adminActionLog.createLog({
         user_id: (request as unknown as AuthenticatedRequest).user.id,
         action: 'cancel_invitation',
         entity_type: 'invitation',
@@ -189,7 +186,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
   // Get all programs
   fastify.get('/admin/programs', async (_request, _reply) => {
-    return await await programRepository.getAllPrograms();
+    return await repos.program.getAllPrograms();
   });
 
   // Get program by id
@@ -206,7 +203,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
     }
 
     try {
-      const program = await await programRepository.getProgramById(programId);
+      const program = await repos.program.getProgramById(programId);
       if (!program) {
         return reply.code(404).send({
           error: 'Program not found',
@@ -239,14 +236,14 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
     }
 
     try {
-      const program = await await programRepository.createProgram({
+      const program = await repos.program.createProgram({
         name,
         description,
         created_by_user_id,
       });
 
       // Log admin action
-      await adminActionLogRepository.createLog({
+      await repos.adminActionLog.createLog({
         user_id: created_by_user_id,
         action: 'create_program',
         entity_type: 'program',
@@ -275,7 +272,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       });
     }
 
-    return await await programRepository.getProgramAssignments(programId);
+    return await repos.program.getProgramAssignments(programId);
   });
 
   // Create program assignment
@@ -315,7 +312,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
     try {
       // Verify user exists
-      const user = await await userRepository.getUserById(user_id);
+      const user = await repos.user.getUserById(user_id);
       if (!user) {
         return reply.code(404).send({
           error: 'User not found',
@@ -324,7 +321,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       }
 
       // Verify program exists
-      const program = await await programRepository.getProgramById(programId);
+      const program = await repos.program.getProgramById(programId);
       if (!program) {
         return reply.code(404).send({
           error: 'Program not found',
@@ -332,7 +329,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
         });
       }
 
-      const assignment = await await programRepository.createProgramAssignment({
+      const assignment = await repos.program.createProgramAssignment({
         program_id: programId,
         user_id,
         role,
@@ -340,7 +337,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
       // Log admin action
       try {
-        await adminActionLogRepository.createLog({
+        await repos.adminActionLog.createLog({
           user_id: (request as unknown as AuthenticatedRequest).user.id,
           action: 'create_program_assignment',
           entity_type: 'program_assignment',
@@ -386,8 +383,8 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
     if (programId) filters.programId = parseInt(programId, 10);
     if (trainingStatus) filters.trainingStatus = trainingStatus;
 
-    const documents = await knowledgeBaseRepository.getAllDocuments(filters);
-    const overview = await knowledgeBaseRepository.getOverview();
+    const documents = await repos.knowledgeBase.getAllDocuments(filters);
+    const overview = await repos.knowledgeBase.getOverview();
 
     return {
       documents,
@@ -407,7 +404,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       });
     }
 
-    const document = await knowledgeBaseRepository.getDocumentById(documentId);
+    const document = await repos.knowledgeBase.getDocumentById(documentId);
     if (!document) {
       return reply.code(404).send({
         error: 'Document not found',
@@ -446,7 +443,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
     }
 
     try {
-      const document = await knowledgeBaseRepository.createDocument({
+      const document = await repos.knowledgeBase.createDocument({
         title,
         type,
         source,
@@ -455,7 +452,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       });
 
       // Log admin action
-      await adminActionLogRepository.createLog({
+      await repos.adminActionLog.createLog({
         user_id: (request as unknown as AuthenticatedRequest).user.id,
         action: 'create_knowledge_base_document',
         entity_type: 'knowledge_base_document',
@@ -497,7 +494,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
     try {
       // Verify document exists
       const existingDoc =
-        await knowledgeBaseRepository.getDocumentById(documentId);
+        await repos.knowledgeBase.getDocumentById(documentId);
       if (!existingDoc) {
         return reply.code(404).send({
           error: 'Document not found',
@@ -512,13 +509,13 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       if (metadata !== undefined) updates.metadata = metadata;
       if (programId !== undefined) updates.programId = programId;
 
-      const document = await knowledgeBaseRepository.updateDocument(
+      const document = await repos.knowledgeBase.updateDocument(
         documentId,
         updates
       );
 
       // Log admin action
-      await adminActionLogRepository.createLog({
+      await repos.adminActionLog.createLog({
         user_id: (request as unknown as AuthenticatedRequest).user.id,
         action: 'update_knowledge_base_document',
         entity_type: 'knowledge_base_document',
@@ -552,7 +549,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
     try {
       // Verify document exists
       const document =
-        await knowledgeBaseRepository.getDocumentById(documentId);
+        await repos.knowledgeBase.getDocumentById(documentId);
       if (!document) {
         return reply.code(404).send({
           error: 'Document not found',
@@ -560,10 +557,10 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
         });
       }
 
-      await knowledgeBaseRepository.deleteDocument(documentId);
+      await repos.knowledgeBase.deleteDocument(documentId);
 
       // Log admin action
-      await adminActionLogRepository.createLog({
+      await repos.adminActionLog.createLog({
         user_id: (request as unknown as AuthenticatedRequest).user.id,
         action: 'delete_knowledge_base_document',
         entity_type: 'knowledge_base_document',
@@ -597,7 +594,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
     try {
       // Verify document exists
       const document =
-        await knowledgeBaseRepository.getDocumentById(documentId);
+        await repos.knowledgeBase.getDocumentById(documentId);
       if (!document) {
         return reply.code(404).send({
           error: 'Document not found',
@@ -606,12 +603,12 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       }
 
       // Set status to training
-      await knowledgeBaseRepository.updateDocument(documentId, {
+      await repos.knowledgeBase.updateDocument(documentId, {
         trainingStatus: 'training',
       });
 
       // Log admin action
-      await adminActionLogRepository.createLog({
+      await repos.adminActionLog.createLog({
         user_id: (request as unknown as AuthenticatedRequest).user.id,
         action: 'retrain_knowledge_base_document',
         entity_type: 'knowledge_base_document',
@@ -621,7 +618,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       });
 
       // Perform actual retraining asynchronously
-      const retrainingService = new RetrainingService(fastify.log);
+      const retrainingService = new RetrainingService(fastify.prisma, fastify.log);
       
       // Run retraining in background (don't await)
       retrainingService.retrainDocument(documentId)
@@ -663,9 +660,9 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
       for (const id of ids) {
         try {
-          const document = await knowledgeBaseRepository.getDocumentById(id);
+          const document = await repos.knowledgeBase.getDocumentById(id);
           if (document) {
-            await knowledgeBaseRepository.deleteDocument(id);
+            await repos.knowledgeBase.deleteDocument(id);
             deleted.push(id);
           } else {
             failed.push({ id, reason: 'Document not found' });
@@ -679,7 +676,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       }
 
       // Log admin action
-      await adminActionLogRepository.createLog({
+      await repos.adminActionLog.createLog({
         user_id: (request as unknown as AuthenticatedRequest).user.id,
         action: 'bulk_delete_knowledge_base_documents',
         entity_type: 'knowledge_base_document',
@@ -715,9 +712,9 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
       for (const id of ids) {
         try {
-          const document = await knowledgeBaseRepository.getDocumentById(id);
+          const document = await repos.knowledgeBase.getDocumentById(id);
           if (document) {
-            await knowledgeBaseRepository.updateDocument(id, {
+            await repos.knowledgeBase.updateDocument(id, {
               trainingStatus: 'training',
             });
             retrained.push(id);
@@ -733,7 +730,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
       }
 
       // Log admin action
-      await adminActionLogRepository.createLog({
+      await repos.adminActionLog.createLog({
         user_id: (request as unknown as AuthenticatedRequest).user.id,
         action: 'bulk_retrain_knowledge_base_documents',
         entity_type: 'knowledge_base_document',
@@ -744,7 +741,7 @@ const admin: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
       // Perform actual retraining asynchronously for all documents
       if (retrained.length > 0) {
-        const retrainingService = new RetrainingService(fastify.log);
+        const retrainingService = new RetrainingService(fastify.prisma, fastify.log);
         
         // Run retraining in background (don't await)
         retrainingService.retrainDocuments(retrained)

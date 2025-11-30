@@ -3,7 +3,7 @@ import { type FastifyPluginAsync } from 'fastify';
 import { Readable } from 'node:stream';
 import { type ApproachContext } from '../lib/index.js';
 import { type SchemaTypes } from '../plugins/schemas.js';
-import { chatService } from '../services/chat-service.js';
+import { createChatService } from '../services/chat-service.js';
 import type { Citation } from '../types/chat-types.js';
 
 // In-memory store for previous_response_id per chat (for stateful conversations)
@@ -20,6 +20,8 @@ const chatApi: FastifyPluginAsync = async (
       SerializerSchemaOptions: { references: SchemaTypes };
     }>
   >();
+  
+  const chatService = createChatService(fastify.prisma);
 
   fastify.post('/api/chat', {
     preHandler: [fastify.authenticate],

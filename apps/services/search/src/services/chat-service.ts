@@ -1,9 +1,6 @@
-import { chatRepository, type Chat } from '../db/chat-repository.js';
-import { messageRepository } from '../db/message-repository.js';
-import { metaPromptRepository } from '../db/meta-prompt-repository.js';
-import { usageEventRepository } from '../db/usage-event-repository.js';
-import { userSettingsRepository } from '../db/user-settings-repository.js';
+import type { PrismaClient, Chat } from '@prisma/client';
 import type { Citation } from '../types/chat-types.js';
+import { createRepositories } from '../db/index.js';
 
 export interface PrepareChatContextInput {
   chatId?: number | null;
@@ -20,16 +17,19 @@ export interface PreparedChatContext {
   }>;
 }
 
-export const chatService = {
-  async prepareChatContext(
-    input: PrepareChatContextInput
-  ): Promise<PreparedChatContext> {
-    const { chatId, userId, input: messageText, personalityId } = input;
+export const createChatService = (prisma: PrismaClient) => {
+  const repos = createRepositories(prisma);
+  
+  return {
+    async prepareChatContext(
+      input: PrepareChatContextInput
+    ): Promise<PreparedChatContext> {
+      const { chatId, userId, input: messageText, personalityId } = input;
 
-    let chat: Chat | undefined;
-    if (chatId) {
-      chat = await chatRepository.getChatById(chatId);
-      if (!chat || chat.user_id !== userId) {
+      let chat: Chat | null;
+      if (chatId) {
+        chat = await repos.chat.getChatById(chatId);
+        if (!chat || chat.userId !== userId) {
         throw {
           status: 403,
           error: { error: 'Forbidden' },
@@ -41,19 +41,19 @@ export const chatService = {
         messageText.length > 50
           ? messageText.slice(0, 50) + '...'
           : messageText;
-      chat = await chatRepository.createChat({
+      chat = await repos.chat.createChat({
         user_id: userId,
         title,
       });
     }
 
-    await messageRepository.createMessage({
+    await repos.message.createMessage({
       chat_id: chat.id,
-      role: 'user',
+      role: 'USER',
       content: messageText,
     });
 
-    await usageEventRepository.createUsageEvent({
+    await repos.usageEvent.createUsageEvent({
       user_id: userId,
       type: 'chat_message',
       meta_json: { chatId: chat.id, role: 'user' },
@@ -61,32 +61,32 @@ export const chatService = {
 
     let personalityPromptText = '';
     if (personalityId) {
-      const personality = await metaPromptRepository.getMetaPromptById(
+      const personality = await repos.metaPrompt.getMetaPromptById(
         personalityId
       );
       if (personality) {
-        personalityPromptText = personality.prompt_text;
+        personalityPromptText = personality.promptText;
       }
     } else {
-      const settings = await userSettingsRepository.getUserSettings(userId);
-      if (settings?.default_personality_id) {
-        const personality = await metaPromptRepository.getMetaPromptById(
-          settings.default_personality_id
+      const settings = await repos.userSettings.getUserSettings(userId);
+      if (settings?.defaultPersonalityId) {
+        const personality = await repos.metaPrompt.getMetaPromptById(
+          settings.defaultPersonalityId
         );
         if (personality) {
-          personalityPromptText = personality.prompt_text;
+          personalityPromptText = personality.promptText;
         }
       } else {
         const defaultPersonality =
-          await metaPromptRepository.getDefaultMetaPrompt();
+          await repos.metaPrompt.getDefaultMetaPrompt();
         if (defaultPersonality) {
-          personalityPromptText = defaultPersonality.prompt_text;
+          personalityPromptText = defaultPersonality.promptText;
         }
       }
     }
 
     const recentDatabaseMessages =
-      await messageRepository.getRecentMessages(chat.id, 10);
+      await repos.message.getRecentMessages(chat.id, 10);
 
     const messages: Array<{
       role: 'system' | 'user' | 'assistant';
@@ -124,19 +124,20 @@ export const chatService = {
       return;
     }
 
-    await messageRepository.createMessage({
+    await repos.message.createMessage({
       chat_id: chatId,
-      role: 'assistant',
+      role: 'ASSISTANT',
       content,
       citations: citations && citations.length > 0 ? citations : undefined,
     });
 
-    await usageEventRepository.createUsageEvent({
+    await repos.usageEvent.createUsageEvent({
       user_id: userId,
       type: 'chat_message',
       meta_json: { chatId, role: 'assistant' },
     });
 
-    await chatRepository.updateChatTimestamp(chatId);
+    await repos.chat.updateChatTimestamp(chatId);
   },
+  };
 };

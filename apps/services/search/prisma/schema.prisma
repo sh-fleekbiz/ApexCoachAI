@@ -7,6 +7,7 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
+  url       = env("DATABASE_URL")
 }
 
 model User {
@@ -30,6 +31,8 @@ model User {
   userSettings       UserSettings?
   createdPrograms    Program[]     @relation("CreatedByUser")
   adminActionLogs    AdminActionLog[]
+  goals              Goal[]
+  sessionSummaries   SessionSummary[]
 
   @@index([isDemo, demoRole])
   @@map("users")
@@ -43,8 +46,9 @@ model Chat {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  messages ChatMessage[]
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages        ChatMessage[]
+  sessionSummary  SessionSummary?
 
   @@index([userId])
   @@index([updatedAt(sort: Desc)])
@@ -226,6 +230,66 @@ model KnowledgeBaseDocument {
   @@map("knowledge_base_documents")
 }
 
+model Goal {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  title       String
+  description String?
+  status      GoalStatus @default(ACTIVE)
+  targetDate  DateTime? @map("target_date")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  completedAt DateTime? @map("completed_at")
+
+  // Relations
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  milestones Milestone[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("goals")
+}
+
+model Milestone {
+  id          Int      @id @default(autoincrement())
+  goalId      Int      @map("goal_id")
+  title       String
+  description String?
+  status      MilestoneStatus @default(PENDING)
+  targetDate  DateTime? @map("target_date")
+  completedAt DateTime? @map("completed_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  goal Goal @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@index([goalId])
+  @@index([status])
+  @@map("milestones")
+}
+
+model SessionSummary {
+  id          Int      @id @default(autoincrement())
+  chatId      Int      @map("chat_id")
+  userId      Int      @map("user_id")
+  summary     String
+  keyInsights Json?    @map("key_insights")
+  actionItems Json?    @map("action_items")
+  topics      String[] @default([])
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([chatId])
+  @@index([userId])
+  @@index([createdAt(sort: Desc)])
+  @@map("session_summaries")
+}
+
 // Enums
 enum Role {
   OWNER
@@ -250,4 +314,18 @@ enum InvitationStatus {
 enum AssignmentRole {
   COACH
   PARTICIPANT
+}
+
+enum GoalStatus {
+  ACTIVE
+  COMPLETED
+  PAUSED
+  CANCELLED
+}
+
+enum MilestoneStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  SKIPPED
 }

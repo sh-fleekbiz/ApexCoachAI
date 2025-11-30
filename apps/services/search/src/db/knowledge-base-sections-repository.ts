@@ -2,9 +2,11 @@
  * Knowledge Base Sections Repository
  * 
  * Handles CRUD operations for knowledge_base_sections table (vector storage).
+ * Uses raw SQL for pgvector operations since Prisma doesn't support pgvector natively.
  */
 
-import { withClient } from '../lib/db.js';
+import type { PrismaClient } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 export interface KnowledgeBaseSection {
   id: number;
@@ -27,72 +29,60 @@ export interface SectionInput {
   embedding: number[];
 }
 
-export const knowledgeBaseSectionsRepository = {
+export const createKnowledgeBaseSectionsRepository = (prisma: PrismaClient) => ({
   /**
    * Get all sections for a document (by sourcefile)
    */
   async getSectionsBySourcefile(sourcefile: string): Promise<KnowledgeBaseSection[]> {
-    return withClient(async (client) => {
-      const result = await client.query(
-        `SELECT id, index_name, content, category, sourcepage, sourcefile, program_id, created_at
-         FROM knowledge_base_sections
-         WHERE sourcefile = $1
-         ORDER BY sourcepage`,
-        [sourcefile]
-      );
-      return result.rows;
-    });
+    const result = await prisma.$queryRaw<KnowledgeBaseSection[]>`
+      SELECT id, index_name, content, category, sourcepage, sourcefile, program_id, created_at
+      FROM knowledge_base_sections
+      WHERE sourcefile = ${sourcefile}
+      ORDER BY sourcepage
+    `;
+    return result;
   },
 
   /**
    * Delete all sections for a specific sourcefile
    */
   async deleteSectionsBySourcefile(sourcefile: string): Promise<number> {
-    return withClient(async (client) => {
-      const result = await client.query(
-        'DELETE FROM knowledge_base_sections WHERE sourcefile = $1',
-        [sourcefile]
-      );
-      return result.rows?.length || 0;
-    });
+    const result = await prisma.$executeRaw`
+      DELETE FROM knowledge_base_sections WHERE sourcefile = ${sourcefile}
+    `;
+    return result;
   },
 
   /**
    * Delete all sections for a specific index name
    */
   async deleteSectionsByIndexName(indexName: string): Promise<number> {
-    return withClient(async (client) => {
-      const result = await client.query(
-        'DELETE FROM knowledge_base_sections WHERE index_name = $1',
-        [indexName]
-      );
-      return result.rows?.length || 0;
-    });
+    const result = await prisma.$executeRaw`
+      DELETE FROM knowledge_base_sections WHERE index_name = ${indexName}
+    `;
+    return result;
   },
 
   /**
    * Insert a single section with embedding
    */
   async insertSection(indexName: string, section: SectionInput): Promise<KnowledgeBaseSection> {
-    return withClient(async (client) => {
-      const embeddingVector = `[${section.embedding.join(',')}]`;
-      const result = await client.query(
-        `INSERT INTO knowledge_base_sections
-          (index_name, content, category, sourcepage, sourcefile, program_id, embedding)
-         VALUES ($1, $2, $3, $4, $5, $6, $7::vector)
-         RETURNING id, index_name, content, category, sourcepage, sourcefile, program_id, created_at`,
-        [
-          indexName,
-          section.content,
-          section.category,
-          section.sourcepage,
-          section.sourcefile,
-          section.program_id ?? null,
-          embeddingVector,
-        ]
-      );
-      return result.rows[0];
-    });
+    const embeddingVector = `[${section.embedding.join(',')}]`;
+    const result = await prisma.$queryRaw<KnowledgeBaseSection[]>`
+      INSERT INTO knowledge_base_sections
+        (index_name, content, category, sourcepage, sourcefile, program_id, embedding)
+      VALUES (
+        ${indexName},
+        ${section.content},
+        ${section.category},
+        ${section.sourcepage},
+        ${section.sourcefile},
+        ${section.program_id ?? null},
+        ${embeddingVector}::vector
+      )
+      RETURNING id, index_name, content, category, sourcepage, sourcefile, program_id, created_at
+    `;
+    return result[0];
   },
 
   /**
@@ -101,56 +91,47 @@ export const knowledgeBaseSectionsRepository = {
   async insertSectionsBatch(indexName: string, sections: SectionInput[]): Promise<number> {
     if (sections.length === 0) return 0;
 
-    return withClient(async (client) => {
-      let inserted = 0;
-      for (const section of sections) {
-        if (!section.embedding || section.embedding.length === 0) {
-          continue;
-        }
-        const embeddingVector = `[${section.embedding.join(',')}]`;
-        await client.query(
-          `INSERT INTO knowledge_base_sections
-            (index_name, content, category, sourcepage, sourcefile, program_id, embedding)
-           VALUES ($1, $2, $3, $4, $5, $6, $7::vector)`,
-          [
-            indexName,
-            section.content,
-            section.category,
-            section.sourcepage,
-            section.sourcefile,
-            section.program_id ?? null,
-            embeddingVector,
-          ]
-        );
-        inserted++;
+    let inserted = 0;
+    for (const section of sections) {
+      if (!section.embedding || section.embedding.length === 0) {
+        continue;
       }
-      return inserted;
-    });
+      const embeddingVector = `[${section.embedding.join(',')}]`;
+      await prisma.$executeRaw`
+        INSERT INTO knowledge_base_sections
+          (index_name, content, category, sourcepage, sourcefile, program_id, embedding)
+        VALUES (
+          ${indexName},
+          ${section.content},
+          ${section.category},
+          ${section.sourcepage},
+          ${section.sourcefile},
+          ${section.program_id ?? null},
+          ${embeddingVector}::vector
+        )
+      `;
+      inserted++;
+    }
+    return inserted;
   },
 
   /**
    * Count sections for a specific sourcefile
    */
   async countSectionsBySourcefile(sourcefile: string): Promise<number> {
-    return withClient(async (client) => {
-      const result = await client.query(
-        'SELECT COUNT(*) as count FROM knowledge_base_sections WHERE sourcefile = $1',
-        [sourcefile]
-      );
-      return parseInt(result.rows[0]?.count || '0', 10);
-    });
+    const result = await prisma.$queryRaw<[{ count: bigint }]>`
+      SELECT COUNT(*) as count FROM knowledge_base_sections WHERE sourcefile = ${sourcefile}
+    `;
+    return Number(result[0]?.count || 0);
   },
 
   /**
    * Count sections for a specific index
    */
   async countSectionsByIndexName(indexName: string): Promise<number> {
-    return withClient(async (client) => {
-      const result = await client.query(
-        'SELECT COUNT(*) as count FROM knowledge_base_sections WHERE index_name = $1',
-        [indexName]
-      );
-      return parseInt(result.rows[0]?.count || '0', 10);
-    });
+    const result = await prisma.$queryRaw<[{ count: bigint }]>`
+      SELECT COUNT(*) as count FROM knowledge_base_sections WHERE index_name = ${indexName}
+    `;
+    return Number(result[0]?.count || 0);
   },
-};
+});

@@ -141,5 +141,33 @@
   text-decoration: underline;
 }
 
+/* Mobile responsive auth */
+@media (max-width: 767px) {
+  .authContainer {
+    padding: 16px;
+  }
+
+  .authCard {
+    padding: 24px 20px;
+  }
+
+  .authTitle {
+    font-size: 24px;
+  }
+
+  .roleButton {
+    min-height: 80px;
+    padding: 16px;
+  }
+
+  .roleIcon {
+    font-size: 28px;
+  }
+
+  .roleLabel {
+    font-size: 16px;
+  }
+}
+
 
 
