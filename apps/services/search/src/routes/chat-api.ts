@@ -31,6 +31,16 @@ const chatApi: FastifyPluginAsync = async (
         properties: {
           chatId: { type: ['number', 'null'] },
           input: { type: 'string' },
+          messages: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                role: { type: 'string' },
+                content: { type: 'string' },
+              },
+            },
+          },
           personalityId: { type: ['number', 'null'] },
           context: {
             type: 'object',
@@ -54,7 +64,11 @@ const chatApi: FastifyPluginAsync = async (
           },
           stream: { type: 'boolean' },
         },
-        required: ['input'],
+        // Accept either 'input' or 'messages' (for backward compatibility)
+        anyOf: [
+          { required: ['input'] },
+          { required: ['messages'] },
+        ],
       },
       response: {
         400: { $ref: 'httpError' },
@@ -64,22 +78,44 @@ const chatApi: FastifyPluginAsync = async (
       },
     } as const,
     handler: async function (request, reply) {
-      const { chatId, input, personalityId, context, stream } =
+      const { chatId, input, messages, personalityId, context, stream } =
         request.body as {
           chatId?: number | null;
-          input: string;
+          input?: string;
+          messages?: Array<{ role: string; content: string }>;
           personalityId?: number | null;
           context?: any;
           stream?: boolean;
         };
 
+      // Extract input from messages array if input is not provided
+      let userInput = input;
+      if (!userInput && messages && messages.length > 0) {
+        // Get the last user message from the messages array
+        const lastUserMessage = messages
+          .slice()
+          .reverse()
+          .find((msg) => msg.role === 'user');
+        userInput = lastUserMessage?.content || '';
+      }
+
+      if (!userInput) {
+        return reply.badRequest('Either "input" or "messages" with at least one user message is required');
+      }
+
       try {
-        const { chat, messages } = await chatService.prepareChatContext({
+        const result = await chatService.prepareChatContext({
           chatId,
           userId: request.user!.id,
-          input,
+          input: userInput,
           personalityId,
         });
+
+        if (!result) {
+          return reply.internalServerError('Failed to prepare chat context');
+        }
+
+        const { chat, messages: chatMessages } = result;
 
         const { approach } = context ?? {};
         const chatApproach = fastify.approaches.chat[approach ?? 'rrr'];
@@ -102,7 +138,7 @@ const chatApi: FastifyPluginAsync = async (
           reply.type('application/x-ndjson').send(buffer);
 
           const chunks = await chatApproach.runWithStreaming(
-            messages,
+            chatMessages,
             approachContext
           );
           let fullResponse = '';
@@ -137,7 +173,7 @@ const chatApi: FastifyPluginAsync = async (
 
           buffer.push(JSON.stringify({ chatId: chat.id, done: true }) + '\n');
         } else {
-          const response = await chatApproach.run(messages, approachContext);
+          const response = await chatApproach.run(chatMessages, approachContext);
 
           const assistantMessage = response.choices?.[0]?.message;
           if (assistantMessage) {

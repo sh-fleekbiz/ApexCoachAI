@@ -1,9 +1,20 @@
 import fp from 'fastify-plugin';
 import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 
 export default fp(async (fastify, _options): Promise<void> => {
+  // Prisma 7 requires an adapter for all databases
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) {
+    throw new Error('DATABASE_URL environment variable is required');
+  }
+
+  // Create PostgreSQL adapter
+  const adapter = new PrismaPg({ connectionString: databaseUrl });
+
   const prisma = new PrismaClient({
-    log: ['query', 'info', 'warn', 'error'],
+    adapter,
+    log: process.env.NODE_ENV === 'development' ? ['query', 'info', 'warn', 'error'] : ['warn', 'error'],
   });
 
   // Make Prisma Client available through the fastify instance

@@ -226,6 +226,7 @@ export async function initializeDatabase(): Promise<void> {
 // Seed default meta prompt if none exists
 export async function seedDefaultData(): Promise<void> {
   await withClient(async (client) => {
+    // Seed default meta prompt
     const result = await client.query(
       'SELECT COUNT(*) as count FROM meta_prompts'
     );
@@ -253,6 +254,61 @@ Remember: Real transformation starts from the inside out.`,
       );
 
       console.log('Default meta prompt seeded');
+    }
+
+    // Seed demo users if they don't exist
+    const demoUsersResult = await client.query(
+      'SELECT COUNT(*) as count FROM users WHERE is_demo = TRUE'
+    );
+    const demoUserCount = parseInt(demoUsersResult.rows[0].count, 10);
+
+    if (demoUserCount === 0) {
+      const bcrypt = await import('bcryptjs');
+      const demoUsers = [
+        {
+          email: 'demo.admin@apexcoachai.com',
+          password: 'demo123',
+          name: 'Alex Morgan',
+          role: 'ADMIN',
+          demo_role: 'admin',
+          demo_label: 'Admin Demo - Full Platform Access',
+        },
+        {
+          email: 'demo.coach@apexcoachai.com',
+          password: 'demo123',
+          name: 'Tim Johnson',
+          role: 'COACH',
+          demo_role: 'coach',
+          demo_label: 'Coach Demo - Inside Out Method Expert',
+        },
+        {
+          email: 'demo.client@apexcoachai.com',
+          password: 'demo123',
+          name: 'Michael Roberts',
+          role: 'USER',
+          demo_role: 'client',
+          demo_label: 'Client Demo - Seeking Relationship Help',
+        },
+      ];
+
+      for (const demoUser of demoUsers) {
+        const passwordHash = await bcrypt.default.hash(demoUser.password, 10);
+        await client.query(
+          `INSERT INTO users (email, password_hash, name, role, is_demo, demo_role, demo_label)
+           VALUES ($1, $2, $3, $4, TRUE, $5, $6)
+           ON CONFLICT (email) DO NOTHING`,
+          [
+            demoUser.email,
+            passwordHash,
+            demoUser.name,
+            demoUser.role,
+            demoUser.demo_role,
+            demoUser.demo_label,
+          ]
+        );
+      }
+
+      console.log('Demo users seeded');
     }
   });
 }

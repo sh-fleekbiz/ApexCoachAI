@@ -15,7 +15,7 @@
     --accent: 210 57% 92%; /* soft blue surface */
     --accent-foreground: 220 18% 18%;
     --muted: 220 12% 90%;
-    --muted-foreground: 220 10% 45%;
+    --muted-foreground: 220 10% 40%; /* Darker for better contrast (was 45%) */
     --primary-soft: color-mix(in srgb, hsl(var(--primary)) 15%, hsl(var(--surface)) 85%);
     --accent-soft: color-mix(in srgb, hsl(var(--accent)) 35%, hsl(var(--surface)) 65%);
     --destructive-strong: color-mix(in srgb, hsl(var(--destructive)) 85%, hsl(var(--surface)) 15%);
@@ -59,6 +59,11 @@
   *::before,
   *::after {
     box-sizing: border-box;
+  }
+
+  *:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
   }
 
   html,

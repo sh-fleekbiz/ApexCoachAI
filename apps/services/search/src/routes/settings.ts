@@ -6,9 +6,8 @@ const settings: FastifyPluginAsync = async (
   fastify,
   _options
 ): Promise<void> => {
-  // Get all meta prompts (personalities)
+  // Get all meta prompts (personalities) - public endpoint for frontend initialization
   fastify.get('/meta-prompts', {
-    preHandler: [fastify.authenticate],
     schema: {
       description: 'Get all meta prompts (personalities)',
       tags: ['settings'],
